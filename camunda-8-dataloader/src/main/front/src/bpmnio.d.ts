@@ -1,0 +1,1 @@
+declare module '@bpmn-io/element-template-icon-renderer';

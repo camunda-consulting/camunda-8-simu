@@ -1,0 +1,26 @@
+<h2>Deployed definitions</h2>
+<div class="container">
+  
+  <table class="table table-striped table-hover">
+    <thead class="table-dark ">
+      <tr>
+        <th scope="col">BPMN Process Id</th>
+        <th scope="col">Version</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="table-group-divider">
+      <tr *ngFor="let definition of definitions">
+        <td>
+          {{definition.bpmnProcessId}}
+        </td>
+        <td>
+          {{definition.version}}
+        </td>
+        <td>
+          <button (click)="openPlan(definition)" class="btn btn-dark"><i class="bi bi-pen"></i> Prepare execution plan</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

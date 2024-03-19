@@ -1,0 +1,37 @@
+<h2>Active instances</h2>
+<div class="container">
+  <button (click)="migrate()" class="btn btn-dark"><i class="bi bi-send"></i> Migrate</button>
+  <table class="table table-striped table-hover">
+    <thead class="table-dark ">
+      <tr>
+        <th scope="col">Should migrate</th>
+        <th scope="col">Process Instance</th>
+        <th scope="col">Migration</th>
+      </tr>
+    </thead>
+    <tbody class="table-group-divider">
+      <tr *ngFor="let instance of instances">
+        <td>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" [(ngModel)]="instance.migrate">
+          </div>
+        </td>
+        <td>
+          <b>Proces instance key{{instance.key}} </b> <br />
+          <i> (started on {{instance.startDate}})</i><br />
+          ProcessId : {{instance.bpmnProcessId}}, version <i>{{instance.processVersion}}</i>
+        </td>
+        <td>
+          <div *ngIf="instance.result">
+            Instance is migrated with process instance key : <b>{{instance.result.newProcessInstanceKey}}</b><br />
+            Flow Nodes activated are : <span *ngFor="let flowNode of instance.result.activeFlowNodes">
+              {{flowNode.flowNodeId}},
+            </span><br /><br />
+            Variables are :<br />{{JSON.stringify(instance.result.variables)}}<br />
+            
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
