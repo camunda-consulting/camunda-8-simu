@@ -1,12 +1,15 @@
 package org.example.camunda.dto;
 
 import io.camunda.operate.model.ProcessDefinition;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ExecutionPlan {
   private ProcessDefinition definition;
   private String xml;
   private Boolean xmlModified = false;
-  private InstantiationsPlan instantiationsPlan;
+  private PlanPrecisionEnum precision = PlanPrecisionEnum.DAY;
+  private List<Scenario> scenarii = new ArrayList<>();
 
   public ProcessDefinition getDefinition() {
     return definition;
@@ -32,11 +35,19 @@ public class ExecutionPlan {
     this.xmlModified = xmlModified;
   }
 
-  public InstantiationsPlan getInstantiationsPlan() {
-    return instantiationsPlan;
+  public PlanPrecisionEnum getPrecision() {
+    return precision;
   }
 
-  public void setInstantiationsPlan(InstantiationsPlan instantiationsPlan) {
-    this.instantiationsPlan = instantiationsPlan;
+  public void setPrecision(PlanPrecisionEnum precision) {
+    this.precision = precision;
+  }
+
+  public List<Scenario> getScenarii() {
+    return scenarii;
+  }
+
+  public void setScenarii(List<Scenario> scenarii) {
+    this.scenarii = scenarii;
   }
 }

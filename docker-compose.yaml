@@ -297,7 +297,7 @@ services:
       - xpack.security.enabled=false
       # allow running with low disk space
       - cluster.routing.allocation.disk.threshold_enabled=false
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "ES_JAVA_OPTS=-Xms1024m -Xmx2048m"
     ulimits:
       memlock:
         soft: -1

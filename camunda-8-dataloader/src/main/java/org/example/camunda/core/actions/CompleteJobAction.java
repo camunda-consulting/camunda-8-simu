@@ -1,6 +1,5 @@
 package org.example.camunda.core.actions;
 
-import java.io.IOException;
 import java.util.Map;
 import org.example.camunda.core.ZeebeService;
 
@@ -24,12 +23,6 @@ public class CompleteJobAction extends Action {
 
   @Override
   public void run() {
-    try {
-      this.getZeebeService()
-          .completeJob(this.jobKey, getVariables(this.payloadTemplate, variables));
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
+    this.getZeebeService().completeJob(this.jobKey, getVariables(this.payloadTemplate, variables));
   }
 }

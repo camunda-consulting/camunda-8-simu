@@ -3,9 +3,19 @@ package org.example.camunda.core;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.camunda.zeebe.client.ZeebeClient;
 import io.camunda.zeebe.client.api.command.ClientException;
+import io.camunda.zeebe.client.api.command.ClientStatusException;
+import io.camunda.zeebe.client.api.response.DeploymentEvent;
+import io.camunda.zeebe.client.api.worker.JobHandler;
+import io.camunda.zeebe.client.api.worker.JobWorker;
+import io.grpc.Status;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import org.example.camunda.service.ScenarioExecService;
+import org.example.camunda.utils.ThreadUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -16,6 +26,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 public class ZeebeService {
+  private static final Logger LOG = LoggerFactory.getLogger(ScenarioExecService.class);
 
   @Autowired private ZeebeClient zeebeClient;
   @Autowired private RestTemplate restTemplate;
@@ -27,12 +38,20 @@ public class ZeebeService {
   private boolean engineIdle = true;
   Timer engineIdleTimer = null;
 
+  public DeploymentEvent deploy(String name, String bpmnXml) {
+    return zeebeClient
+        .newDeployResourceCommand()
+        .addResourceString(bpmnXml, StandardCharsets.UTF_8, name)
+        .send()
+        .join();
+  }
+
   private synchronized void schedule(TimerTask task) {
     if (engineIdleTimer != null) {
       engineIdleTimer.cancel();
     }
     engineIdleTimer = new Timer();
-    engineIdleTimer.schedule(task, 600);
+    engineIdleTimer.schedule(task, 250);
   }
 
   public void zeebeWorks() {
@@ -59,7 +78,7 @@ public class ZeebeService {
     }
   }
 
-  public Long startProcessInstance(String bpmnProcessId, int version, Object variables) {
+  public Long startProcessInstance(String bpmnProcessId, Long version, Object variables) {
     zeebeWorks();
     try {
       return zeebeClient
@@ -71,13 +90,7 @@ public class ZeebeService {
           .join()
           .getProcessInstanceKey();
     } catch (ClientException e) {
-
-      try {
-        Thread.sleep(100);
-      } catch (InterruptedException e1) {
-        // TODO Auto-generated catch block
-        e1.printStackTrace();
-      }
+      ThreadUtils.pause(200);
       return startProcessInstance(bpmnProcessId, version, variables);
     }
   }
@@ -105,13 +118,27 @@ public class ZeebeService {
     try {
       this.zeebeClient.newCompleteCommand(jobKey).variables(variables).send().join();
     } catch (ClientException e) {
-      try {
-        Thread.sleep(100);
-      } catch (InterruptedException e1) {
-        // TODO Auto-generated catch block
-        e1.printStackTrace();
+      if (e instanceof ClientStatusException
+              && (((ClientStatusException) e).getStatus().getCode() == Status.Code.NOT_FOUND)
+          || (((ClientStatusException) e).getStatus().getCode() == Status.Code.CANCELLED)) {
+        LOG.error("Error completing " + jobKey, e);
+      } else {
+        ThreadUtils.pause(200);
+        completeJob(jobKey, variables);
       }
-      completeJob(jobKey, variables);
     }
+  }
+
+  public JobWorker createStreamingWorker(String jobType, JobHandler jobHandler) {
+    return this.zeebeClient
+        .newWorker()
+        .jobType(jobType)
+        .handler(jobHandler)
+        .name(jobType)
+        .maxJobsActive(100)
+        .timeout(2000)
+        // .streamTimeout()
+        .streamEnabled(true)
+        .open();
   }
 }

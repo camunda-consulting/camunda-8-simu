@@ -7,6 +7,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 import org.example.camunda.service.OperateService;
+import org.example.camunda.service.ScenarioExecService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
@@ -46,5 +47,29 @@ public class IntermediateCatchScheduler {
 
   public void stop() {
     scheduled.cancel(true);
+  }
+
+  public void start(ScenarioExecService scenarioExecService) {
+    scheduled =
+        taskScheduler.scheduleWithFixedDelay(
+            () -> {
+              try {
+                SearchResult<FlowNodeInstance> catchEventsResult =
+                    operateService.getIntermediateCatchEvents(this.searchAfter);
+                List<Object> newSearchAfter = catchEventsResult.getSortValues();
+                ;
+                if (newSearchAfter != null && !newSearchAfter.isEmpty()) {
+                  this.searchAfter = newSearchAfter;
+                }
+                for (FlowNodeInstance instance : catchEventsResult) {
+                  scenarioExecService.handleIntermediateEvent(instance);
+                }
+
+              } catch (OperateException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+              }
+            },
+            Duration.ofMillis(300));
   }
 }

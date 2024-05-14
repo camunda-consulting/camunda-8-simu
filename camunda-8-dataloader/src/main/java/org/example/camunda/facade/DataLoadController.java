@@ -1,12 +1,8 @@
 package org.example.camunda.facade;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
-import org.example.camunda.core.ScenarioExecutor;
-import org.example.camunda.core.StartPiScheduler;
-import org.example.camunda.core.model.Scenario;
-import org.example.camunda.simu.Simu;
+import org.example.camunda.service.ScenarioExecService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +24,13 @@ public class DataLoadController {
   @Value("${timers.from:operate}")
   private String timers;
 
-  @Autowired StartPiScheduler piScheduler;
-  @Autowired Simu simu;
-  @Autowired ScenarioExecutor scenarioExecutor;
+  @Autowired private ScenarioExecService scenarioExecService;
 
-  @GetMapping("/start")
+  // @Autowired StartPiScheduler piScheduler;
+  // @Autowired Simu simu;
+  // @Autowired ScenarioExecutor scenarioExecutor;
+
+  /*@GetMapping("/start")
   public void start() {
     List<Scenario> scenarii = simu.getScenarios();
     for (Scenario s : scenarii) {
@@ -40,33 +38,39 @@ public class DataLoadController {
     }
     scenarioExecutor.execute();
     // piScheduler.start();
-  }
+  }*/
 
   @PostMapping("/record/{timestamp}")
   public void catchIntermediateEvent(
       @PathVariable Long timestamp, @RequestBody Map<String, Object> processInstanceRecordValue)
       throws IOException {
-    // LOG.info("catch event at timestamp " + timestamp);
+    LOG.info("catch event at timestamp " + timestamp);
     // LOG.info(JsonUtils.toJson(processInstanceRecordValue));
 
     // {"tenantId":"<default>","bpmnProcessId":"simpleDataLoad","processDefinitionKey":2251799813685249,"processInstanceKey":2251799813687096,"elementId":"Event_1k51mvz","flowScopeKey":2251799813687096,"bpmnEventType":"TIMER","parentProcessInstanceKey":-1,"parentElementInstanceKey":-1,"bpmnElementType":"INTERMEDIATE_CATCH_EVENT","bpmnProcessIdBuffer":{"expandable":false},"elementIdBuffer":{"expandable":false},"version":1,"encodedLength":275,"length":275,"empty":false}
     if (!timers.equals("operate")) {
       // timestamp is not relyable as not based on internal clock
-      scenarioExecutor.executeIntermediateEvent(
+      /*scenarioExecutor.executeIntermediateEvent(
+      (Long) processInstanceRecordValue.get("processInstanceKey"),
+      (String) processInstanceRecordValue.get("elementId"));
+      */
+      scenarioExecService.handleIntermediateEvent(
           (Long) processInstanceRecordValue.get("processInstanceKey"),
-          (String) processInstanceRecordValue.get("elementId"));
+          (String) processInstanceRecordValue.get("elementId"),
+          timestamp);
     }
   }
 
   @GetMapping("/engine/idle")
   public void catchIdle() {
     if (!timers.equals("operate")) {
-      scenarioExecutor.nextTimedActions();
+      scenarioExecService.nextTimedAction();
+      // scenarioExecutor.nextTimedActions();
     }
   }
 
-  @GetMapping("/stop")
+  /*@GetMapping("/stop")
   public void stop() {
     piScheduler.stop();
-  }
+  }*/
 }

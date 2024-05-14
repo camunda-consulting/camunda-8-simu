@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -20,19 +22,21 @@ public class JsonUtils {
   private static ObjectMapper mapper;
 
   public static Object eventuallyJsonNode(String someString) {
-    try {
-      return toJsonNode(someString);
-    } catch (IOException e) {
-      return someString;
-    }
+    return toJsonNode(someString);
   }
 
   public static JsonNode toJsonNode(InputStream is) throws IOException {
     return getObjectMapper().readTree(is);
   }
 
-  public static JsonNode toJsonNode(String json) throws IOException {
-    return getObjectMapper().readTree(json);
+  public static JsonNode toJsonNode(String json) {
+    try {
+      return getObjectMapper().readTree(json);
+    } catch (JsonProcessingException e) {
+      ObjectNode node = getObjectMapper().createObjectNode();
+      node.put("error", "Exception reading the template : " + e.getLocalizedMessage());
+      return node;
+    }
   }
 
   public static <T> T toObject(String json, Class<T> type) {
@@ -70,6 +74,7 @@ public class JsonUtils {
   private static ObjectMapper getObjectMapper() {
     if (mapper == null) {
       mapper = new ObjectMapper();
+      mapper.registerModule(new JavaTimeModule());
       mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
     return mapper;

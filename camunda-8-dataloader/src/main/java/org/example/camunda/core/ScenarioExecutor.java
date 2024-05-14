@@ -15,7 +15,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import org.example.camunda.core.actions.Action;
 import org.example.camunda.core.actions.CompleteJobAction;
-import org.example.camunda.core.actions.StartInstancesAction;
 import org.example.camunda.core.model.Scenario;
 import org.example.camunda.core.model.Step;
 import org.example.camunda.core.model.StepType;
@@ -43,9 +42,10 @@ public class ScenarioExecutor {
     scenarii.add(scenario);
     Step firstStep = scenario.getSteps().get(0);
     if (firstStep.getType() == StepType.START) {
-      addAction(
-          firstStep.getTimeBeforeCompletion(),
-          new StartInstancesAction(scenario, this.zeebeService, processInstanceScenarioMap));
+      /*addAction(
+            firstStep.getTimeBeforeCompletion(),
+            new StartInstancesAction(scenario, 1, this.zeebeService, processInstanceScenarioMap));
+      */
     }
   }
 

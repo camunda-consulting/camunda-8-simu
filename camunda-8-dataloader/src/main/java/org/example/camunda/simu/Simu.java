@@ -21,15 +21,15 @@ public class Simu {
       }
     }*/
 
-    for (long i = 0; i < 60; i++) {
-      long nbInstances = 10 + Math.round(Math.random() * i);
+    for (long i = 0; i < 90; i++) {
+      long nbInstances = 5 + Math.round(Math.random() * i);
       for (long j = 0; j < nbInstances; j++) {
         if (j % 4 == 0) {
           result.add(buildScenario2(i * 86400000));
-          result.add(buildScenario2(i * 12400000));
+          result.add(buildScenario2(i * 86400000 + 43200000));
         } else {
           result.add(buildScenario1(i * 96400000));
-          result.add(buildScenario1(i * 14400000));
+          result.add(buildScenario1(i * 96400000 + 43200000));
         }
       }
     }

@@ -4,6 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -124,6 +126,37 @@ public class BpmnUtils {
       }
     }
     return null;
+  }
+
+  public static List<String> getServiceTasksElementsId(Document xmlDocument) {
+    return getElementsIds(xmlDocument, "bpmn2:serviceTask");
+  }
+
+  public static List<String> getUserTasksElementsId(Document xmlDocument) {
+    return getElementsIds(xmlDocument, "bpmn2:userTask");
+  }
+
+  public static List<String> getElementsIds(Document xmlDocument, String tagName) {
+    NodeList nodeList = xmlDocument.getElementsByTagName(tagName);
+    List<String> result = new ArrayList<>();
+    for (int i = 0; i < nodeList.getLength(); i++) {
+      result.add(nodeList.item(i).getAttributes().getNamedItem("id").getNodeValue());
+    }
+    return result;
+  }
+
+  public static List<String> getJobTypes(String xml) {
+    return getJobTypes(getXmlDocument(xml));
+  }
+
+  public static List<String> getJobTypes(Document xmlDocument) {
+    List<String> result = new ArrayList<>();
+    result.add("io.camunda.zeebe:userTask");
+    NodeList nodeList = xmlDocument.getElementsByTagName("zeebe:taskDefinition");
+    for (int i = 0; i < nodeList.getLength(); i++) {
+      result.add(nodeList.item(i).getAttributes().getNamedItem("type").getNodeValue());
+    }
+    return result;
   }
 
   public static String getLinkedStartingFormId(Document xmlDocument) {

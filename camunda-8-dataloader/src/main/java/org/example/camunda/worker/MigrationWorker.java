@@ -1,17 +1,10 @@
 package org.example.camunda.worker;
 
-import io.camunda.zeebe.client.api.response.ActivatedJob;
-import io.camunda.zeebe.spring.client.annotation.JobWorker;
-import io.camunda.zeebe.spring.client.annotation.VariablesAsType;
-import java.io.IOException;
-import java.util.Map;
-import org.example.camunda.core.ScenarioExecutor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class MigrationWorker {
-
+  /*
   @Autowired private ScenarioExecutor scenarioExecutor;
 
   @JobWorker(autoComplete = false)
@@ -31,4 +24,5 @@ public class MigrationWorker {
       throws IOException {
     this.scenarioExecutor.executeWorker(job, variables);
   }
+  */
 }

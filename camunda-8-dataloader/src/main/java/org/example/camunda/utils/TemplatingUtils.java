@@ -1,6 +1,7 @@
 package org.example.camunda.utils;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
 
@@ -35,5 +36,24 @@ public class TemplatingUtils {
     // code.append(rand.nextInt(89) + 10);
 
     return code.toString();
+  }
+
+  public static int counter = 0;
+
+  public static String generateUUID(String prefix) {
+    // for demo reasons we generate something readable
+    if (counter == 0) {
+      counter =
+          Calendar.getInstance().get(Calendar.MINUTE) + Calendar.getInstance().get(Calendar.SECOND);
+    } else {
+      counter++;
+    }
+    String result = prefix + Calendar.getInstance().get(Calendar.DAY_OF_YEAR) + counter;
+    return result;
+  }
+
+  public static long range(long min, long max) {
+    long dif = max - min;
+    return min + Math.round(Math.random() * dif);
   }
 }
