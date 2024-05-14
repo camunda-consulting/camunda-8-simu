@@ -8,7 +8,6 @@ import io.camunda.zeebe.client.api.worker.JobHandler;
 import io.camunda.zeebe.client.api.worker.JobWorker;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
@@ -118,9 +117,9 @@ public class ScenarioExecService {
   }
 
   private void prepareInstances(Scenario scenario) {
-    Long time = scenario.getFirstDay().atStartOfDay(ZoneId.systemDefault()).toEpochSecond() * 1000;
+    Long time = scenario.getFirstDay().toEpochSecond() * 1000;
     if (scenario.getPrecision().equals(PlanPrecisionEnum.DAY)) {
-      long duration = ChronoUnit.DAYS.between(scenario.getFirstDay(), scenario.getLastDay());
+      long duration = ChronoUnit.DAYS.between(scenario.getFirstDay(), scenario.getLastDay()) + 1;
       for (double x = 0; x < duration; x++) {
         long nbInstances = calculateInstances(scenario, x / duration);
         addAction(

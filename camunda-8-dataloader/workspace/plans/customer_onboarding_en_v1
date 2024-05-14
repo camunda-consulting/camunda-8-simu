@@ -12,16 +12,8 @@
   "scenarii": [
     {
       "name": "Green scenario",
-      "firstDay": [
-        2024,
-        1,
-        20
-      ],
-      "lastDay": [
-        2024,
-        4,
-        20
-      ],
+      "firstDayFeelExpression": "now() - duration(\"P3M\")",
+      "lastDayFeelExpression": "now()",
       "nbInstancesStart": 10,
       "nbInstancesEnd": 100,
       "evolution": "LINEAR",
@@ -117,16 +109,8 @@
     },
     {
       "name": "Red",
-      "firstDay": [
-        2024,
-        1,
-        20
-      ],
-      "lastDay": [
-        2024,
-        4,
-        20
-      ],
+      "firstDayFeelExpression": "now() - duration(\"P2M\")",
+      "lastDayFeelExpression": "now()",
       "nbInstancesStart": 5,
       "nbInstancesEnd": 40,
       "evolution": "LINEAR_SALTED",
@@ -222,16 +206,8 @@
     },
     {
       "name": "Yellow",
-      "firstDay": [
-        2024,
-        1,
-        20
-      ],
-      "lastDay": [
-        2024,
-        4,
-        20
-      ],
+      "firstDayFeelExpression": "now() - duration(\"P3M\")",
+      "lastDayFeelExpression": "now() - duration(\"P1M\")",
       "nbInstancesStart": 30,
       "nbInstancesEnd": 5,
       "evolution": "LINEAR",

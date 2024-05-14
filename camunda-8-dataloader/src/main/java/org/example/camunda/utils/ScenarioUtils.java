@@ -1,6 +1,5 @@
 package org.example.camunda.utils;
 
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import org.example.camunda.dto.Scenario;
@@ -16,8 +15,8 @@ public class ScenarioUtils {
     List<String> serviceTaskIds = BpmnUtils.getServiceTasksElementsId(doc);
 
     Scenario result = new Scenario();
-    result.setFirstDay(LocalDate.now().minusMonths(3));
-    result.setLastDay(LocalDate.now());
+    result.setFirstDayFeelExpression("now() - duration(\"P3M\")");
+    result.setLastDayFeelExpression("now()");
     result.setNbInstancesStart(10);
     result.setNbInstancesEnd(100);
     result.setEvolution(ScenarioProgressionEnum.LINEAR);

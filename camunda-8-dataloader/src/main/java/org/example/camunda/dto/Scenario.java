@@ -1,16 +1,18 @@
 package org.example.camunda.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.Map;
+import org.camunda.feel.syntaxtree.ValDateTime;
+import org.example.camunda.utils.FeelUtils;
 
 public class Scenario {
   private String name;
   @JsonIgnore private String bpmnProcessId;
   @JsonIgnore private Long version = -1L;
   @JsonIgnore private PlanPrecisionEnum precision;
-  private LocalDate firstDay;
-  private LocalDate lastDay;
+  private String firstDayFeelExpression;
+  private String lastDayFeelExpression;
   private Integer nbInstancesStart;
   private Integer nbInstancesEnd;
   private ScenarioProgressionEnum evolution;
@@ -52,20 +54,28 @@ public class Scenario {
     this.precision = precision;
   }
 
-  public LocalDate getFirstDay() {
-    return firstDay;
+  public String getFirstDayFeelExpression() {
+    return firstDayFeelExpression;
   }
 
-  public void setFirstDay(LocalDate firstDay) {
-    this.firstDay = firstDay;
+  public void setFirstDayFeelExpression(String firstDayFeelExpression) {
+    this.firstDayFeelExpression = firstDayFeelExpression;
   }
 
-  public LocalDate getLastDay() {
-    return lastDay;
+  public String getLastDayFeelExpression() {
+    return lastDayFeelExpression;
   }
 
-  public void setLastDay(LocalDate lastDay) {
-    this.lastDay = lastDay;
+  public void setLastDayFeelExpression(String lastDayFeelExpression) {
+    this.lastDayFeelExpression = lastDayFeelExpression;
+  }
+
+  public ZonedDateTime getFirstDay() {
+    return FeelUtils.evaluate(firstDayFeelExpression, ValDateTime.class).value();
+  }
+
+  public ZonedDateTime getLastDay() {
+    return FeelUtils.evaluate(lastDayFeelExpression, ValDateTime.class).value();
   }
 
   public Integer getNbInstancesStart() {

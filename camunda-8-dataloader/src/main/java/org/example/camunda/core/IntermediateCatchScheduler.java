@@ -21,30 +21,6 @@ public class IntermediateCatchScheduler {
   private ScheduledFuture<?> scheduled;
   private List<Object> searchAfter = null;
 
-  public void start(ScenarioExecutor executor) {
-    scheduled =
-        taskScheduler.scheduleWithFixedDelay(
-            () -> {
-              try {
-                SearchResult<FlowNodeInstance> catchEventsResult =
-                    operateService.getIntermediateCatchEvents(this.searchAfter);
-                List<Object> newSearchAfter = catchEventsResult.getSortValues();
-                ;
-                if (newSearchAfter != null && !newSearchAfter.isEmpty()) {
-                  this.searchAfter = newSearchAfter;
-                }
-                for (FlowNodeInstance instance : catchEventsResult) {
-                  executor.executeIntermediateEvent(instance);
-                }
-
-              } catch (OperateException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-              }
-            },
-            Duration.ofMillis(300));
-  }
-
   public void stop() {
     scheduled.cancel(true);
   }
