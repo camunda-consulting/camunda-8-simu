@@ -22,7 +22,6 @@ import org.example.camunda.core.actions.Action;
 import org.example.camunda.core.actions.CompleteJobAction;
 import org.example.camunda.core.actions.StartInstancesAction;
 import org.example.camunda.dto.ExecutionPlan;
-import org.example.camunda.dto.PlanPrecisionEnum;
 import org.example.camunda.dto.Scenario;
 import org.example.camunda.dto.ScenarioProgressionEnum;
 import org.example.camunda.dto.StepActionEnum;
@@ -117,32 +116,77 @@ public class ScenarioExecService {
   }
 
   private void prepareInstances(Scenario scenario) {
-    Long time = scenario.getFirstDay().toEpochSecond() * 1000;
-    if (scenario.getPrecision().equals(PlanPrecisionEnum.DAY)) {
-      long duration = ChronoUnit.DAYS.between(scenario.getFirstDay(), scenario.getLastDay()) + 1;
-      for (double x = 0; x < duration; x++) {
-        long nbInstances = calculateInstances(scenario, x / duration);
-        addAction(
-            time,
-            new StartInstancesAction(
-                scenario, nbInstances, this.zeebeService, processInstanceScenarioMap));
-        time = time + 86400000;
-      }
-    } else {
-      throw new UnsupportedOperationException("DAY precision is the only supported one");
+    long time = scenario.getFirstDay().withHour(scenario.getDayTimeStart()).toEpochSecond() * 1000;
+
+    long durationInDays =
+        ChronoUnit.DAYS.between(scenario.getFirstDay(), scenario.getLastDay()) + 1;
+    for (double x = 0; x < durationInDays; x++) {
+      long nbInstancesPerDay = calculateInstancesPerDay(scenario, x / durationInDays);
+      addInstancesWithDesiredPrecision(time, nbInstancesPerDay, scenario);
+
+      time = time + 86400000;
     }
   }
 
-  private long calculateInstances(Scenario scenario, double fraction) {
+  private void addInstancesWithDesiredPrecision(
+      long time, long nbInstancesPerDay, Scenario scenario) {
+    if (scenario.getPrecision() == ChronoUnit.DAYS) {
+      addAction(
+          time,
+          new StartInstancesAction(
+              scenario, nbInstancesPerDay, this.zeebeService, processInstanceScenarioMap));
+    } else if (scenario.getPrecision() == ChronoUnit.HALF_DAYS) {
+      addAction(
+          time,
+          new StartInstancesAction(
+              scenario, nbInstancesPerDay / 2, this.zeebeService, processInstanceScenarioMap));
+      int nextround = (scenario.getDayTimeEnd() - scenario.getDayTimeStart()) / 2;
+      addAction(
+          time + nextround * ChronoUnit.HOURS.getDuration().toMillis(),
+          new StartInstancesAction(
+              scenario, nbInstancesPerDay / 2, this.zeebeService, processInstanceScenarioMap));
+
+    } else if (scenario.getPrecision() == ChronoUnit.HOURS) {
+      int nbHours = scenario.getDayTimeEnd() - scenario.getDayTimeStart();
+      long nbInstancesPerHour = nbInstancesPerDay / nbHours;
+      long residual = nbInstancesPerDay - nbInstancesPerHour * nbHours;
+      for (int i = 0; i < nbHours; i++) {
+        long nbInstances = nbInstancesPerHour + (residual-- > 0 ? 1 : 0);
+        if (nbInstances > 0) {
+          addAction(
+              time + i * ChronoUnit.HOURS.getDuration().toMillis(),
+              new StartInstancesAction(
+                  scenario, nbInstances, this.zeebeService, processInstanceScenarioMap));
+        }
+      }
+    } else if (scenario.getPrecision() == ChronoUnit.MINUTES) {
+      int nbMinutes = (scenario.getDayTimeEnd() - scenario.getDayTimeStart()) * 60;
+      long nbInstancesPerMinute = nbInstancesPerDay / nbMinutes;
+      long residual = nbInstancesPerDay - nbInstancesPerMinute * nbMinutes;
+      long residualDistrib = nbMinutes / residual;
+      for (int i = 0; i < nbMinutes; i++) {
+        long nbInstances = nbInstancesPerMinute + (i % residualDistrib == 0 ? 1 : 0);
+        if (nbInstances > 0) {
+          addAction(
+              time + i * ChronoUnit.MINUTES.getDuration().toMillis(),
+              new StartInstancesAction(
+                  scenario, nbInstances, this.zeebeService, processInstanceScenarioMap));
+        }
+      }
+    }
+  }
+
+  private long calculateInstancesPerDay(Scenario scenario, double progress) {
+
     int difference = scenario.getNbInstancesEnd() - scenario.getNbInstancesStart();
     if (scenario.getEvolution() == ScenarioProgressionEnum.LINEAR) {
-      return scenario.getNbInstancesStart() + Math.round(difference * fraction);
+      return scenario.getNbInstancesStart() + Math.round(difference * progress);
     }
     if (scenario.getEvolution() == ScenarioProgressionEnum.LINEAR_SALTED) {
       long saltDif = scenario.getSaltMax() - scenario.getSaltMin();
       long salt = Math.round(Math.random() * saltDif) + scenario.getSaltMin();
       long multiplier = (Math.round(Math.random()) < 1) ? -1 : 1;
-      return scenario.getNbInstancesStart() + Math.round(difference * fraction) + salt * multiplier;
+      return scenario.getNbInstancesStart() + Math.round(difference * progress) + salt * multiplier;
     }
     return 0;
   }

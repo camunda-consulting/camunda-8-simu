@@ -2,6 +2,7 @@ package org.example.camunda.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import org.camunda.feel.syntaxtree.ValDateTime;
 import org.example.camunda.utils.FeelUtils;
@@ -10,7 +11,9 @@ public class Scenario {
   private String name;
   @JsonIgnore private String bpmnProcessId;
   @JsonIgnore private Long version = -1L;
-  @JsonIgnore private PlanPrecisionEnum precision;
+  @JsonIgnore private ChronoUnit precision;
+  private int dayTimeStart = 9;
+  private int dayTimeEnd = 18;
   private String firstDayFeelExpression;
   private String lastDayFeelExpression;
   private Integer nbInstancesStart;
@@ -46,12 +49,28 @@ public class Scenario {
     this.version = version;
   }
 
-  public PlanPrecisionEnum getPrecision() {
+  public ChronoUnit getPrecision() {
     return precision;
   }
 
-  public void setPrecision(PlanPrecisionEnum precision) {
+  public void setPrecision(ChronoUnit precision) {
     this.precision = precision;
+  }
+
+  public int getDayTimeStart() {
+    return dayTimeStart;
+  }
+
+  public void setDayTimeStart(int dayTimeStart) {
+    this.dayTimeStart = dayTimeStart;
+  }
+
+  public int getDayTimeEnd() {
+    return dayTimeEnd;
+  }
+
+  public void setDayTimeEnd(int dayTimeEnd) {
+    this.dayTimeEnd = dayTimeEnd;
   }
 
   public String getFirstDayFeelExpression() {

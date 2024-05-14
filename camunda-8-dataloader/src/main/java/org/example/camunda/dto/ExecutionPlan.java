@@ -1,6 +1,7 @@
 package org.example.camunda.dto;
 
 import io.camunda.operate.model.ProcessDefinition;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +9,7 @@ public class ExecutionPlan {
   private ProcessDefinition definition;
   private String xml;
   private Boolean xmlModified = false;
-  private PlanPrecisionEnum precision = PlanPrecisionEnum.DAY;
+  private ChronoUnit precision = ChronoUnit.DAYS;
   private List<Scenario> scenarii = new ArrayList<>();
 
   public ProcessDefinition getDefinition() {
@@ -35,11 +36,11 @@ public class ExecutionPlan {
     this.xmlModified = xmlModified;
   }
 
-  public PlanPrecisionEnum getPrecision() {
+  public ChronoUnit getPrecision() {
     return precision;
   }
 
-  public void setPrecision(PlanPrecisionEnum precision) {
+  public void setPrecision(ChronoUnit precision) {
     this.precision = precision;
   }
 
