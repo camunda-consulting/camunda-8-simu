@@ -1,6 +1,6 @@
 package org.example.camunda.dto;
 
-public enum ScenarioProgressionEnum {
+public enum ProgressionEnum {
   LINEAR,
   LINEAR_SALTED
 }

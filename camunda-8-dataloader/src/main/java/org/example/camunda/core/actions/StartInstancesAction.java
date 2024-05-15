@@ -1,25 +1,22 @@
 package org.example.camunda.core.actions;
 
-import java.util.Map;
 import org.example.camunda.core.ZeebeService;
 import org.example.camunda.dto.Scenario;
+import org.example.camunda.utils.ContextUtils;
 
 public class StartInstancesAction extends Action {
 
   private Scenario scenario;
   private long nbInstances;
-  private Map<Long, Scenario> scenarioMap;
+  private Double progress;
 
   public StartInstancesAction(
-      Scenario scenario,
-      long nbInstances,
-      ZeebeService zeebeService,
-      Map<Long, Scenario> scenarioMap) {
+      Scenario scenario, long nbInstances, ZeebeService zeebeService, Double progress) {
     super();
     this.scenario = scenario;
     this.nbInstances = nbInstances;
     this.setZeebeService(zeebeService);
-    this.scenarioMap = scenarioMap;
+    this.progress = progress;
   }
 
   @Override
@@ -33,7 +30,7 @@ public class StartInstancesAction extends Action {
                     this.scenario.getBpmnProcessId(),
                     this.scenario.getVersion(),
                     getVariables(this.scenario.getJsonTemplate(), null));
-        scenarioMap.put(processInstanceKey, this.scenario);
+        ContextUtils.addInstance(processInstanceKey, this.scenario, this.progress);
       }
     } catch (Exception e) {
       e.printStackTrace();

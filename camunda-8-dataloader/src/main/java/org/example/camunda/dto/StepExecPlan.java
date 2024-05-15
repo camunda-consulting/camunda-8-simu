@@ -4,9 +4,7 @@ public class StepExecPlan {
   private String elementId;
   private StepActionEnum action = StepActionEnum.COMPLETE;
   // COMPLETE
-  private Integer avgDuration = 5000;
-  private Integer maxDuration = 10000;
-  private Integer minDuration = 1000;
+  private StepDuration duration;
   // CLOCK
   private Long timeAdvance = 1000L;
   // MSG
@@ -33,28 +31,12 @@ public class StepExecPlan {
     this.action = action;
   }
 
-  public Integer getAvgDuration() {
-    return avgDuration;
+  public StepDuration getDuration() {
+    return duration;
   }
 
-  public void setAvgDuration(Integer avgDuration) {
-    this.avgDuration = avgDuration;
-  }
-
-  public Integer getMaxDuration() {
-    return maxDuration;
-  }
-
-  public void setMaxDuration(Integer maxDuration) {
-    this.maxDuration = maxDuration;
-  }
-
-  public Integer getMinDuration() {
-    return minDuration;
-  }
-
-  public void setMinDuration(Integer minDuration) {
-    this.minDuration = minDuration;
+  public void setDuration(StepDuration duration) {
+    this.duration = duration;
   }
 
   public Long getTimeAdvance() {

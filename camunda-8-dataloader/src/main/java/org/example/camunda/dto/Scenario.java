@@ -11,14 +11,15 @@ public class Scenario {
   private String name;
   @JsonIgnore private String bpmnProcessId;
   @JsonIgnore private Long version = -1L;
-  @JsonIgnore private ChronoUnit precision;
+  @JsonIgnore private ChronoUnit instanceDistribution;
+  @JsonIgnore private TimePrecisionEnum timePrecision = TimePrecisionEnum.HUNDRED_MILLIS;
   private int dayTimeStart = 9;
   private int dayTimeEnd = 18;
   private String firstDayFeelExpression;
   private String lastDayFeelExpression;
   private Integer nbInstancesStart;
   private Integer nbInstancesEnd;
-  private ScenarioProgressionEnum evolution;
+  private ProgressionEnum evolution;
   private Integer saltMin;
   private Integer saltMax;
   private Map<String, StepExecPlan> steps;
@@ -49,12 +50,20 @@ public class Scenario {
     this.version = version;
   }
 
-  public ChronoUnit getPrecision() {
-    return precision;
+  public ChronoUnit getInstanceDistribution() {
+    return instanceDistribution;
   }
 
-  public void setPrecision(ChronoUnit precision) {
-    this.precision = precision;
+  public void setInstanceDistribution(ChronoUnit instanceDistribution) {
+    this.instanceDistribution = instanceDistribution;
+  }
+
+  public TimePrecisionEnum getTimePrecision() {
+    return timePrecision;
+  }
+
+  public void setTimePrecision(TimePrecisionEnum timePrecision) {
+    this.timePrecision = timePrecision;
   }
 
   public int getDayTimeStart() {
@@ -113,11 +122,11 @@ public class Scenario {
     this.nbInstancesEnd = nbInstancesEnd;
   }
 
-  public ScenarioProgressionEnum getEvolution() {
+  public ProgressionEnum getEvolution() {
     return evolution;
   }
 
-  public void setEvolution(ScenarioProgressionEnum evolution) {
+  public void setEvolution(ProgressionEnum evolution) {
     this.evolution = evolution;
   }
 
