@@ -1,11 +1,8 @@
 package org.example.camunda.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
-import org.camunda.feel.syntaxtree.ValDateTime;
-import org.example.camunda.utils.FeelUtils;
 
 public class Scenario {
   private String name;
@@ -96,14 +93,6 @@ public class Scenario {
 
   public void setLastDayFeelExpression(String lastDayFeelExpression) {
     this.lastDayFeelExpression = lastDayFeelExpression;
-  }
-
-  public ZonedDateTime getFirstDay() {
-    return FeelUtils.evaluate(firstDayFeelExpression, ValDateTime.class).value();
-  }
-
-  public ZonedDateTime getLastDay() {
-    return FeelUtils.evaluate(lastDayFeelExpression, ValDateTime.class).value();
   }
 
   public Integer getNbInstancesStart() {

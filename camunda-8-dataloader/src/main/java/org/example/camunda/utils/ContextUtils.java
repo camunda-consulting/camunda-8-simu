@@ -16,6 +16,8 @@ import org.example.camunda.dto.TimePrecisionEnum;
 
 public class ContextUtils {
 
+  private static Map<String, String> dateTimers = new HashMap<>();
+  private static Map<String, String> durationTimers = new HashMap<>();
   private static SortedMap<Long, List<Action>> timedActions = new TreeMap<>();
   private static Map<Long, InstanceContext> processInstanceScenarioMap = new HashMap<>();
   private static Set<String> minHandledMap = new HashSet<>();
@@ -80,6 +82,8 @@ public class ContextUtils {
   }
 
   public static void clean() {
+    durationTimers.clear();
+    dateTimers.clear();
     processInstanceScenarioMap.clear();
     minHandledMap.clear();
     maxHandledMap.clear();
@@ -97,5 +101,29 @@ public class ContextUtils {
 
   public static boolean shouldComputeMax(Long processInstanceKey) {
     return maxProcessInstances.contains(processInstanceKey);
+  }
+
+  public static void addDateTimer(String flowNodeId, String date) {
+    dateTimers.put(flowNodeId, date);
+  }
+
+  public static void addDurationTimer(String flowNodeId, String durationFeelExpression) {
+    durationTimers.put(flowNodeId, durationFeelExpression);
+  }
+
+  public static boolean isDateTimer(String flowNodeId) {
+    return dateTimers.containsKey(flowNodeId);
+  }
+
+  public static boolean isDurationTimer(String flowNodeId) {
+    return durationTimers.containsKey(flowNodeId);
+  }
+
+  public static String getDateTimer(String flowNodeId) {
+    return dateTimers.get(flowNodeId);
+  }
+
+  public static String getDurationTimer(String flowNodeId) {
+    return durationTimers.get(flowNodeId);
   }
 }

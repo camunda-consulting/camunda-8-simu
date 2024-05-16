@@ -40,24 +40,14 @@ public class DataLoadController {
     // piScheduler.start();
   }*/
 
-  @PostMapping("/record/{timestamp}")
+  @PostMapping("/record/{dueTimestamp}")
   public void catchIntermediateEvent(
-      @PathVariable Long timestamp, @RequestBody Map<String, Object> processInstanceRecordValue)
+      @PathVariable Long dueTimestamp, @RequestBody Map<String, Object> processInstanceRecordValue)
       throws IOException {
-    LOG.info("catch event at timestamp " + timestamp);
-    // LOG.info(JsonUtils.toJson(processInstanceRecordValue));
-
-    // {"tenantId":"<default>","bpmnProcessId":"simpleDataLoad","processDefinitionKey":2251799813685249,"processInstanceKey":2251799813687096,"elementId":"Event_1k51mvz","flowScopeKey":2251799813687096,"bpmnEventType":"TIMER","parentProcessInstanceKey":-1,"parentElementInstanceKey":-1,"bpmnElementType":"INTERMEDIATE_CATCH_EVENT","bpmnProcessIdBuffer":{"expandable":false},"elementIdBuffer":{"expandable":false},"version":1,"encodedLength":275,"length":275,"empty":false}
+    LOG.info("catch event due at timestamp " + dueTimestamp);
     if (!timers.equals("operate")) {
-      // timestamp is not relyable as not based on internal clock
-      /*scenarioExecutor.executeIntermediateEvent(
-      (Long) processInstanceRecordValue.get("processInstanceKey"),
-      (String) processInstanceRecordValue.get("elementId"));
-      */
-      scenarioExecService.handleIntermediateEvent(
-          (Long) processInstanceRecordValue.get("processInstanceKey"),
-          (String) processInstanceRecordValue.get("elementId"),
-          timestamp);
+
+      scenarioExecService.handleIntermediateEvent(dueTimestamp);
     }
   }
 

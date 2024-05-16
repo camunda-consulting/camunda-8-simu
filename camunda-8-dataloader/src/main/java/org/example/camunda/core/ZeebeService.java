@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import org.example.camunda.service.ScenarioExecService;
+import org.example.camunda.utils.FeelUtils;
 import org.example.camunda.utils.ThreadUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +52,7 @@ public class ZeebeService {
       engineIdleTimer.cancel();
     }
     engineIdleTimer = new Timer();
-    engineIdleTimer.schedule(task, 250);
+    engineIdleTimer.schedule(task, 300);
   }
 
   public void zeebeWorks() {
@@ -101,6 +102,8 @@ public class ZeebeService {
     HttpEntity<String> request = new HttpEntity<>("{\"epochMilli\": " + time + "}", headers);
     Map<String, Object> result =
         restTemplate.postForObject(gatewayActuator + "/clock/pin", request, Map.class);
+    FeelUtils.setClock(time);
+    zeebeWorks();
     return (long) result.get("epochMilli");
   }
 

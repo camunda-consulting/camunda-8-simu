@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -129,18 +131,44 @@ public class BpmnUtils {
   }
 
   public static List<String> getServiceTasksElementsId(Document xmlDocument) {
-    return getElementsIds(xmlDocument, "bpmn2:serviceTask");
+    return getElementsIds(xmlDocument, List.of("bpmn2:serviceTask", "bpmn:serviceTask"));
   }
 
   public static List<String> getUserTasksElementsId(Document xmlDocument) {
-    return getElementsIds(xmlDocument, "bpmn2:userTask");
+    return getElementsIds(xmlDocument, List.of("bpmn2:userTask", "bpmn:userTask"));
   }
 
-  public static List<String> getElementsIds(Document xmlDocument, String tagName) {
-    NodeList nodeList = xmlDocument.getElementsByTagName(tagName);
-    List<String> result = new ArrayList<>();
+  public static Map<String, String> getTimerCatchEvents(String xml) {
+    Document doc = getXmlDocument(xml);
+    NodeList nodeList = doc.getElementsByTagName("bpmn:intermediateCatchEvent");
+    Map<String, String> timers = new HashMap<>();
     for (int i = 0; i < nodeList.getLength(); i++) {
-      result.add(nodeList.item(i).getAttributes().getNamedItem("id").getNodeValue());
+      Node node = nodeList.item(i);
+      NodeList timerList = ((Element) node).getElementsByTagName("bpmn:timerEventDefinition");
+      if (timerList.getLength() == 1) {
+        String flowNode = node.getAttributes().getNamedItem("id").getNodeValue();
+        Element timerDef = ((Element) (timerList.item(0)));
+        NodeList durations = timerDef.getElementsByTagName("bpmn:timeDuration");
+        if (durations.getLength() == 1) {
+          timers.put(flowNode, "duration:" + durations.item(0).getNodeValue());
+        } else {
+          NodeList dates = timerDef.getElementsByTagName("bpmn:timeDate");
+          if (dates.getLength() == 1) {
+            timers.put(flowNode, "date:" + dates.item(0).getNodeValue());
+          }
+        }
+      }
+    }
+    return timers;
+  }
+
+  public static List<String> getElementsIds(Document xmlDocument, List<String> tagNames) {
+    List<String> result = new ArrayList<>();
+    for (String tagName : tagNames) {
+      NodeList nodeList = xmlDocument.getElementsByTagName(tagName);
+      for (int i = 0; i < nodeList.getLength(); i++) {
+        result.add(nodeList.item(i).getAttributes().getNamedItem("id").getNodeValue());
+      }
     }
     return result;
   }

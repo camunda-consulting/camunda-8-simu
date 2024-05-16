@@ -7,9 +7,11 @@ import io.camunda.zeebe.client.api.worker.JobClient;
 import io.camunda.zeebe.client.api.worker.JobHandler;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import org.example.camunda.core.IntermediateCatchScheduler;
 import org.example.camunda.core.ZeebeService;
 import org.example.camunda.core.actions.Action;
@@ -52,9 +54,24 @@ public class ScenarioExecService {
   }
 
   public void start(ExecutionPlan plan, String scenarioName) {
+    initClock(System.currentTimeMillis());
+    prepareTimerCatchEvents(plan);
     prepareInstances(plan, scenarioName);
     prepareWorkers(plan);
     execute();
+  }
+
+  private void prepareTimerCatchEvents(ExecutionPlan plan) {
+    Map<String, String> timers = BpmnUtils.getTimerCatchEvents(plan.getXml());
+    for (Map.Entry<String, String> timer : timers.entrySet()) {
+      String flowNodeId = timer.getKey();
+      String wait = timer.getValue();
+      if (wait.startsWith("date:")) {
+        ContextUtils.addDateTimer(flowNodeId, wait.substring(5));
+      } else {
+        ContextUtils.addDurationTimer(flowNodeId, wait.substring(9));
+      }
+    }
   }
 
   private void prepareWorkers(ExecutionPlan plan) {
@@ -103,10 +120,12 @@ public class ScenarioExecService {
   }
 
   private void prepareInstances(Scenario scenario) {
-    long time = scenario.getFirstDay().withHour(scenario.getDayTimeStart()).toEpochSecond() * 1000;
+    ZonedDateTime firstDay = ScenarioUtils.getZonedDateDay(scenario.getFirstDayFeelExpression());
+    ZonedDateTime lastDay = ScenarioUtils.getZonedDateDay(scenario.getLastDayFeelExpression());
 
-    long durationInDays =
-        ChronoUnit.DAYS.between(scenario.getFirstDay(), scenario.getLastDay()) + 1;
+    long time = firstDay.withHour(scenario.getDayTimeStart()).toEpochSecond() * 1000;
+
+    long durationInDays = ChronoUnit.DAYS.between(firstDay, lastDay) + 1;
     for (double x = 0; x < durationInDays; x++) {
       long nbInstancesPerDay = ScenarioUtils.calculateInstancesPerDay(scenario, x / durationInDays);
       addInstancesWithDesiredPrecision(time, nbInstancesPerDay, scenario, x / durationInDays);
@@ -197,20 +216,16 @@ public class ScenarioExecService {
   }
 
   public void handleIntermediateEvent(FlowNodeInstance instance) {
-    handleIntermediateEvent(
-        instance.getProcessInstanceKey(),
-        instance.getFlowNodeId(),
-        instance.getStartDate().getTime());
+    // TODO : test
+    String flowNodeId = instance.getFlowNodeId();
+    Long startTime = instance.getStartDate().getTime();
+    Long targetTime = ScenarioUtils.getTimerCatchEventTime(flowNodeId, startTime);
+
+    handleIntermediateEvent(targetTime);
   }
 
-  public void handleIntermediateEvent(Long processInstanceKey, String flowNodeId, long startTime) {
-    InstanceContext context = ContextUtils.getContext(processInstanceKey);
-    if (context == null) {
-      return;
-    }
-    StepExecPlan step = context.getScenario().getSteps().get(flowNodeId);
-    if (step.getAction() == StepActionEnum.CLOCK) {
-      ContextUtils.buildEntry(startTime + step.getTimeAdvance());
-    }
+  public void handleIntermediateEvent(long dueTimestamp) {
+    this.zeebeService.zeebeWorks();
+    ContextUtils.buildEntry(dueTimestamp);
   }
 }

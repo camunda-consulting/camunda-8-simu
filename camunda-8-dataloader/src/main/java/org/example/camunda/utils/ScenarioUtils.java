@@ -1,8 +1,11 @@
 package org.example.camunda.utils;
 
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
+import org.camunda.feel.syntaxtree.ValDateTime;
 import org.example.camunda.dto.InstanceContext;
 import org.example.camunda.dto.ProgressionEnum;
 import org.example.camunda.dto.Scenario;
@@ -89,5 +92,32 @@ public class ScenarioUtils {
             (Math.random() * duration.getMinMaxPercent() * 2 - duration.getMinMaxPercent())
                 * desiredAvg);
     return desiredAvg + salt;
+  }
+
+  public static Long getTimerCatchEventTime(String flowNodeId, long creationTime) {
+    if (ContextUtils.isDateTimer(flowNodeId)) {
+      String date = ContextUtils.getDateTimer(flowNodeId);
+      if (date.startsWith("=")) {
+        return getMillis(FeelUtils.evaluate(date.substring(1), new HashMap<>(), ValDateTime.class));
+      }
+      return Instant.parse(date.substring(1)).toEpochMilli();
+    } else if (ContextUtils.isDurationTimer(flowNodeId)) {
+      String duration = ContextUtils.getDurationTimer(flowNodeId);
+      String creationDate = Instant.ofEpochMilli(creationTime).toString();
+      return getMillis(
+          FeelUtils.evaluate(
+              "date and time(\"" + creationDate + "\") + duration(\"" + duration + "\")",
+              new HashMap<>(),
+              ValDateTime.class));
+    }
+    return null;
+  }
+
+  public static Long getMillis(ValDateTime valDate) {
+    return Instant.parse(valDate.toString()).toEpochMilli();
+  }
+
+  public static ZonedDateTime getZonedDateDay(String feelExpression) {
+    return FeelUtils.evaluate(feelExpression, ValDateTime.class).value();
   }
 }
