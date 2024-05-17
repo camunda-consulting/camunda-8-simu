@@ -2,11 +2,13 @@ package org.example.camunda.facade;
 
 import io.camunda.operate.exception.OperateException;
 import java.io.IOException;
+import java.util.List;
 import org.example.camunda.dto.ExecutionPlan;
 import org.example.camunda.dto.Scenario;
 import org.example.camunda.service.ExecutionPlanService;
 import org.example.camunda.service.OperateService;
 import org.example.camunda.service.ScenarioExecService;
+import org.example.camunda.utils.ContextUtils;
 import org.example.camunda.utils.ScenarioUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,5 +98,10 @@ public class ExecPlanController {
       this.ScenarioExecService.deploy(plan.getDefinition().getName(), plan.getXml());
     }
     this.ScenarioExecService.start(plan, scenarioName);
+  }
+
+  @GetMapping("/histo")
+  public List<String> histo() {
+    return ContextUtils.getHisto();
   }
 }

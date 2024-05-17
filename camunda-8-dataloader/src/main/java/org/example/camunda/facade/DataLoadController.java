@@ -1,8 +1,10 @@
 package org.example.camunda.facade;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Map;
 import org.example.camunda.service.ScenarioExecService;
+import org.example.camunda.utils.ContextUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +48,8 @@ public class DataLoadController {
       throws IOException {
     LOG.info("catch event due at timestamp " + dueTimestamp);
     if (!timers.equals("operate")) {
+      ContextUtils.addHisto(
+          "Receive timer due at " + Instant.ofEpochMilli(dueTimestamp).toString());
 
       scenarioExecService.handleIntermediateEvent(dueTimestamp);
     }
@@ -54,6 +58,8 @@ public class DataLoadController {
   @GetMapping("/engine/idle")
   public void catchIdle() {
     if (!timers.equals("operate")) {
+      ContextUtils.addHisto("Receive engine IDLE ");
+
       scenarioExecService.nextTimedAction();
       // scenarioExecutor.nextTimedActions();
     }

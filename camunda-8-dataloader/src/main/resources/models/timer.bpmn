@@ -16,11 +16,11 @@
       <bpmn:outgoing>Flow_1n8yomo</bpmn:outgoing>
     </bpmn:userTask>
     <bpmn:sequenceFlow id="Flow_0pug1kf" sourceRef="Event_05nfjgv" targetRef="Event_10nga4d" />
-    <bpmn:intermediateCatchEvent id="Event_1extyza" name="duration 5D">
+    <bpmn:intermediateCatchEvent id="Event_1extyza" name="duration 5minute">
       <bpmn:incoming>Flow_1n8yomo</bpmn:incoming>
       <bpmn:outgoing>Flow_0jt5wlh</bpmn:outgoing>
       <bpmn:timerEventDefinition id="TimerEventDefinition_0f3ck0k">
-        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">P5D</bpmn:timeDuration>
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT5M</bpmn:timeDuration>
       </bpmn:timerEventDefinition>
     </bpmn:intermediateCatchEvent>
     <bpmn:serviceTask id="Activity_18d5u7e" name="should be quick">
@@ -30,11 +30,11 @@
       <bpmn:incoming>Flow_0jt5wlh</bpmn:incoming>
       <bpmn:outgoing>Flow_0ftqsdd</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:intermediateCatchEvent id="Event_05nfjgv" name="date in 2 days">
+    <bpmn:intermediateCatchEvent id="Event_05nfjgv" name="date in 1 minute">
       <bpmn:incoming>Flow_0ftqsdd</bpmn:incoming>
       <bpmn:outgoing>Flow_0pug1kf</bpmn:outgoing>
       <bpmn:timerEventDefinition id="TimerEventDefinition_10kpn1m">
-        <bpmn:timeDate xsi:type="bpmn:tFormalExpression">=now()+duration("P2D")</bpmn:timeDate>
+        <bpmn:timeDate xsi:type="bpmn:tFormalExpression">=now()+duration("PT1M")</bpmn:timeDate>
       </bpmn:timerEventDefinition>
     </bpmn:intermediateCatchEvent>
   </bpmn:process>
@@ -43,12 +43,12 @@
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
         <dc:Bounds x="150" y="100" width="36" height="36" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_10nga4d_di" bpmnElement="Event_10nga4d">
+        <dc:Bounds x="742" y="100" width="36" height="36" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_122lwnm_di" bpmnElement="Activity_1s36lgv">
         <dc:Bounds x="240" y="78" width="100" height="80" />
         <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_10nga4d_di" bpmnElement="Event_10nga4d">
-        <dc:Bounds x="742" y="100" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_00z58xu_di" bpmnElement="Event_1extyza">
         <dc:Bounds x="402" y="100" width="36" height="36" />
@@ -63,7 +63,7 @@
       <bpmndi:BPMNShape id="Event_0qhhf08_di" bpmnElement="Event_05nfjgv">
         <dc:Bounds x="652" y="100" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="637" y="143" width="69" height="14" />
+          <dc:Bounds x="629" y="143" width="85" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_0kphubs_di" bpmnElement="Flow_0kphubs">

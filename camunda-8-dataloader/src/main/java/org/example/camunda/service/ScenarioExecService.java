@@ -7,6 +7,7 @@ import io.camunda.zeebe.client.api.worker.JobClient;
 import io.camunda.zeebe.client.api.worker.JobHandler;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -19,6 +20,7 @@ import org.example.camunda.core.actions.CompleteJobAction;
 import org.example.camunda.core.actions.StartInstancesAction;
 import org.example.camunda.dto.ExecutionPlan;
 import org.example.camunda.dto.InstanceContext;
+import org.example.camunda.dto.PostStepAction;
 import org.example.camunda.dto.Scenario;
 import org.example.camunda.dto.StepActionEnum;
 import org.example.camunda.dto.StepExecPlan;
@@ -55,6 +57,7 @@ public class ScenarioExecService {
 
   public void start(ExecutionPlan plan, String scenarioName) {
     initClock(System.currentTimeMillis());
+    ContextUtils.setIdleTimeBeforeClockMove(plan.getIdleTimeBeforeClockMove());
     prepareTimerCatchEvents(plan);
     prepareInstances(plan, scenarioName);
     prepareWorkers(plan);
@@ -92,15 +95,30 @@ public class ScenarioExecService {
                   }
                   StepExecPlan step = context.getScenario().getSteps().get(job.getElementId());
                   if (step.getAction() == StepActionEnum.COMPLETE) {
-                    ContextUtils.addAction(
+                    long targetTime =
                         estimateEngineTime
-                            + ScenarioUtils.calculateTaskDuration(step, processInstanceKey),
+                            + ScenarioUtils.calculateTaskDuration(step, processInstanceKey);
+                    ContextUtils.addAction(
+                        targetTime,
                         new CompleteJobAction(
                             job.getKey(),
                             step.getJsonTemplate(),
                             job.getVariablesAsMap(),
                             zeebeService),
                         context.getScenario().getTimePrecision());
+                    if (step.getPostStep() != null) {
+                      PostStepAction postStep = step.getPostStep();
+                      if (postStep.getType() == StepActionEnum.CLOCK) {
+                        ContextUtils.buildEntry(targetTime + postStep.getTimeAdvance());
+                      }
+                    }
+                  } else {
+                    if (step.getPostStep() != null) {
+                      PostStepAction postStep = step.getPostStep();
+                      if (postStep.getType() == StepActionEnum.CLOCK) {
+                        ContextUtils.buildEntry(estimateEngineTime + postStep.getTimeAdvance());
+                      }
+                    }
                   }
                 }
               }));
@@ -198,21 +216,29 @@ public class ScenarioExecService {
         });
   }
 
-  public void nextTimedAction() {
-    if (ContextUtils.hasTimeEntries()) {
-      Long timedKey = ContextUtils.nextTimeEntry();
-      initClock(timedKey);
-      List<Action> actions = ContextUtils.getActionsAt(timedKey);
-      while (actions.size() > 0) {
-        Action a = actions.get(0);
-        a.run();
-        actions.remove(a);
+  boolean running = false;
+
+  public synchronized void nextTimedAction() {
+    if (!running) {
+      running = true;
+      if (ContextUtils.hasTimeEntries()) {
+        Long timedKey = ContextUtils.nextTimeEntry();
+        initClock(timedKey);
+
+        ContextUtils.addHisto("Move clock to " + Instant.ofEpochMilli(timedKey).toString());
+        List<Action> actions = ContextUtils.getActionsAt(timedKey);
+        while (actions.size() > 0) {
+          Action a = actions.get(0);
+          a.run();
+          actions.remove(a);
+        }
+        LOG.info("Actions at " + dateFormat.format(new Date(timedKey)) + " are executed");
+        ContextUtils.removeTimeEntry(timedKey);
+      } else {
+        ContextUtils.clean();
       }
-      LOG.info("Actions at " + dateFormat.format(new Date(timedKey)) + " are executed");
-      ContextUtils.removeTimeEntry(timedKey);
-    } else {
-      ContextUtils.clean();
     }
+    running = false;
   }
 
   public void handleIntermediateEvent(FlowNodeInstance instance) {

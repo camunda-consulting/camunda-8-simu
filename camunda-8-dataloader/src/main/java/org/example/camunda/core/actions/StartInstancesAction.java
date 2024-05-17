@@ -1,8 +1,10 @@
 package org.example.camunda.core.actions;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.example.camunda.core.ZeebeService;
 import org.example.camunda.dto.Scenario;
 import org.example.camunda.utils.ContextUtils;
+import org.example.camunda.utils.JsonUtils;
 
 public class StartInstancesAction extends Action {
 
@@ -24,13 +26,14 @@ public class StartInstancesAction extends Action {
 
     try {
       for (long x = 0; x < this.nbInstances; x++) {
+        JsonNode variables = getVariables(this.scenario.getJsonTemplate(), null);
         Long processInstanceKey =
             this.getZeebeService()
                 .startProcessInstance(
-                    this.scenario.getBpmnProcessId(),
-                    this.scenario.getVersion(),
-                    getVariables(this.scenario.getJsonTemplate(), null));
+                    this.scenario.getBpmnProcessId(), this.scenario.getVersion(), variables);
         ContextUtils.addInstance(processInstanceKey, this.scenario, this.progress);
+        ContextUtils.addHisto(
+            "Started instance " + processInstanceKey + " with " + JsonUtils.toJson(variables));
       }
     } catch (Exception e) {
       e.printStackTrace();

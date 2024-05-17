@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import org.example.camunda.service.ScenarioExecService;
+import org.example.camunda.utils.ContextUtils;
 import org.example.camunda.utils.FeelUtils;
 import org.example.camunda.utils.ThreadUtils;
 import org.slf4j.Logger;
@@ -52,7 +53,7 @@ public class ZeebeService {
       engineIdleTimer.cancel();
     }
     engineIdleTimer = new Timer();
-    engineIdleTimer.schedule(task, 300);
+    engineIdleTimer.schedule(task, ContextUtils.getIdleTimeBeforeClockMove());
   }
 
   public void zeebeWorks() {

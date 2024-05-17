@@ -9,6 +9,7 @@ public class ExecutionPlan {
   private ProcessDefinition definition;
   private String xml;
   private Boolean xmlModified = false;
+  private Integer idleTimeBeforeClockMove = 300;
   private ChronoUnit instanceDistribution = ChronoUnit.DAYS;
   private TimePrecisionEnum timePrecision = TimePrecisionEnum.HUNDRED_MILLIS;
   private List<Scenario> scenarii = new ArrayList<>();
@@ -35,6 +36,14 @@ public class ExecutionPlan {
 
   public void setXmlModified(Boolean xmlModified) {
     this.xmlModified = xmlModified;
+  }
+
+  public Integer getIdleTimeBeforeClockMove() {
+    return idleTimeBeforeClockMove;
+  }
+
+  public void setIdleTimeBeforeClockMove(Integer idleTimeBeforeClockMove) {
+    this.idleTimeBeforeClockMove = idleTimeBeforeClockMove;
   }
 
   public ChronoUnit getInstanceDistribution() {

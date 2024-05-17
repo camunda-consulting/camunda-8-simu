@@ -38,7 +38,7 @@ public class TemplatingUtils {
     return code.toString();
   }
 
-  public static int counter = 0;
+  private static int counter = 0;
 
   public static String generateUUID(String prefix) {
     // for demo reasons we generate something readable
@@ -55,5 +55,11 @@ public class TemplatingUtils {
   public static long range(long min, long max) {
     long dif = max - min;
     return min + Math.round(Math.random() * dif);
+  }
+
+  private static long sequence = 0L;
+
+  public static long sequentialNumber() {
+    return sequence++;
   }
 }

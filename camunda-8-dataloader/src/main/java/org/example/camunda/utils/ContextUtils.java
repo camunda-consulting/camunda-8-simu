@@ -1,6 +1,7 @@
 package org.example.camunda.utils;
 
 import io.camunda.zeebe.client.api.worker.JobWorker;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,6 +17,9 @@ import org.example.camunda.dto.TimePrecisionEnum;
 
 public class ContextUtils {
 
+  private static List<String> histo = new ArrayList<>();
+
+  private static int idleTimeBeforeClockMove = 300;
   private static Map<String, String> dateTimers = new HashMap<>();
   private static Map<String, String> durationTimers = new HashMap<>();
   private static SortedMap<Long, List<Action>> timedActions = new TreeMap<>();
@@ -55,11 +59,12 @@ public class ContextUtils {
   }
 
   public static void addAction(long time, Action action, TimePrecisionEnum timePrecision) {
-    timedActions.get(buildEntry(timePrecision.round(time))).add(action);
+    if (time < System.currentTimeMillis())
+      timedActions.get(buildEntry(timePrecision.round(time))).add(action);
   }
 
   public static long buildEntry(long time) {
-    if (!timedActions.containsKey(time)) {
+    if (time < System.currentTimeMillis() && !timedActions.containsKey(time)) {
       timedActions.put(time, new ArrayList<>());
     }
     return time;
@@ -125,5 +130,21 @@ public class ContextUtils {
 
   public static String getDurationTimer(String flowNodeId) {
     return durationTimers.get(flowNodeId);
+  }
+
+  public static int getIdleTimeBeforeClockMove() {
+    return idleTimeBeforeClockMove;
+  }
+
+  public static void setIdleTimeBeforeClockMove(int idleTimeBeforeClockMove) {
+    ContextUtils.idleTimeBeforeClockMove = idleTimeBeforeClockMove;
+  }
+
+  public static void addHisto(String comment) {
+    histo.add(Instant.now().toString() + " : " + comment);
+  }
+
+  public static List<String> getHisto() {
+    return histo;
   }
 }
