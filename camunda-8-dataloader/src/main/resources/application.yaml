@@ -18,7 +18,7 @@ operate:
   selfmanaged:
     url: http://localhost:8081
     clientId: dataloader
-    clientSecret: nXKnTqcnnYKL0ysJqGhwk0W6UWq2QYLM
+    clientSecret: Tcx9kFqVwxlnWMZOhjYCemnLvBr1Gvs3
     keycloakUrl: http://localhost:18080
   #cloud:
   #  region: bru-2

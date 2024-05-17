@@ -1,7 +1,6 @@
 package org.example.camunda.facade;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.Map;
 import org.example.camunda.service.ScenarioExecService;
 import org.example.camunda.utils.ContextUtils;
@@ -46,13 +45,13 @@ public class DataLoadController {
   public void catchIntermediateEvent(
       @PathVariable Long dueTimestamp, @RequestBody Map<String, Object> processInstanceRecordValue)
       throws IOException {
-    LOG.info("catch event due at timestamp " + dueTimestamp);
-    if (!timers.equals("operate")) {
+    // LOG.info("catch event due at timestamp " + dueTimestamp);
+    /*if (!timers.equals("operate")) {
       ContextUtils.addHisto(
           "Receive timer due at " + Instant.ofEpochMilli(dueTimestamp).toString());
 
       scenarioExecService.handleIntermediateEvent(dueTimestamp);
-    }
+    }*/
   }
 
   @GetMapping("/engine/idle")

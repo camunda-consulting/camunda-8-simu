@@ -98,14 +98,15 @@ public class ScenarioExecService {
                     long targetTime =
                         estimateEngineTime
                             + ScenarioUtils.calculateTaskDuration(step, processInstanceKey);
-                    ContextUtils.addAction(
-                        targetTime,
-                        new CompleteJobAction(
-                            job.getKey(),
-                            step.getJsonTemplate(),
-                            job.getVariablesAsMap(),
-                            zeebeService),
-                        context.getScenario().getTimePrecision());
+                    targetTime =
+                        ContextUtils.addAction(
+                            targetTime,
+                            new CompleteJobAction(
+                                job.getKey(),
+                                step.getJsonTemplate(),
+                                job.getVariablesAsMap(),
+                                zeebeService),
+                            context.getScenario().getTimePrecision());
                     if (step.getPostStep() != null) {
                       PostStepAction postStep = step.getPostStep();
                       if (postStep.getType() == StepActionEnum.CLOCK) {

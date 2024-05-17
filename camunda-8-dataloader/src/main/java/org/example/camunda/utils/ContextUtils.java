@@ -58,9 +58,14 @@ public class ContextUtils {
     activeWorkers.add(worker);
   }
 
-  public static void addAction(long time, Action action, TimePrecisionEnum timePrecision) {
-    if (time < System.currentTimeMillis())
-      timedActions.get(buildEntry(timePrecision.round(time))).add(action);
+  public static long addAction(long time, Action action, TimePrecisionEnum timePrecision) {
+    if (time < System.currentTimeMillis()) {
+      long realTime = buildEntry(timePrecision.round(time));
+      timedActions.get(realTime).add(action);
+      return realTime;
+    } else {
+      return -1;
+    }
   }
 
   public static long buildEntry(long time) {
