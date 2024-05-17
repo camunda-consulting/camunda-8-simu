@@ -33,10 +33,10 @@
           "avgProgression" : "LINEAR_SALTED",
           "progressionSalt" : 180000
         },
-        "postStep" : {
+        "postStep" : [{
           "type" : "CLOCK",
           "timeAdvance" : 300000
-        }
+        }]
       },
       "Activity_18d5u7e" : {
         "elementId" : "Activity_18d5u7e",
@@ -48,10 +48,10 @@
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000
         },
-        "postStep" : {
+        "postStep" : [{
           "type" : "CLOCK",
           "timeAdvance" : 60000
-        }
+        }]
       }
     },
     "jsonTemplate": "{\"sequentialNumber\": [( ${templateUtils.sequentialNumber()} )]}"

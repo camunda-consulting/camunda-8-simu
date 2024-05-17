@@ -20,9 +20,9 @@ import org.example.camunda.core.actions.CompleteJobAction;
 import org.example.camunda.core.actions.StartInstancesAction;
 import org.example.camunda.dto.ExecutionPlan;
 import org.example.camunda.dto.InstanceContext;
-import org.example.camunda.dto.PostStepAction;
 import org.example.camunda.dto.Scenario;
 import org.example.camunda.dto.StepActionEnum;
+import org.example.camunda.dto.StepAdditionalAction;
 import org.example.camunda.dto.StepExecPlan;
 import org.example.camunda.utils.BpmnUtils;
 import org.example.camunda.utils.ContextUtils;
@@ -94,6 +94,13 @@ public class ScenarioExecService {
                     context = ContextUtils.getContext(processInstanceKey);
                   }
                   StepExecPlan step = context.getScenario().getSteps().get(job.getElementId());
+                  if (step.getPreSteps() != null) {
+                    for (StepAdditionalAction preStep : step.getPreSteps()) {
+                      if (preStep.getType() == StepActionEnum.CLOCK) {
+                        ContextUtils.buildEntry(estimateEngineTime + preStep.getTimeAdvance());
+                      }
+                    }
+                  }
                   if (step.getAction() == StepActionEnum.COMPLETE) {
                     long targetTime =
                         estimateEngineTime
@@ -107,17 +114,19 @@ public class ScenarioExecService {
                                 job.getVariablesAsMap(),
                                 zeebeService),
                             context.getScenario().getTimePrecision());
-                    if (step.getPostStep() != null) {
-                      PostStepAction postStep = step.getPostStep();
-                      if (postStep.getType() == StepActionEnum.CLOCK) {
-                        ContextUtils.buildEntry(targetTime + postStep.getTimeAdvance());
+                    if (step.getPostSteps() != null) {
+                      for (StepAdditionalAction postStep : step.getPostSteps()) {
+                        if (postStep.getType() == StepActionEnum.CLOCK) {
+                          ContextUtils.buildEntry(targetTime + postStep.getTimeAdvance());
+                        }
                       }
                     }
                   } else {
-                    if (step.getPostStep() != null) {
-                      PostStepAction postStep = step.getPostStep();
-                      if (postStep.getType() == StepActionEnum.CLOCK) {
-                        ContextUtils.buildEntry(estimateEngineTime + postStep.getTimeAdvance());
+                    if (step.getPostSteps() != null) {
+                      for (StepAdditionalAction postStep : step.getPostSteps()) {
+                        if (postStep.getType() == StepActionEnum.CLOCK) {
+                          ContextUtils.buildEntry(estimateEngineTime + postStep.getTimeAdvance());
+                        }
                       }
                     }
                   }

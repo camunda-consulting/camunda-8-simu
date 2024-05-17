@@ -1,6 +1,6 @@
 package org.example.camunda.dto;
 
-public class PostStepAction {
+public class StepAdditionalAction {
   private StepActionEnum type = StepActionEnum.CLOCK;
 
   // CLOCK

@@ -1,5 +1,7 @@
 package org.example.camunda.dto;
 
+import java.util.List;
+
 public class StepExecPlan {
   private String elementId;
   private StepActionEnum action = StepActionEnum.COMPLETE;
@@ -8,7 +10,8 @@ public class StepExecPlan {
 
   // MSG or COMPLETE
   private String jsonTemplate = "{}";
-  private PostStepAction postStep;
+  private List<StepAdditionalAction> postSteps;
+  private List<StepAdditionalAction> preSteps;
 
   public String getElementId() {
     return elementId;
@@ -42,11 +45,19 @@ public class StepExecPlan {
     this.jsonTemplate = jsonTemplate;
   }
 
-  public PostStepAction getPostStep() {
-    return postStep;
+  public List<StepAdditionalAction> getPostSteps() {
+    return postSteps;
   }
 
-  public void setPostStep(PostStepAction postStep) {
-    this.postStep = postStep;
+  public void setPostSteps(List<StepAdditionalAction> postSteps) {
+    this.postSteps = postSteps;
+  }
+
+  public List<StepAdditionalAction> getPreSteps() {
+    return preSteps;
+  }
+
+  public void setPreSteps(List<StepAdditionalAction> preSteps) {
+    this.preSteps = preSteps;
   }
 }
