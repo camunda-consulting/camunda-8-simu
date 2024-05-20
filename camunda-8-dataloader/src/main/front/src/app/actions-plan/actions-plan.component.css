@@ -1,0 +1,8 @@
+.nav-tabs .nav-link.active {
+  box-shadow: 0px 0px 4px var(--bs-nav-link-color);
+  position: relative;
+}
+.tab-pane {
+  background: white;
+  position: relative;
+}

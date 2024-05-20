@@ -13,7 +13,6 @@ export class ExecutionplanComponent {
   state: string = 'plan';
 
   back(): void {
-    this.processService.clear();
     this.execPlanService.clear();
   }
 

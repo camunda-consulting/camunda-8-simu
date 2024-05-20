@@ -68,6 +68,19 @@ public class ExecPlanController {
     return plan;
   }
 
+  @PutMapping("/{bpmnProcessId}/{version}/newScenario")
+  public ExecutionPlan newScenario(
+      @PathVariable String bpmnProcessId,
+      @PathVariable Long version,
+      @RequestBody ExecutionPlan plan)
+      throws OperateException, IOException {
+    ExecutionPlan originalPlan = execPlanService.find(bpmnProcessId, version);
+    Scenario s = ScenarioUtils.generateScenario(originalPlan.getXml());
+    s.setName("Scenario " + (plan.getScenarii().size() + 1));
+    plan.getScenarii().add(s);
+    return plan;
+  }
+
   @PutMapping("/{bpmnProcessId}/{version}")
   public ExecutionPlan definitions(
       @PathVariable String bpmnProcessId,

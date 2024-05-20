@@ -11,6 +11,8 @@ import { OptimizePreviewComponent } from './optimize-preview/optimize-preview.co
 import { ModelerComponent } from './modeler/modeler.component';
 import { ViewerComponent } from './viewer/viewer.component';
 import { ActionsPlanComponent } from './actions-plan/actions-plan.component';
+import { InstantiateComponent } from './instantiate/instantiate.component';
+import { StepComponent } from './step/step.component';
 declare module '@bpmn-io/element-template-icon-renderer';
 @NgModule({
   declarations: [
@@ -21,7 +23,9 @@ declare module '@bpmn-io/element-template-icon-renderer';
     OptimizePreviewComponent,
     ModelerComponent,
     ViewerComponent,
-    ActionsPlanComponent
+    ActionsPlanComponent,
+    InstantiateComponent,
+    StepComponent
   ],
   imports: [
     BrowserModule, FormsModule, HttpClientModule

@@ -23,7 +23,7 @@
       "evolution": "LINEAR",
       "saltMin": null,
       "saltMax": null,
-      "jsonTemplate": "{\"applicationNumber\":\"[( ${templateUtils.generateUUID(\"A-\")} )]\", \"applicant\":{\"name\":\"[( ${templateUtils.firstname()} )]\", \"email\":\"[( ${templateUtils.firstname()} )]@gmail.com\", \"birthday\":\"1986-11-24 13:12:00.000+00:00\", \"age\":38}, \"employment\":\"Salaried\", \"category\":\"Basic Package\"}",
+      "jsonTemplate": "{\"applicationNumber\":\"[( ${templateUtils.generateUUID()} )]\", \"applicant\":{\"name\":\"[( ${templateUtils.firstname()} )]\", \"email\":\"[( ${templateUtils.firstname()} )]@gmail.com\", \"birthday\":\"1986-11-24 13:12:00.000+00:00\", \"age\":38}, \"employment\":\"Salaried\", \"category\":\"Basic Package\"}",
       "steps": {
         "ServiceTask_0tixwo5": {
           "elementId": "ServiceTask_0tixwo5",

@@ -14,7 +14,16 @@ export class ActionsPlanComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  addScenario(): void {
+    this.execPlanService.addScenario();
+  }
+
   save(): void {
-    this.processService.updatePlan();
+    this.execPlanService.updatePlan();
+  }
+
+  selectScenario(i: number): void {
+    this.execPlanService.selectScenario(this.execPlanService.executionPlan.scenarii[i]);
+    this.state = '' + i;
   }
 }

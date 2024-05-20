@@ -40,6 +40,10 @@ public class TemplatingUtils {
 
   private static int counter = 0;
 
+  public static String generateUUID() {
+    return generateUUID("A-");
+  }
+
   public static String generateUUID(String prefix) {
     // for demo reasons we generate something readable
     if (counter == 0) {

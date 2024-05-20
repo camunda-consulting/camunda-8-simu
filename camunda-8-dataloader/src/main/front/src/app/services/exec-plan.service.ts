@@ -1,31 +1,62 @@
 import { Injectable } from '@angular/core';
-import { ProcessService } from './process.service';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ExecPlanService {
 
-  constructor(processService: ProcessService) { }
-  activities: any[] = [];
-  actions: any = {};
+  constructor(
+    private http: HttpClient) { }
+  executionPlan: any | undefined;
+  activities: string[] = [];
+  scenario:any={};
   currentActivity: string | undefined;
+  activitySubject = new BehaviorSubject<string>('');
 
-  addActivity(activity: any) {
-    this.activities.push(activity);
-    this.actions[activity.id] = {};
-    if (!this.currentActivity) {
-      this.currentActivity = activity.id;
-    }
+  openExecutionPlan(definition: any): void {
+    this.http.get<any>("http://localhost:8080/api/plan/" + definition.bpmnProcessId + "/" + definition.version).subscribe((response: any) => {
+      this.executionPlan = response;
+      this.scenario = this.executionPlan.scenarii[0];
+    });
   }
-  selectActivity(activity: string): void {
-    this.currentActivity = activity;
+  updateDef(xml: string): void {
+    this.http.post<any>("http://localhost:8080/api/plan/" + this.executionPlan.definition.bpmnProcessId + "/" + this.executionPlan.definition.version + '/xml', xml).subscribe((response: any) => {
+      this.executionPlan = response;
+    });
   }
-
+  updatePlan(): void {
+    this.http.put<any>("http://localhost:8080/api/plan/" + this.executionPlan.definition.bpmnProcessId + "/" + this.executionPlan.definition.version, this.executionPlan).subscribe((response: any) => {
+      this.executionPlan = response;
+    });
+  }
+  addScenario(): void {
+    this.http.put<any>("http://localhost:8080/api/plan/" + this.executionPlan.definition.bpmnProcessId + "/" + this.executionPlan.definition.version+"/newScenario", this.executionPlan).subscribe((response: any) => {
+      this.executionPlan = response;
+    });
+  }
 
   clear(): void {
+    this.executionPlan = undefined;
+    this.scenario = {};
     this.activities = [];
-    this.actions = {};
     this.currentActivity = undefined;
   }
+
+  addActivity(activity: string) {
+    this.activities.push(activity);
+  }
+  selectActivity(activity: string): void {
+    if (this.activities.indexOf(activity) >= 0 || activity =='startInstances') {
+      this.currentActivity = activity;
+      this.activitySubject.next(activity);
+    }
+  }
+
+  selectScenario(scenario: any): void {
+    this.selectActivity('startInstances');
+    this.scenario = scenario;
+  }
+
 }

@@ -2,6 +2,7 @@ import { Component, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import BpmnModeler from 'camunda-bpmn-js/lib/camunda-cloud/Modeler';
 import ElementTemplatesIconsRenderer from '@bpmn-io/element-template-icon-renderer';
 import { ProcessService } from '../services/process.service';
+import { ExecPlanService } from '../services/exec-plan.service';
 
 @Component({
   selector: 'app-modeler',
@@ -10,7 +11,7 @@ import { ProcessService } from '../services/process.service';
 })
 export class ModelerComponent implements AfterViewInit {
 
-  constructor(private processService: ProcessService) { }
+  constructor(private processService: ProcessService, private execPlanService: ExecPlanService) { }
 
   @ViewChild('modeler') modelerElt: ElementRef | undefined;
   @ViewChild('properties') properties: ElementRef | undefined;
@@ -28,13 +29,13 @@ export class ModelerComponent implements AfterViewInit {
       position: 'center',
       additionalModules: [ElementTemplatesIconsRenderer],
     });
-    this.modeler!.importXML(this.processService.executionPlan.xml);
+    this.modeler!.importXML(this.execPlanService.executionPlan.xml);
  
   }
 
   save(): void {
     this.modeler!.saveXML().then((result: any) => {
-      this.processService.updateDef(result.xml);
+      this.execPlanService.updateDef(result.xml);
     });
   }
 

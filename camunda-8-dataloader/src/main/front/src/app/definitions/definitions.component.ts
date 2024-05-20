@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ProcessService } from '../services/process.service';
+import { ExecPlanService } from '../services/exec-plan.service';
 
 @Component({
   selector: 'app-definitions',
@@ -8,7 +9,7 @@ import { ProcessService } from '../services/process.service';
 })
 export class DefinitionsComponent implements OnInit {
 
-  constructor(private processService: ProcessService) { }
+  constructor(private processService: ProcessService, private execPlanService: ExecPlanService) { }
 
   definitions: any[] = [];
 
@@ -19,6 +20,6 @@ export class DefinitionsComponent implements OnInit {
   }
 
   openPlan(definition: any): void {
-    this.processService.openExecutionPlan(definition);
+    this.execPlanService.openExecutionPlan(definition);
   }
 }
