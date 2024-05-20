@@ -3,7 +3,6 @@ import { basicSetup, EditorView } from 'codemirror';
 import { json } from '@codemirror/lang-json';
 import { ProcessService } from '../services/process.service';
 import { ExecPlanService } from '../services/exec-plan.service';
-import { catchError } from 'rxjs';
 
 @Component({
   selector: 'app-instantiate',
@@ -38,6 +37,6 @@ export class InstantiateComponent implements AfterViewInit {
   }
 
   updateListenerExtension = EditorView.updateListener.of((v) => {
-    console.log(v.state.doc.toString());
+    this.execPlanService.scenario.jsonTemplate =v.state.doc.toString();
   });
 }

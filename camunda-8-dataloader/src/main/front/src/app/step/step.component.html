@@ -1,1 +1,61 @@
-<p>step works!</p>
+<div class="row">
+  <div class="col-8">
+    <div class="input-group mb-3 ">
+      <span class="input-group-text">Element Id</span>
+      <input type="text" class="form-control" value="{{step.elementId}}" readonly disabled>
+    </div>
+  </div>
+  <div class="col-4">
+    <div class="input-group mb-3 ">
+      <span class="input-group-text">Action</span>
+      <select class="form-select" [(ngModel)]="step.action">
+        <option selected>Choose...</option>
+        <option value="COMPLETE">COMPLETE</option>
+        <option value="DO_NOTHING">DO_NOTHING</option>
+      </select>
+    </div>
+  </div>
+</div>
+<div class="row" *ngIf="step.action=='COMPLETE'">
+  <div class="col">
+    <div class="input-group mb-3 ">
+      <span class="input-group-text">Completion time</span>
+      <button class="btn btn-outline-primary" (click)="openDurationModal()"><i class="bi bi-pencil"></i> Avg from {{step.duration.startDesiredAvg}} to {{step.duration.startDesiredAvg}}ms (variation {{step.duration.minMaxPercent}}%). Progression {{step.duration.avgProgression}}</button>
+    </div>
+    </div>
+    <!--
+            "elementId": "ServiceTask_0tixwo5",
+            "action": "COMPLETE",
+            "duration": {
+              "startDesiredAvg": 8000,
+              "endDesiredAvg": 4000,
+              "minMaxPercent": 20,
+              "avgProgression": "LINEAR",
+              "progressionSalt": 1000
+            },
+    -->
+  </div>
+  <div class="row">
+    <div class="input-group mb-3 col-12">
+      <span class="input-group-text">JSON Template</span>
+      <div class="form-control" #jsonTemplate></div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="{{step.elementId}}-durationModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Duration</h5>
+          <button type="button" class="btn-close" (click)="closeDurationModal()"></button>
+        </div>
+        <div class="modal-body">
+          <p>Modal body text goes here.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary">Save changes</button>
+          <button type="button" class="btn btn-secondary" (click)="closeDurationModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>

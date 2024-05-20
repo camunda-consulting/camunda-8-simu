@@ -79,7 +79,7 @@
           <div [ngClass]="execPlanService.currentActivity == 'startInstances' ? 'tab-pane fade show active' : 'tab-pane fade'">
             <app-instantiate></app-instantiate>
           </div>
-          <div *ngFor="let step of scenario.steps | keyvalue"  [ngClass]="execPlanService.currentActivity == step.key ? 'tab-pane fade show active' : 'tab-pane fade'"><app-step></app-step></div>
+          <div *ngFor="let step of scenario.steps | keyvalue"  [ngClass]="execPlanService.currentActivity == step.key ? 'tab-pane fade show active' : 'tab-pane fade'"><app-step [step]="step.value"></app-step></div>
         </div>
       </div>
     </div>

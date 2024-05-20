@@ -5,4 +5,10 @@
 .tab-pane {
   background: white;
   position: relative;
+  padding: 20px;
+}
+
+.tab-content {
+  width: 100%;
+  padding: 0px 20px;
 }
