@@ -13,7 +13,7 @@ export class ViewerComponent implements AfterViewInit {
   viewer: NavigatedViewer | undefined;
   previousActivity?: string;
 
-  constructor(private processService: ProcessService, private execPlanService: ExecPlanService) {
+  constructor(private processService: ProcessService, public execPlanService: ExecPlanService) {
     this.execPlanService.activitySubject.subscribe((activity: string) => {
       if (this.viewer) {
         if (this.previousActivity) {
@@ -49,6 +49,9 @@ export class ViewerComponent implements AfterViewInit {
 
   selectActivity = (event: any) => {
     this.execPlanService.selectActivity(event.element.id);
+    if (!this.execPlanService.scenario.steps[event.element.id]) {
+      this.opennewstepModal();
+    }
   }
   
   colorActivity(id: string, color: string): void {
@@ -65,4 +68,14 @@ export class ViewerComponent implements AfterViewInit {
     }
   };
 
+  opennewstepModal() {
+    (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById('newstep')).show();
+  }
+  closenewstepModal() {
+    (window as any).bootstrap.Modal.getInstance(document.getElementById('newstep')).hide();
+  }
+  createStep() {
+    this.execPlanService.createCurrentStepInScenario();
+    this.closenewstepModal();
+  }
 }

@@ -59,4 +59,18 @@ export class ExecPlanService {
     this.scenario = scenario;
   }
 
+  createCurrentStepInScenario(): void {
+    this.scenario.steps[this.currentActivity!] = {
+      "elementId": this.currentActivity,
+      "action": "COMPLETE",
+      "duration": {
+        "startDesiredAvg": 8000,
+        "endDesiredAvg": 4000,
+        "minMaxPercent": 0,
+        "avgProgression": "LINEAR",
+        "progressionSalt": 0
+      },
+      "jsonTemplate": "{}",
+    };
+  }
 }

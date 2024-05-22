@@ -6,7 +6,7 @@
     <a [ngClass]="state==''+i ? 'nav-link active' : 'nav-link'" (click)="selectScenario(i)"><i class="bi bi-list-ol"></i> {{scenario.name}}</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" (click)="addScenario()"><i class="bi bi-plus-circle"></i> Add scenario</a>
+    <a class="nav-link text-warning" (click)="addScenario()"><i class="bi bi-plus-circle"></i> Add scenario</a>
   </li>
   <li class="nav-item">
     <a class="nav-link" (click)="save()"><i class="bi bi-floppy"></i> Save</a>

@@ -33,7 +33,7 @@
 <div class="row">
   <div class="col-6">
     <h4>Pre-steps <button type="button" class="btn btn-outline-primary btn-tooltip" data-bs-toggle="tooltip" data-bs-placement="top" title="Steps time will be calculated based on the main task creation time">?</button>
-    <button type="button" class="btn btn-outline-primary btn-icon" (click)="addPreStep()">+</button></h4>
+    <button type="button" class="btn btn-outline-warning btn-icon" (click)="addPreStep()">+</button></h4>
     <ul>
       <li *ngFor="let prestep of step.preSteps; let i=index"><button class="btn btn-outline-primary" (click)="openPreStepModal(i)"><i class="bi bi-pencil"></i> {{prestep.type}} at {{prestep.delay}}ms</button></li>
     </ul>
@@ -41,7 +41,7 @@
   <div class="col-6">
     <h4>
       Post-steps <button type="button" class="btn btn-outline-primary btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="Steps time will be calculated based on the main task completion time">?</button>
-      <button type="button" class="btn btn-outline-primary btn-icon" (click)="addPostStep()">+</button>
+      <button type="button" class="btn btn-outline-warning btn-icon" (click)="addPostStep()">+</button>
     </h4>
     <ul>
       <li *ngFor="let postep of step.postSteps; let i=index"><button class="btn btn-outline-primary" (click)="openPostStepModal(i)"><i class="bi bi-pencil"></i> {{postep.type}} at {{postep.delay}}ms</button></li>
