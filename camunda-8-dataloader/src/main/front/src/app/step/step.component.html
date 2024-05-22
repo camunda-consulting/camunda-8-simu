@@ -22,40 +22,134 @@
       <span class="input-group-text">Completion time</span>
       <button class="btn btn-outline-primary" (click)="openDurationModal()"><i class="bi bi-pencil"></i> Avg from {{step.duration.startDesiredAvg}} to {{step.duration.startDesiredAvg}}ms (variation {{step.duration.minMaxPercent}}%). Progression {{step.duration.avgProgression}}</button>
     </div>
-    </div>
-    <!--
-            "elementId": "ServiceTask_0tixwo5",
-            "action": "COMPLETE",
-            "duration": {
-              "startDesiredAvg": 8000,
-              "endDesiredAvg": 4000,
-              "minMaxPercent": 20,
-              "avgProgression": "LINEAR",
-              "progressionSalt": 1000
-            },
-    -->
   </div>
-  <div class="row">
-    <div class="input-group mb-3 col-12">
-      <span class="input-group-text">JSON Template</span>
-      <div class="form-control" #jsonTemplate></div>
-    </div>
+</div>
+<div class="row">
+  <div class="input-group mb-3">
+    <span class="input-group-text">JSON Template</span>
+    <div class="form-control" #jsonTemplate></div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-6">
+    <h4>Pre-steps <button type="button" class="btn btn-outline-primary btn-tooltip" data-bs-toggle="tooltip" data-bs-placement="top" title="Steps time will be calculated based on the main task creation time">?</button>
+    <button type="button" class="btn btn-outline-primary btn-icon" (click)="addPreStep()">+</button></h4>
+    <ul>
+      <li *ngFor="let prestep of step.preSteps; let i=index"><button class="btn btn-outline-primary" (click)="openPreStepModal(i)"><i class="bi bi-pencil"></i> {{prestep.type}} at {{prestep.delay}}ms</button></li>
+    </ul>
+  </div>
+  <div class="col-6">
+    <h4>
+      Post-steps <button type="button" class="btn btn-outline-primary btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="Steps time will be calculated based on the main task completion time">?</button>
+      <button type="button" class="btn btn-outline-primary btn-icon" (click)="addPostStep()">+</button>
+    </h4>
+    <ul>
+      <li *ngFor="let postep of step.postSteps; let i=index"><button class="btn btn-outline-primary" (click)="openPostStepModal(i)"><i class="bi bi-pencil"></i> {{postep.type}} at {{postep.delay}}ms</button></li>
+    </ul>
   </div>
 
-  <div class="modal fade" id="{{step.elementId}}-durationModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Duration</h5>
-          <button type="button" class="btn-close" (click)="closeDurationModal()"></button>
+</div>
+
+
+<div class="modal fade" id="{{step.elementId}}-durationModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Duration</h5>
+        <button type="button" class="btn-close" (click)="closeDurationModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="input-group mb-3 ">
+          <span class="input-group-text">Duration avg at start</span>
+          <input type="number" class="form-control" min=0 [(ngModel)]="step.duration.startDesiredAvg">
         </div>
-        <div class="modal-body">
-          <p>Modal body text goes here.</p>
+        <div class="input-group mb-3 ">
+          <span class="input-group-text">Duration avg at end</span>
+          <input type="number" class="form-control" min=0 [(ngModel)]="step.duration.endDesiredAvg">
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary">Save changes</button>
-          <button type="button" class="btn btn-secondary" (click)="closeDurationModal()">Close</button>
+        <div class="input-group mb-3 ">
+          <span class="input-group-text">Percentage variations</span>
+          <input type="number" class="form-control" min=0 max=100 [(ngModel)]="step.duration.minMaxPercent">
         </div>
+        <div class="input-group mb-3 ">
+          <span class="input-group-text">Progression</span>
+          <select class="form-select" [(ngModel)]="step.duration.avgProgression">
+            <option selected>Choose...</option>
+            <option value="LINEAR">LINEAR</option>
+            <option value="LINEAR_SALTED">LINEAR_SALTED</option>
+          </select>
+        </div>
+        <div class="input-group mb-3" *ngIf="step.duration.avgProgression=='LINEAR_SALTED'">
+          <span class="input-group-text">progression salt</span>
+          <input type="number" class="form-control" min=0 [(ngModel)]="step.duration.progressionSalt">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeDurationModal()">Close</button>
       </div>
     </div>
   </div>
+</div>
+
+
+<div class="modal fade" id="{{step.elementId}}-prestep" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" *ngIf="prestep">Pre step  (executed {{prestep.delay}}ms after creation time)</h5>
+        <button type="button" class="btn-close" (click)="closePreStepModal()"></button>
+      </div>
+      <div class="modal-body" *ngIf="prestep">
+        <div class="input-group mb-3 ">
+          <span class="input-group-text">Progression</span>
+          <select class="form-select" [(ngModel)]="prestep.type">
+            <option selected>Choose...</option>
+            <option value="CLOCK">CLOCK</option>
+            <option value="MSG">MSG</option>
+          </select>
+        </div>
+        <div class="input-group mb-3 ">
+          <span class="input-group-text">Delay</span>
+          <input type="number" class="form-control" min=0 [(ngModel)]="prestep.delay">
+        </div>
+        <div class="input-group mb-3 " *ngIf="prestep.type=='MSG'">
+          <div class="alert alert-danger">MSG not implemented yet</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closePreStepModal()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="{{step.elementId}}-poststep" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" *ngIf="poststep">Post step (executed {{poststep.delay}}ms after completion time)</h5>
+        <button type="button" class="btn-close" (click)="closePostStepModal()"></button>
+      </div>
+      <div class="modal-body" *ngIf="poststep">
+        <div class="input-group mb-3 ">
+          <span class="input-group-text">Progression</span>
+          <select class="form-select" [(ngModel)]="poststep.type">
+            <option selected>Choose...</option>
+            <option value="CLOCK">CLOCK</option>
+            <option value="MSG">MSG</option>
+          </select>
+        </div>
+        <div class="input-group mb-3 ">
+          <span class="input-group-text">Delay</span>
+          <input type="number" class="form-control" min=0 [(ngModel)]="poststep.delay">
+        </div>
+        <div class="input-group mb-3 " *ngIf="poststep.type=='MSG'">
+          <div class="alert alert-danger">MSG not implemented yet</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closePostStepModal()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

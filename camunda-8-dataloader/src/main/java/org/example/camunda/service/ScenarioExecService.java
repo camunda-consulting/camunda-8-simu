@@ -97,7 +97,7 @@ public class ScenarioExecService {
                   if (step.getPreSteps() != null) {
                     for (StepAdditionalAction preStep : step.getPreSteps()) {
                       if (preStep.getType() == StepActionEnum.CLOCK) {
-                        ContextUtils.buildEntry(estimateEngineTime + preStep.getTimeAdvance());
+                        ContextUtils.buildEntry(estimateEngineTime + preStep.getDelay());
                       }
                     }
                   }
@@ -117,7 +117,7 @@ public class ScenarioExecService {
                     if (step.getPostSteps() != null) {
                       for (StepAdditionalAction postStep : step.getPostSteps()) {
                         if (postStep.getType() == StepActionEnum.CLOCK) {
-                          ContextUtils.buildEntry(targetTime + postStep.getTimeAdvance());
+                          ContextUtils.buildEntry(targetTime + postStep.getDelay());
                         }
                       }
                     }
@@ -125,7 +125,7 @@ public class ScenarioExecService {
                     if (step.getPostSteps() != null) {
                       for (StepAdditionalAction postStep : step.getPostSteps()) {
                         if (postStep.getType() == StepActionEnum.CLOCK) {
-                          ContextUtils.buildEntry(estimateEngineTime + postStep.getTimeAdvance());
+                          ContextUtils.buildEntry(estimateEngineTime + postStep.getDelay());
                         }
                       }
                     }

@@ -201,10 +201,10 @@
             "progressionSalt": 43200000
           },
           "jsonTemplate": "{\"approved\":false}",
-          "preStep": [
+          "preSteps": [
             {
               "type": "CLOCK",
-              "timeAdvance": 172800000
+              "delay": 172800000
             }
           ]
         },

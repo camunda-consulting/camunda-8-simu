@@ -33,9 +33,9 @@
           "avgProgression" : "LINEAR_SALTED",
           "progressionSalt" : 180000
         },
-        "postStep" : [{
+        "postSteps" : [{
           "type" : "CLOCK",
-          "timeAdvance" : 300000
+          "delay" : 300000
         }]
       },
       "Activity_18d5u7e" : {
@@ -48,9 +48,9 @@
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000
         },
-        "postStep" : [{
+        "postSteps" : [{
           "type" : "CLOCK",
-          "timeAdvance" : 60000
+          "delay" : 60000
         }]
       }
     },

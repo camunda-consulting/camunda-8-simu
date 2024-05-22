@@ -29,7 +29,7 @@ export class ViewerComponent implements AfterViewInit {
 
     this.viewer = new NavigatedViewer({
       container: this.viewerElt!.nativeElement,
-      height: 500
+      height: 400
     });
     this.viewer.importXML(this.execPlanService.executionPlan.xml).then((result: any) => {
       const eltRegistry: any = this.viewer!.get('elementRegistry');

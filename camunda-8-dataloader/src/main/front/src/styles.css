@@ -1,3 +1,10 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import '~camunda-bpmn-js/dist/assets/camunda-cloud-modeler.css';
+
+.btn.btn-tooltip, .btn.btn-icon {
+  border-radius: 15px;
+  padding: 0px;
+  width: 30px;
+  height: 30px;
+}

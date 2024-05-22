@@ -3,13 +3,12 @@ package org.example.camunda.dto;
 public class StepAdditionalAction {
   private StepActionEnum type = StepActionEnum.CLOCK;
 
-  // CLOCK
-  private Long timeAdvance = 1000L;
+  // CLOCK AND MSG
+  private Long delay = 1000L;
 
   // MSG
   private String msg = "MSG";
   private String correlationId;
-  private Long delayBeforeMsg = 0L;
   private String jsonTemplate = "{}";
 
   public StepActionEnum getType() {
@@ -20,12 +19,12 @@ public class StepAdditionalAction {
     this.type = type;
   }
 
-  public Long getTimeAdvance() {
-    return timeAdvance;
+  public Long getDelay() {
+    return delay;
   }
 
-  public void setTimeAdvance(Long timeAdvance) {
-    this.timeAdvance = timeAdvance;
+  public void setDelay(Long delay) {
+    this.delay = delay;
   }
 
   public String getMsg() {
@@ -42,14 +41,6 @@ public class StepAdditionalAction {
 
   public void setCorrelationId(String correlationId) {
     this.correlationId = correlationId;
-  }
-
-  public Long getDelayBeforeMsg() {
-    return delayBeforeMsg;
-  }
-
-  public void setDelayBeforeMsg(Long delayBeforeMsg) {
-    this.delayBeforeMsg = delayBeforeMsg;
   }
 
   public String getJsonTemplate() {
