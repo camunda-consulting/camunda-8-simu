@@ -3,6 +3,8 @@
     <div class="input-group mb-3 ">
       <span class="input-group-text">Element Id</span>
       <input type="text" class="form-control" value="{{step.elementId}}" readonly disabled>
+
+      <button class="btn btn-danger" (click)="execPlanService.deleteCurrentStep()"><i class="bi bi-trash"></i></button>
     </div>
   </div>
   <div class="col-4">
@@ -40,7 +42,7 @@
   </div>
   <div class="col-6">
     <h4>
-      Post-steps <button type="button" class="btn btn-outline-primary btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="Steps time will be calculated based on the main task completion time">?</button>
+      Post-steps <button type="button" class="btn btn-outline-primary btn-tooltip" data-bs-toggle="tooltip" data-bs-placement="top" title="Steps time will be calculated based on the main task completion time">?</button>
       <button type="button" class="btn btn-outline-warning btn-icon" (click)="addPostStep()">+</button>
     </h4>
     <ul>

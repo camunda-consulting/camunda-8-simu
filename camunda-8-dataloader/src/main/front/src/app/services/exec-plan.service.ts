@@ -48,20 +48,22 @@ export class ExecPlanService {
     this.activities.push(activity);
   }
   selectActivity(activity: string): void {
-    if (this.activities.indexOf(activity) >= 0 || activity =='startInstances') {
+    //if (this.activities.indexOf(activity) >= 0 || activity =='startInstances') {
       this.currentActivity = activity;
       this.activitySubject.next(activity);
-    }
+    //}
   }
 
   selectScenario(scenario: any): void {
     this.selectActivity('startInstances');
     this.scenario = scenario;
   }
-
   createCurrentStepInScenario(): void {
-    this.scenario.steps[this.currentActivity!] = {
-      "elementId": this.currentActivity,
+    this.createStepInScenario(this.currentActivity!)
+  }
+  createStepInScenario(elementId: string): void {
+    this.scenario.steps[elementId] = {
+      "elementId": elementId,
       "action": "COMPLETE",
       "duration": {
         "startDesiredAvg": 8000,
@@ -73,4 +75,13 @@ export class ExecPlanService {
       "jsonTemplate": "{}",
     };
   }
+
+  deleteCurrentStep(): void {
+    delete this.scenario.steps[this.currentActivity!];
+    this.selectActivity('startInstances');
+  }
+
+    deleteScenario(index: number): void {
+      this.executionPlan.scenarii.splice(index, 1);
+    }
 }

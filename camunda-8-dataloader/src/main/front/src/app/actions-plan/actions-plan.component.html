@@ -9,78 +9,104 @@
     <a class="nav-link text-warning" (click)="addScenario()"><i class="bi bi-plus-circle"></i> Add scenario</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" (click)="save()"><i class="bi bi-floppy"></i> Save</a>
+    <a class="nav-link text-success" (click)="save()"><i class="bi bi-floppy"></i> Save</a>
   </li>
 </ul>
-  <div *ngIf="state=='general'" class="tab-pane">
-    <div class="input-group mb-3">
-      <span class="input-group-text" id="basic-addon1">Milliseconds Idle time before next clock move</span>
-      <input type="number" class="form-control" [ngModel]="execPlanService.executionPlan!.idleTimeBeforeClockMove">
-    </div>
-    <div class="input-group mb-3">
-      <span class="input-group-text" id="basic-addon1">Time precision</span>
-      <select class="form-select" [ngModel]="execPlanService.executionPlan!.timePrecision">
-        <option selected>Choose...</option>
-        <option value="SECOND">SECOND</option>
-        <option value="HUNDRED_MILLIS">HUNDRED_MILLIS</option>
-        <option value="TEN_MILLIS">TEN_MILLIS</option>
-        <option value="MILLIS">MILLIS</option>
-      </select>
-    </div>
-    <div class="input-group mb-3">
-      <span class="input-group-text" id="basic-addon1">Instance distribution</span>
-      <select class="form-select" [ngModel]="execPlanService.executionPlan!.instanceDistribution">
-        <option selected>Choose...</option>
-        <option value="DAYS">DAYS</option>
-        <option value="HALF_DAYS">HALF_DAYS</option>
-        <option value="HOURS">HOURS</option>
-        <option value="MINUTES">MINUTES</option>
-      </select>
-    </div>
-    <div class="input-group mb-3">
-      <span class="input-group-text" id="basic-addon1">Number of instances last day</span>
-      <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1">
-    </div>
-    <div class="input-group mb-3">
-      <label class="input-group-text" for="evolution">Evolution</label>
-      <select class="form-select" id="evolution">
-        <option selected>Choose...</option>
-        <option value="linear">Linear</option>
-        <option value="chainsaw">Chainsaw</option>
-      </select>
-      <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">From</button>
-      <ul class="dropdown-menu">
-        <li><a class="dropdown-item" href="#">10%</a></li>
-        <li><a class="dropdown-item" href="#">20%</a></li>
-        <li><a class="dropdown-item" href="#">30%</a></li>
-        <li><a class="dropdown-item" href="#">40%</a></li>
-        <li><a class="dropdown-item" href="#">50%</a></li>
-        <li><a class="dropdown-item" href="#">60%</a></li>
-      </ul>
-      <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">To</button>
-      <ul class="dropdown-menu">
-        <li><a class="dropdown-item" href="#">Action</a></li>
-        <li><a class="dropdown-item" href="#">Another action</a></li>
-        <li><a class="dropdown-item" href="#">Something else here</a></li>
-        <li><hr class="dropdown-divider"></li>
-        <li><a class="dropdown-item" href="#">Separated link</a></li>
-      </ul>
-    </div>
+<div *ngIf="state=='general'" class="tab-pane">
+  <div class="input-group mb-3">
+    <span class="input-group-text" id="basic-addon1">Milliseconds Idle time before next clock move</span>
+    <input type="number" class="form-control" [ngModel]="execPlanService.executionPlan!.idleTimeBeforeClockMove">
   </div>
+  <div class="input-group mb-3">
+    <span class="input-group-text" id="basic-addon1">Time precision</span>
+    <select class="form-select" [ngModel]="execPlanService.executionPlan!.timePrecision">
+      <option selected>Choose...</option>
+      <option value="SECOND">SECOND</option>
+      <option value="HUNDRED_MILLIS">HUNDRED_MILLIS</option>
+      <option value="TEN_MILLIS">TEN_MILLIS</option>
+      <option value="MILLIS">MILLIS</option>
+    </select>
+  </div>
+  <div class="input-group mb-3">
+    <span class="input-group-text" id="basic-addon1">Instance distribution</span>
+    <select class="form-select" [ngModel]="execPlanService.executionPlan!.instanceDistribution">
+      <option selected>Choose...</option>
+      <option value="DAYS">DAYS</option>
+      <option value="HALF_DAYS">HALF_DAYS</option>
+      <option value="HOURS">HOURS</option>
+      <option value="MINUTES">MINUTES</option>
+    </select>
+  </div>
+  <div class="input-group mb-3">
+    <span class="input-group-text" id="basic-addon1">Number of instances last day</span>
+    <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1">
+  </div>
+  <div class="input-group mb-3">
+    <label class="input-group-text" for="evolution">Evolution</label>
+    <select class="form-select" id="evolution">
+      <option selected>Choose...</option>
+      <option value="linear">Linear</option>
+      <option value="chainsaw">Chainsaw</option>
+    </select>
+    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">From</button>
+    <ul class="dropdown-menu">
+      <li><a class="dropdown-item" href="#">10%</a></li>
+      <li><a class="dropdown-item" href="#">20%</a></li>
+      <li><a class="dropdown-item" href="#">30%</a></li>
+      <li><a class="dropdown-item" href="#">40%</a></li>
+      <li><a class="dropdown-item" href="#">50%</a></li>
+      <li><a class="dropdown-item" href="#">60%</a></li>
+    </ul>
+    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">To</button>
+    <ul class="dropdown-menu">
+      <li><a class="dropdown-item" href="#">Action</a></li>
+      <li><a class="dropdown-item" href="#">Another action</a></li>
+      <li><a class="dropdown-item" href="#">Something else here</a></li>
+      <li><hr class="dropdown-divider"></li>
+      <li><a class="dropdown-item" href="#">Separated link</a></li>
+    </ul>
+  </div>
+</div>
 
-  <div *ngFor="let scenario of execPlanService.executionPlan!.scenarii; let i=index">
-    <div class="tab-pane" *ngIf="state==''+i">
-      <div class="d-flex align-items-start">
-        <div class="nav flex-column nav-pills me-3" role="tablist">
-          <button [ngClass]="execPlanService.currentActivity == 'startInstances' ? 'nav-link active' : 'nav-link'" (click)="execPlanService.selectActivity('startInstances')">Scenario settings</button>
-          <button *ngFor="let step of scenario.steps | keyvalue" [ngClass]="execPlanService.currentActivity == step.key ? 'nav-link active' : 'nav-link'"  role="tab"  (click)="execPlanService.selectActivity($any(step.key))">{{step.key}}</button>
+<div *ngFor="let scenario of execPlanService.executionPlan!.scenarii; let i=index">
+  <div class="tab-pane" *ngIf="state==''+i">
+    <div class="d-flex align-items-start">
+      <div class="nav flex-column nav-pills me-3" role="tablist">
+        <button [ngClass]="execPlanService.currentActivity == 'startInstances' ? 'nav-link active' : 'nav-link'" (click)="execPlanService.selectActivity('startInstances')">Scenario settings</button>
+        <button *ngFor="let step of scenario.steps | keyvalue" [ngClass]="execPlanService.currentActivity == step.key ? 'nav-link active' : 'nav-link'" role="tab" (click)="execPlanService.selectActivity($any(step.key))">{{step.key}}</button>
+        <button class="btn btn-outline-warning" (click)="openAddStepModal()"><i class="bi bi-plus-circle"></i> Add step</button>
+        <hr />
+        <button class="btn btn-danger" (click)="deleteScenario(i)"><i class="bi bi-trash"></i> Delete scenario</button>
+      </div>
+      <div class="tab-content" id="v-pills-tabContent">
+        <div [ngClass]="execPlanService.currentActivity == 'startInstances' ? 'tab-pane fade show active' : 'tab-pane fade'">
+          <app-instantiate></app-instantiate>
         </div>
-        <div class="tab-content" id="v-pills-tabContent">
-          <div [ngClass]="execPlanService.currentActivity == 'startInstances' ? 'tab-pane fade show active' : 'tab-pane fade'">
-            <app-instantiate></app-instantiate>
-          </div>
-          <div *ngFor="let step of scenario.steps | keyvalue"  [ngClass]="execPlanService.currentActivity == step.key ? 'tab-pane fade show active' : 'tab-pane fade'"><app-step [step]="step.value"></app-step></div>
-        </div>
+        <div *ngFor="let step of scenario.steps | keyvalue" [ngClass]="execPlanService.currentActivity == step.key ? 'tab-pane fade show active' : 'tab-pane fade'"><app-step [step]="step.value"></app-step></div>
       </div>
     </div>
   </div>
+</div>
+
+<div class="modal fade" id="addnewstep" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Create new step</h5>
+        <button type="button" class="btn-close" (click)="closeAddStepModal()"></button>
+      </div>
+      <div class="modal-body">
+        Please provide the elementId that you want to add as a step
+
+        <div class="input-group mb-3 ">
+          <span class="input-group-text">Element Id</span>
+          <input type="text" class="form-control" [(ngModel)]="newStepElementId">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-warning" (click)="createStep()"><i class="bi bi-plus-circle"></i> Add step</button>
+        <button type="button" class="btn btn-secondary" (click)="closeAddStepModal()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

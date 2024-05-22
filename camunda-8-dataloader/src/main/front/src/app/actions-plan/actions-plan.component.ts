@@ -9,6 +9,7 @@ import { ProcessService } from '../services/process.service';
 })
 export class ActionsPlanComponent implements OnInit {
   state: string = 'general';
+  newStepElementId: string = '';
   constructor(public execPlanService: ExecPlanService, public processService: ProcessService) { }
 
   ngOnInit(): void {
@@ -25,5 +26,21 @@ export class ActionsPlanComponent implements OnInit {
   selectScenario(i: number): void {
     this.execPlanService.selectScenario(this.execPlanService.executionPlan.scenarii[i]);
     this.state = '' + i;
+  }
+
+  deleteScenario(i: number): void {
+    this.execPlanService.deleteScenario(i);
+    this.state = 'general';
+  }
+
+  openAddStepModal(): void {
+    (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById('addnewstep')).show();
+  }
+  closeAddStepModal() {
+    (window as any).bootstrap.Modal.getInstance(document.getElementById('addnewstep')).hide();
+  }
+  createStep() {
+    this.execPlanService.createStepInScenario(this.newStepElementId);
+    this.closeAddStepModal();
   }
 }
