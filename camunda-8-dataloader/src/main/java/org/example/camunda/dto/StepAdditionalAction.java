@@ -8,7 +8,7 @@ public class StepAdditionalAction {
 
   // MSG
   private String msg = "MSG";
-  private String correlationId;
+  private String correlationKey;
   private String jsonTemplate = "{}";
 
   public StepActionEnum getType() {
@@ -35,12 +35,12 @@ public class StepAdditionalAction {
     this.msg = msg;
   }
 
-  public String getCorrelationId() {
-    return correlationId;
+  public String getCorrelationKey() {
+    return correlationKey;
   }
 
-  public void setCorrelationId(String correlationId) {
-    this.correlationId = correlationId;
+  public void setCorrelationKey(String correlationKey) {
+    this.correlationKey = correlationKey;
   }
 
   public String getJsonTemplate() {

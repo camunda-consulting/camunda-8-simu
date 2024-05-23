@@ -103,8 +103,8 @@
       </div>
       <div class="modal-body" *ngIf="prestep">
         <div class="input-group mb-3 ">
-          <span class="input-group-text">Progression</span>
-          <select class="form-select" [(ngModel)]="prestep.type">
+          <span class="input-group-text">Type</span>
+          <select class="form-select" [(ngModel)]="prestep.type" (ngModelChange)="buildPreStepJsonEditor()">
             <option selected>Choose...</option>
             <option value="CLOCK">CLOCK</option>
             <option value="MSG">MSG</option>
@@ -115,7 +115,16 @@
           <input type="number" class="form-control" min=0 [(ngModel)]="prestep.delay">
         </div>
         <div class="input-group mb-3 " *ngIf="prestep.type=='MSG'">
-          <div class="alert alert-danger">MSG not implemented yet</div>
+          <span class="input-group-text">Message</span>
+          <input type="text" class="form-control" [(ngModel)]="prestep.msg">
+        </div>
+        <div class="input-group mb-3 " *ngIf="prestep.type=='MSG'">
+          <span class="input-group-text">Correlation Key</span>
+          <input type="text" class="form-control" [(ngModel)]="prestep.correlationKey">
+        </div>
+        <div class="input-group mb-3" [ngClass]="prestep.type=='MSG' ? '' : 'hidden'">
+          <span class="input-group-text">JSON Template</span>
+          <div class="form-control" id="preStepJsonTemplate"></div>
         </div>
       </div>
       <div class="modal-footer">
@@ -134,8 +143,8 @@
       </div>
       <div class="modal-body" *ngIf="poststep">
         <div class="input-group mb-3 ">
-          <span class="input-group-text">Progression</span>
-          <select class="form-select" [(ngModel)]="poststep.type">
+          <span class="input-group-text">Type</span>
+          <select class="form-select" [(ngModel)]="poststep.type" (ngModelChange)="buildPostStepJsonEditor()">
             <option selected>Choose...</option>
             <option value="CLOCK">CLOCK</option>
             <option value="MSG">MSG</option>
@@ -146,7 +155,16 @@
           <input type="number" class="form-control" min=0 [(ngModel)]="poststep.delay">
         </div>
         <div class="input-group mb-3 " *ngIf="poststep.type=='MSG'">
-          <div class="alert alert-danger">MSG not implemented yet</div>
+          <span class="input-group-text">Message</span>
+          <input type="text" class="form-control" [(ngModel)]="poststep.msg">
+        </div>
+        <div class="input-group mb-3 " *ngIf="poststep.type=='MSG'">
+          <span class="input-group-text">Correlation Key</span>
+          <input type="text" class="form-control" [(ngModel)]="poststep.correlationKey">
+        </div>
+        <div class="input-group mb-3" [ngClass]="poststep.type=='MSG' ? '' : 'hidden'">
+          <span class="input-group-text">JSON Template</span>
+          <div class="form-control" id="postStepJsonTemplate"></div>
         </div>
       </div>
       <div class="modal-footer">

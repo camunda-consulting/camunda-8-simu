@@ -108,13 +108,27 @@ public class ZeebeService {
     return (long) result.get("epochMilli");
   }
 
-  public Long moveClock(long time) {
+  public void message(String message, String correlationKey, JsonNode variables) {
     zeebeWorks();
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
-    HttpEntity<String> request = new HttpEntity<>("{\"offsetMilli\": " + time + "}", headers);
-    Map result = restTemplate.postForObject(gatewayActuator + "/clock/add", request, Map.class);
-    return (long) result.get("epochMilli");
+    try {
+      this.zeebeClient
+          .newPublishMessageCommand()
+          .messageName(message)
+          .correlationKey(correlationKey)
+          .variables(variables)
+          .send()
+          .join();
+    } catch (ClientException e) {
+      if (e instanceof ClientStatusException
+              && (((ClientStatusException) e).getStatus().getCode() == Status.Code.NOT_FOUND)
+          || (((ClientStatusException) e).getStatus().getCode() == Status.Code.CANCELLED)) {
+        LOG.error(
+            "Error publishing message " + message + "with correlation key " + correlationKey, e);
+      } else {
+        ThreadUtils.pause(200);
+        message(message, correlationKey, variables);
+      }
+    }
   }
 
   public void completeJob(Long jobKey, JsonNode variables) {

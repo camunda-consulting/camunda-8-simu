@@ -13,6 +13,8 @@ export class StepComponent implements AfterViewInit {
   @Input() step: any;
   @ViewChild('jsonTemplate') jsonTemplate!: ElementRef;
   codeMirror?: EditorView;
+  preStepcodeMirror?: EditorView;
+  postStepcodeMirror?: EditorView;
   prestep: any;
   poststep: any;
 
@@ -20,7 +22,7 @@ export class StepComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     this.codeMirror = new EditorView({
-      doc: this.prettify(),
+      doc: this.prettify(this.step.jsonTemplate),
       extensions: [
         basicSetup,
         json(),
@@ -28,15 +30,52 @@ export class StepComponent implements AfterViewInit {
       ],
       parent: this.jsonTemplate.nativeElement,
     });
+    
     var tooltips = document.querySelectorAll('.btn-tooltip')
     for (let i = 0; i < tooltips.length; i++) {
       (window as any).bootstrap.Tooltip.getOrCreateInstance(tooltips[i]);
     }
   }
 
-  prettify(): string {
+  buildPreStepJsonEditor(): void {
+    if (this.prestep.type == 'MSG' && !this.preStepcodeMirror) {
+      if (!this.prestep.jsonTemplate) {
+        this.prestep.jsonTemplate = '{}';
+      }
+      this.preStepcodeMirror = new EditorView({
+        doc: this.prestep.jsonTemplate,
+        extensions: [
+          basicSetup,
+          json(),
+          this.updatePreStep
+        ],
+        parent: document.getElementById('preStepJsonTemplate')!,
+      });
+    }
+  }
+
+  buildPostStepJsonEditor(): void {
+    if (this.poststep.type == 'MSG' && !this.postStepcodeMirror) {
+      if (!this.poststep.jsonTemplate) {
+        this.poststep.jsonTemplate = '{}';
+      }
+      this.preStepcodeMirror = new EditorView({
+        doc: this.poststep.jsonTemplate,
+        extensions: [
+          basicSetup,
+          json(),
+          this.updatePostStep
+        ],
+        parent: document.getElementById('postStepJsonTemplate')!,
+      });
+    }
+  }
+
+
+
+  prettify(template: string): string {
     try {
-      return JSON.stringify(JSON.parse(this.step.jsonTemplate), null, 2);
+      return JSON.stringify(JSON.parse(template), null, 2);
     } catch (error) {
       return this.step.jsonTemplate;
     }
@@ -44,6 +83,14 @@ export class StepComponent implements AfterViewInit {
 
   updateListenerExtension = EditorView.updateListener.of((v) => {
     this.step.jsonTemplate = v.state.doc.toString();
+  });
+
+  updatePreStep = EditorView.updateListener.of((v) => {
+    this.prestep.jsonTemplate = v.state.doc.toString();
+  });
+
+  updatePostStep = EditorView.updateListener.of((v) => {
+    this.poststep.jsonTemplate = v.state.doc.toString();
   });
 
   openDurationModal() {

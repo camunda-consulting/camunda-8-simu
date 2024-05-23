@@ -17,6 +17,7 @@ import org.example.camunda.core.IntermediateCatchScheduler;
 import org.example.camunda.core.ZeebeService;
 import org.example.camunda.core.actions.Action;
 import org.example.camunda.core.actions.CompleteJobAction;
+import org.example.camunda.core.actions.MessageAction;
 import org.example.camunda.core.actions.StartInstancesAction;
 import org.example.camunda.dto.ExecutionPlan;
 import org.example.camunda.dto.InstanceContext;
@@ -99,6 +100,16 @@ public class ScenarioExecService {
                     for (StepAdditionalAction preStep : step.getPreSteps()) {
                       if (preStep.getType() == StepActionEnum.CLOCK) {
                         ContextUtils.buildEntry(estimateEngineTime + preStep.getDelay());
+                      } else if (preStep.getType() == StepActionEnum.MSG) {
+                        ContextUtils.addAction(
+                            estimateEngineTime + preStep.getDelay(),
+                            new MessageAction(
+                                preStep.getMsg(),
+                                preStep.getCorrelationKey(),
+                                preStep.getJsonTemplate(),
+                                job.getVariablesAsMap(),
+                                zeebeService),
+                            context.getScenario().getTimePrecision());
                       }
                     }
                   }
@@ -127,6 +138,16 @@ public class ScenarioExecService {
                       for (StepAdditionalAction postStep : step.getPostSteps()) {
                         if (postStep.getType() == StepActionEnum.CLOCK) {
                           ContextUtils.buildEntry(estimateEngineTime + postStep.getDelay());
+                        } else if (postStep.getType() == StepActionEnum.MSG) {
+                          ContextUtils.addAction(
+                              estimateEngineTime + postStep.getDelay(),
+                              new MessageAction(
+                                  postStep.getMsg(),
+                                  postStep.getCorrelationKey(),
+                                  postStep.getJsonTemplate(),
+                                  job.getVariablesAsMap(),
+                                  zeebeService),
+                              context.getScenario().getTimePrecision());
                         }
                       }
                     }
