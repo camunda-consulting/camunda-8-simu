@@ -23,6 +23,10 @@ export class ActionsPlanComponent implements OnInit {
     this.execPlanService.updatePlan();
   }
 
+  execute(): void {
+    this.execPlanService.executeCurrentPlan();
+  }
+
   selectScenario(i: number): void {
     this.execPlanService.selectScenario(this.execPlanService.executionPlan.scenarii[i]);
     this.state = '' + i;

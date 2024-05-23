@@ -52,6 +52,7 @@ public class ScenarioExecService {
   }
 
   public void start(ExecutionPlan plan) {
+
     start(plan, null /*"Green scenario"*/);
   }
 

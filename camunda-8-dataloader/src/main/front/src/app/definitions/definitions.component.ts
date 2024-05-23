@@ -22,4 +22,8 @@ export class DefinitionsComponent implements OnInit {
   openPlan(definition: any): void {
     this.execPlanService.openExecutionPlan(definition);
   }
+
+  executePlan(definition: any): void {
+    this.execPlanService.executePlan(definition);
+  }
 }

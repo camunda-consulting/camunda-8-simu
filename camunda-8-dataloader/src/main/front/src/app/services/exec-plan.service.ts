@@ -21,6 +21,19 @@ export class ExecPlanService {
       this.scenario = this.executionPlan.scenarii[0];
     });
   }
+
+  executePlan(definition: any): void {
+    this.http.get<any>("http://localhost:8080/api/plan/" + definition.bpmnProcessId + "/" + definition.version+"/start").subscribe((response: any) => {
+      console.log("status "+response);
+    });
+  }
+
+  executeCurrentPlan(): void {
+    this.http.post<any>("http://localhost:8080/api/plan/start", this.executionPlan).subscribe((response: any) => {
+      console.log("status " + response);
+    });
+  }
+
   updateDef(xml: string): void {
     this.http.post<any>("http://localhost:8080/api/plan/" + this.executionPlan.definition.bpmnProcessId + "/" + this.executionPlan.definition.version + '/xml', xml).subscribe((response: any) => {
       this.executionPlan = response;

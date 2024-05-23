@@ -91,13 +91,29 @@ public class ExecPlanController {
   }
 
   @GetMapping("/{bpmnProcessId}/{version}/start")
-  public void startPlan(@PathVariable String bpmnProcessId, @PathVariable Long version)
+  public boolean startPlan(@PathVariable String bpmnProcessId, @PathVariable Long version)
       throws OperateException, IOException {
     ExecutionPlan plan = execPlanService.find(bpmnProcessId, version);
+    if (plan == null) {
+      return false;
+    }
     if (plan.getXmlModified()) {
       this.ScenarioExecService.deploy(plan.getDefinition().getName(), plan.getXml());
     }
     this.ScenarioExecService.start(plan);
+    return true;
+  }
+
+  @PostMapping("/start")
+  public boolean startPlan(@RequestBody ExecutionPlan plan) throws OperateException, IOException {
+    if (plan == null) {
+      return false;
+    }
+    if (plan.getXmlModified()) {
+      this.ScenarioExecService.deploy(plan.getDefinition().getName(), plan.getXml());
+    }
+    this.ScenarioExecService.start(plan);
+    return true;
   }
 
   @GetMapping("/{bpmnProcessId}/{version}/scenario/{scenarioName}/start")
