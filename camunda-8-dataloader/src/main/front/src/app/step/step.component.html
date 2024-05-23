@@ -40,7 +40,7 @@
       <li *ngFor="let prestep of step.preSteps; let i=index"><button class="btn btn-outline-primary" (click)="openPreStepModal(i)"><i class="bi bi-pencil"></i> {{prestep.type}} at {{prestep.delay}}ms</button></li>
     </ul>
   </div>
-  <div class="col-6">
+  <div class="col-6" *ngIf="step.action=='COMPLETE'">
     <h4>
       Post-steps <button type="button" class="btn btn-outline-primary btn-tooltip" data-bs-toggle="tooltip" data-bs-placement="top" title="Steps time will be calculated based on the main task completion time">?</button>
       <button type="button" class="btn btn-outline-warning btn-icon" (click)="addPostStep()">+</button>
