@@ -1,0 +1,67 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <span class="navbar-brand"><i class="bi bi-house"></i> Camunda 8 Data $1^^u|_@70®</span>
+  </div>
+</nav>
+<div class="container-fluid row">
+  <div class="col-6 p-2">
+    <div class="card">
+      <div class="card-body ">
+        <h5 class="card-title">Available plans</h5>
+        <table class=" table table-striped table-hover">
+          <thead class="table-dark ">
+            <tr>
+              <th scope="col">BPMN Process Id</th>
+              <th scope="col">Version</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="table-group-divider">
+            <tr *ngFor="let definition of definitions">
+              <td>
+                {{definition.bpmnProcessId}}
+              </td>
+              <td>
+                {{definition.version}}
+              </td>
+              <td>
+                <button (click)="openPlan(definition)" class="btn btn-dark mx-1"><i class="bi bi-pen"></i> Prepare</button>
+                <button (click)="executePlan(definition)" class="btn btn-dark mx-1"><i class="bi bi-send"></i> Execute</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 p-2">
+    <div class="card">
+      <div class="card-body ">
+        <h5 class="card-title">Executions</h5>
+        <div *ngFor="let exec of executions" class="card-text">
+          {{exec.date}}, {{exec.definition.name}} (version {{exec.definition.version}}). Progress : {{exec.progress}}%
+          <button (click)="openHisto(exec.key)" class="btn btn-dark mx-1"><i class="bi bi-hourglass-split"></i> histo</button>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+
+<div class="modal fade modal-lg" id="planHisto" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Histo</h5>
+        <button type="button" class="btn-close" (click)="closeHistoModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div *ngFor="let line of histo">
+          {{line}}
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeHistoModal()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,7 +1,6 @@
 package org.example.camunda.utils;
 
 import io.camunda.zeebe.client.api.worker.JobWorker;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,15 +10,14 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import org.example.camunda.core.actions.Action;
+import org.example.camunda.dto.ExecutionPlan;
 import org.example.camunda.dto.InstanceContext;
 import org.example.camunda.dto.Scenario;
 import org.example.camunda.dto.TimePrecisionEnum;
 
 public class ContextUtils {
 
-  private static List<String> histo = new ArrayList<>();
-
-  private static int idleTimeBeforeClockMove = 300;
+  private static ExecutionPlan currentPlan = null;
   private static Map<String, String> dateTimers = new HashMap<>();
   private static Map<String, String> durationTimers = new HashMap<>();
   private static SortedMap<Long, List<Action>> timedActions = new TreeMap<>();
@@ -91,7 +89,14 @@ public class ContextUtils {
     return !timedActions.isEmpty();
   }
 
-  public static void clean() {
+  public static int nbEntries() {
+    return timedActions.size();
+  }
+
+  public static void endPlan() {
+    HistoUtils.endPlan();
+    currentPlan = null;
+    timedActions.clear();
     durationTimers.clear();
     dateTimers.clear();
     processInstanceScenarioMap.clear();
@@ -138,18 +143,14 @@ public class ContextUtils {
   }
 
   public static int getIdleTimeBeforeClockMove() {
-    return idleTimeBeforeClockMove;
+    return currentPlan.getIdleTimeBeforeClockMove();
   }
 
-  public static void setIdleTimeBeforeClockMove(int idleTimeBeforeClockMove) {
-    ContextUtils.idleTimeBeforeClockMove = idleTimeBeforeClockMove;
+  public static void setPlan(ExecutionPlan plan) {
+    currentPlan = plan;
   }
 
-  public static void addHisto(String comment) {
-    histo.add(Instant.now().toString() + " : " + comment);
-  }
-
-  public static List<String> getHisto() {
-    return histo;
+  public static ExecutionPlan getPlan() {
+    return currentPlan;
   }
 }

@@ -1,17 +1,15 @@
 # https://github.com/camunda-community-hub/spring-zeebe#configuring-camunda-platform-8-saas-connection
 # https://github.com/camunda-community-hub/spring-zeebe#additional-configuration-options
 
-#exporter or operate
-timers.from: exporter
 zeebe.client:
   broker.gatewayAddress: 127.0.0.1:26500
   security.plaintext: true 
 #zeebe.client:
 #  cloud:
 #    region: bru-2
-#    clusterId: debcfc76-bbc4-4b08-b290-8f21848e386a
-#    clientId: wHjN3io7jRkiw0fY7.~~Ux0JUoQzw0om
-#    clientSecret: fx_K_OOZBd9wRFr_yLSFMAhSY3udZZlArNmQx~jDIVddStAsd8ofhY3cWDtq2b2~
+#    clusterId: XXX
+#    clientId: XXX
+#    clientSecret: XXX
       
 gateway.actuator: http://127.0.0.1:9600/actuator
 operate:
@@ -20,11 +18,6 @@ operate:
     clientId: dataloader
     clientSecret: Tcx9kFqVwxlnWMZOhjYCemnLvBr1Gvs3
     keycloakUrl: http://localhost:18080
-  #cloud:
-  #  region: bru-2
-  #  clusterId: debcfc76-bbc4-4b08-b290-8f21848e386a
-  #  clientId: wHjN3io7jRkiw0fY7.~~Ux0JUoQzw0om
-  #  clientSecret: fx_K_OOZBd9wRFr_yLSFMAhSY3udZZlArNmQx~jDIVddStAsd8ofhY3cWDtq2b2~
 
 server:
   port: 8080

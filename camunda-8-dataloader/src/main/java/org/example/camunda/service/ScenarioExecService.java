@@ -13,7 +13,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import org.example.camunda.core.IntermediateCatchScheduler;
 import org.example.camunda.core.ZeebeService;
 import org.example.camunda.core.actions.Action;
 import org.example.camunda.core.actions.CompleteJobAction;
@@ -27,12 +26,12 @@ import org.example.camunda.dto.StepAdditionalAction;
 import org.example.camunda.dto.StepExecPlan;
 import org.example.camunda.utils.BpmnUtils;
 import org.example.camunda.utils.ContextUtils;
+import org.example.camunda.utils.HistoUtils;
 import org.example.camunda.utils.ScenarioUtils;
 import org.example.camunda.utils.ThreadUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -42,11 +41,7 @@ public class ScenarioExecService {
 
   private long estimateEngineTime;
 
-  @Value("${timers.from:operate}")
-  private String timers;
-
   @Autowired private ZeebeService zeebeService;
-  @Autowired private IntermediateCatchScheduler icScheduler;
 
   public DeploymentEvent deploy(String name, String bpmnXml) {
     return zeebeService.deploy(name, bpmnXml);
@@ -59,7 +54,7 @@ public class ScenarioExecService {
 
   public void start(ExecutionPlan plan, String scenarioName) {
     initClock(System.currentTimeMillis());
-    ContextUtils.setIdleTimeBeforeClockMove(plan.getIdleTimeBeforeClockMove());
+    ContextUtils.setPlan(plan);
     prepareTimerCatchEvents(plan);
     prepareInstances(plan, scenarioName);
     prepareWorkers(plan);
@@ -238,15 +233,22 @@ public class ScenarioExecService {
 
   public void execute() {
     initClock(ContextUtils.nextTimeEntry());
-    if (timers.equals("operate")) {
-      icScheduler.start(this);
-    }
 
     this.zeebeService.waitEngineToBeIdle(
         () -> {
           nextTimedAction();
         });
   }
+
+  public void stop() {
+    running = false;
+    ContextUtils.endPlan();
+    zeebeService.deleteControlledClock();
+    HistoUtils.updateProgress(0);
+    HistoUtils.addHisto("Plan execution stopped");
+  }
+
+  public void resume() {}
 
   boolean running = false;
 
@@ -256,8 +258,8 @@ public class ScenarioExecService {
       if (ContextUtils.hasTimeEntries()) {
         Long timedKey = ContextUtils.nextTimeEntry();
         initClock(timedKey);
-
-        ContextUtils.addHisto("Move clock to " + Instant.ofEpochMilli(timedKey).toString());
+        HistoUtils.updateProgress(ContextUtils.nbEntries());
+        HistoUtils.addHisto("Move clock to " + Instant.ofEpochMilli(timedKey).toString());
         List<Action> actions = ContextUtils.getActionsAt(timedKey);
         while (actions.size() > 0) {
           Action a = actions.get(0);
@@ -267,7 +269,7 @@ public class ScenarioExecService {
         LOG.info("Actions at " + dateFormat.format(new Date(timedKey)) + " are executed");
         ContextUtils.removeTimeEntry(timedKey);
       } else {
-        ContextUtils.clean();
+        stop();
       }
     }
     running = false;

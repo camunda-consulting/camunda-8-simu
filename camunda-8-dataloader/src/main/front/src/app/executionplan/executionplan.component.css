@@ -1,0 +1,9 @@
+nav {
+  z-index: 1;
+}
+.mainContent {
+  height: calc(100vh - 40px);
+  position: absolute;
+  top:40px;
+  width:100vw;
+}

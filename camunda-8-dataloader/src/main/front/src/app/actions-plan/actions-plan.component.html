@@ -1,4 +1,4 @@
-<ul class="nav nav-tabs">
+<ul class="nav nav-tabs navbar-dark bg-dark">
   <li class="nav-item">
     <a [ngClass]="state=='general' ? 'nav-link active' : 'nav-link'" (click)="this.state='general'"><i class="bi bi-gear"></i> Global settings</a>
   </li>
@@ -9,10 +9,10 @@
     <a class="nav-link text-warning" (click)="addScenario()"><i class="bi bi-plus-circle"></i> Add scenario</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link text-success" (click)="save()"><i class="bi bi-floppy"></i> Save</a>
+    <a class="nav-link text-light" (click)="save()"><i class="bi bi-floppy"></i> Save</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link text-success text-bold" (click)="execute()"><i class="bi bi-send"></i> Execute</a>
+    <a class="nav-link text-light text-bold" (click)="execute()"><i class="bi bi-send"></i> Execute</a>
   </li>
 </ul>
 <div *ngIf="state=='general'" class="tab-pane">
@@ -40,35 +40,7 @@
       <option value="MINUTES">MINUTES</option>
     </select>
   </div>
-  <div class="input-group mb-3">
-    <span class="input-group-text" id="basic-addon1">Number of instances last day</span>
-    <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1">
-  </div>
-  <div class="input-group mb-3">
-    <label class="input-group-text" for="evolution">Evolution</label>
-    <select class="form-select" id="evolution">
-      <option selected>Choose...</option>
-      <option value="linear">Linear</option>
-      <option value="chainsaw">Chainsaw</option>
-    </select>
-    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">From</button>
-    <ul class="dropdown-menu">
-      <li><a class="dropdown-item" href="#">10%</a></li>
-      <li><a class="dropdown-item" href="#">20%</a></li>
-      <li><a class="dropdown-item" href="#">30%</a></li>
-      <li><a class="dropdown-item" href="#">40%</a></li>
-      <li><a class="dropdown-item" href="#">50%</a></li>
-      <li><a class="dropdown-item" href="#">60%</a></li>
-    </ul>
-    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">To</button>
-    <ul class="dropdown-menu">
-      <li><a class="dropdown-item" href="#">Action</a></li>
-      <li><a class="dropdown-item" href="#">Another action</a></li>
-      <li><a class="dropdown-item" href="#">Something else here</a></li>
-      <li><hr class="dropdown-divider"></li>
-      <li><a class="dropdown-item" href="#">Separated link</a></li>
-    </ul>
-  </div>
+ 
 </div>
 
 <div *ngFor="let scenario of execPlanService.executionPlan!.scenarii; let i=index">

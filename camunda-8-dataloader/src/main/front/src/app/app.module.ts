@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
 import { ActiveinstancesComponent } from './activeinstances/activeinstances.component';
-import { DefinitionsComponent } from './definitions/definitions.component';
+import { HomeComponent } from './home/home.component';
 import { ExecutionplanComponent } from './executionplan/executionplan.component';
 import { OptimizePreviewComponent } from './optimize-preview/optimize-preview.component';
 import { ModelerComponent } from './modeler/modeler.component';
@@ -18,7 +18,7 @@ declare module '@bpmn-io/element-template-icon-renderer';
   declarations: [
     AppComponent,
     ActiveinstancesComponent,
-    DefinitionsComponent,
+    HomeComponent,
     ExecutionplanComponent,
     OptimizePreviewComponent,
     ModelerComponent,

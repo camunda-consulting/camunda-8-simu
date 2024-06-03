@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -16,36 +17,36 @@ export class ExecPlanService {
   activitySubject = new BehaviorSubject<string>('');
 
   openExecutionPlan(definition: any): void {
-    this.http.get<any>("http://localhost:8080/api/plan/" + definition.bpmnProcessId + "/" + definition.version).subscribe((response: any) => {
+    this.http.get<any>(environment.backend +"/api/plan/" + definition.bpmnProcessId + "/" + definition.version).subscribe((response: any) => {
       this.executionPlan = response;
       this.scenario = this.executionPlan.scenarii[0];
     });
   }
 
   executePlan(definition: any): void {
-    this.http.get<any>("http://localhost:8080/api/plan/" + definition.bpmnProcessId + "/" + definition.version+"/start").subscribe((response: any) => {
+    this.http.get<any>(environment.backend +"/api/plan/" + definition.bpmnProcessId + "/" + definition.version+"/start").subscribe((response: any) => {
       console.log("status "+response);
     });
   }
 
   executeCurrentPlan(): void {
-    this.http.post<any>("http://localhost:8080/api/plan/start", this.executionPlan).subscribe((response: any) => {
+    this.http.post<any>(environment.backend + "/api/plan/start", this.executionPlan).subscribe((response: any) => {
       console.log("status " + response);
     });
   }
 
   updateDef(xml: string): void {
-    this.http.post<any>("http://localhost:8080/api/plan/" + this.executionPlan.definition.bpmnProcessId + "/" + this.executionPlan.definition.version + '/xml', xml).subscribe((response: any) => {
+    this.http.post<any>(environment.backend +"/api/plan/" + this.executionPlan.definition.bpmnProcessId + "/" + this.executionPlan.definition.version + '/xml', xml).subscribe((response: any) => {
       this.executionPlan = response;
     });
   }
   updatePlan(): void {
-    this.http.put<any>("http://localhost:8080/api/plan/" + this.executionPlan.definition.bpmnProcessId + "/" + this.executionPlan.definition.version, this.executionPlan).subscribe((response: any) => {
+    this.http.put<any>(environment.backend +"/api/plan/" + this.executionPlan.definition.bpmnProcessId + "/" + this.executionPlan.definition.version, this.executionPlan).subscribe((response: any) => {
       this.executionPlan = response;
     });
   }
   addScenario(): void {
-    this.http.put<any>("http://localhost:8080/api/plan/" + this.executionPlan.definition.bpmnProcessId + "/" + this.executionPlan.definition.version+"/newScenario", this.executionPlan).subscribe((response: any) => {
+    this.http.put<any>(environment.backend +"/api/plan/" + this.executionPlan.definition.bpmnProcessId + "/" + this.executionPlan.definition.version+"/newScenario", this.executionPlan).subscribe((response: any) => {
       this.executionPlan = response;
     });
   }

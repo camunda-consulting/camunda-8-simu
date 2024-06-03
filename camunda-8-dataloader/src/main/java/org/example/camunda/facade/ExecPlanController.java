@@ -2,7 +2,6 @@ package org.example.camunda.facade;
 
 import io.camunda.operate.exception.OperateException;
 import java.io.IOException;
-import java.util.List;
 import org.example.camunda.dto.ExecutionPlan;
 import org.example.camunda.dto.Scenario;
 import org.example.camunda.service.ExecutionPlanService;
@@ -29,15 +28,27 @@ public class ExecPlanController {
   private static final Logger LOG = LoggerFactory.getLogger(ExecPlanController.class);
   private final OperateService operateService;
   private final ExecutionPlanService execPlanService;
-  private final ScenarioExecService ScenarioExecService;
+  private final ScenarioExecService scenarioExecService;
 
   public ExecPlanController(
       OperateService operateService,
       ExecutionPlanService execPlanService,
-      ScenarioExecService ScenarioExecService) {
+      ScenarioExecService scenarioExecService) {
     this.operateService = operateService;
     this.execPlanService = execPlanService;
-    this.ScenarioExecService = ScenarioExecService;
+    this.scenarioExecService = scenarioExecService;
+  }
+
+  @GetMapping("/running")
+  public ExecutionPlan runningPlan() {
+    return ContextUtils.getPlan();
+  }
+
+  @GetMapping("/stop")
+  public void stopPlan() {
+    if (ContextUtils.getPlan() != null) {
+      this.scenarioExecService.stop();
+    }
   }
 
   @GetMapping("/{bpmnProcessId}/{version}")
@@ -98,9 +109,9 @@ public class ExecPlanController {
       return false;
     }
     if (plan.getXmlModified()) {
-      this.ScenarioExecService.deploy(plan.getDefinition().getName(), plan.getXml());
+      this.scenarioExecService.deploy(plan.getDefinition().getName(), plan.getXml());
     }
-    this.ScenarioExecService.start(plan);
+    this.scenarioExecService.start(plan);
     return true;
   }
 
@@ -110,9 +121,9 @@ public class ExecPlanController {
       return false;
     }
     if (plan.getXmlModified()) {
-      this.ScenarioExecService.deploy(plan.getDefinition().getName(), plan.getXml());
+      this.scenarioExecService.deploy(plan.getDefinition().getName(), plan.getXml());
     }
-    this.ScenarioExecService.start(plan);
+    this.scenarioExecService.start(plan);
     return true;
   }
 
@@ -124,13 +135,8 @@ public class ExecPlanController {
       throws OperateException, IOException {
     ExecutionPlan plan = execPlanService.find(bpmnProcessId, version);
     if (plan.getXmlModified()) {
-      this.ScenarioExecService.deploy(plan.getDefinition().getName(), plan.getXml());
+      this.scenarioExecService.deploy(plan.getDefinition().getName(), plan.getXml());
     }
-    this.ScenarioExecService.start(plan, scenarioName);
-  }
-
-  @GetMapping("/histo")
-  public List<String> histo() {
-    return ContextUtils.getHisto();
+    this.scenarioExecService.start(plan, scenarioName);
   }
 }

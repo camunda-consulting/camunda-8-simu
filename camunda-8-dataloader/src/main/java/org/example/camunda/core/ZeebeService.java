@@ -108,6 +108,10 @@ public class ZeebeService {
     return (long) result.get("epochMilli");
   }
 
+  public void deleteControlledClock() {
+    restTemplate.delete(gatewayActuator + "/clock");
+  }
+
   public void message(String message, String correlationKey, JsonNode variables) {
     zeebeWorks();
     try {
