@@ -1,0 +1,5 @@
+hr {
+  border: 2px solid gray;
+  margin: 0;
+  cursor: ns-resize;
+}

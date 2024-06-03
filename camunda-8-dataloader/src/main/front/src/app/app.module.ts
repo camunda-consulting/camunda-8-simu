@@ -13,6 +13,7 @@ import { ViewerComponent } from './viewer/viewer.component';
 import { ActionsPlanComponent } from './actions-plan/actions-plan.component';
 import { InstantiateComponent } from './instantiate/instantiate.component';
 import { StepComponent } from './step/step.component';
+import { DraggableComponent } from './draggable/draggable.component';
 declare module '@bpmn-io/element-template-icon-renderer';
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ declare module '@bpmn-io/element-template-icon-renderer';
     ViewerComponent,
     ActionsPlanComponent,
     InstantiateComponent,
-    StepComponent
+    StepComponent,
+    DraggableComponent
   ],
   imports: [
     BrowserModule, FormsModule, HttpClientModule
