@@ -20,7 +20,27 @@ export class HistoService {
     return this.http.get<any[]>(environment.backend + "/api/histo/progresses");
   }
 
-  histo(plan: string): Observable<string[]> {
-    return this.http.get<string[]>(environment.backend + "/api/histo/logs/"+plan);
+  histo(filter: any): Observable<any> {
+    console.log(filter);
+    let luceneQuery = 'planCode:' + filter.planCode +
+      ' AND engineDate:[' + this.getTime(filter.engineDate.from) + ' TO ' + this.getTime(filter.engineDate.to) + ']' +
+      ' AND realDate:[' + this.getTime(filter.realDate.from) + ' TO ' + this.getTime(filter.realDate.to) + ']';
+
+    if (filter.log && filter.log != '') {
+      luceneQuery = luceneQuery + ' AND log:' + filter.log;
+    }
+    let params = "?size=" + filter.size;
+    if (filter.after) {
+      params += "&after=" + filter.after;
+    }
+    return this.http.post<any>(environment.backend + "/api/histo/search"+params, luceneQuery);
+  }
+
+  getTime(date: string): string {
+    let result = "" + new Date(date).getTime();
+    if (result.length < 13) {
+      result = "0" + result;
+    }
+    return result;
   }
 }

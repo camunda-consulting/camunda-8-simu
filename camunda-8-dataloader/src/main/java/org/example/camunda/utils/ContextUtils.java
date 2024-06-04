@@ -17,6 +17,7 @@ import org.example.camunda.dto.TimePrecisionEnum;
 
 public class ContextUtils {
 
+  private static long estimateEngineTime;
   private static ExecutionPlan currentPlan = null;
   private static Map<String, String> dateTimers = new HashMap<>();
   private static Map<String, String> durationTimers = new HashMap<>();
@@ -152,5 +153,13 @@ public class ContextUtils {
 
   public static ExecutionPlan getPlan() {
     return currentPlan;
+  }
+
+  public static long getEngineTime() {
+    return estimateEngineTime;
+  }
+
+  public static void setEngineTime(long estimateEngineTime) {
+    ContextUtils.estimateEngineTime = estimateEngineTime;
   }
 }

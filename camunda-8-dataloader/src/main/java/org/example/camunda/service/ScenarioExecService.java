@@ -39,8 +39,6 @@ public class ScenarioExecService {
   private static final Logger LOG = LoggerFactory.getLogger(ScenarioExecService.class);
   DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS Z");
 
-  private long estimateEngineTime;
-
   @Autowired private ZeebeService zeebeService;
 
   public DeploymentEvent deploy(String name, String bpmnXml) {
@@ -94,10 +92,10 @@ public class ScenarioExecService {
                   if (step.getPreSteps() != null) {
                     for (StepAdditionalAction preStep : step.getPreSteps()) {
                       if (preStep.getType() == StepActionEnum.CLOCK) {
-                        ContextUtils.buildEntry(estimateEngineTime + preStep.getDelay());
+                        ContextUtils.buildEntry(ContextUtils.getEngineTime() + preStep.getDelay());
                       } else if (preStep.getType() == StepActionEnum.MSG) {
                         ContextUtils.addAction(
-                            estimateEngineTime + preStep.getDelay(),
+                            ContextUtils.getEngineTime() + preStep.getDelay(),
                             new MessageAction(
                                 preStep.getMsg(),
                                 preStep.getCorrelationKey(),
@@ -110,7 +108,7 @@ public class ScenarioExecService {
                   }
                   if (step.getAction() == StepActionEnum.COMPLETE) {
                     long targetTime =
-                        estimateEngineTime
+                        ContextUtils.getEngineTime()
                             + ScenarioUtils.calculateTaskDuration(step, processInstanceKey);
                     targetTime =
                         ContextUtils.addAction(
@@ -132,10 +130,11 @@ public class ScenarioExecService {
                     if (step.getPostSteps() != null) {
                       for (StepAdditionalAction postStep : step.getPostSteps()) {
                         if (postStep.getType() == StepActionEnum.CLOCK) {
-                          ContextUtils.buildEntry(estimateEngineTime + postStep.getDelay());
+                          ContextUtils.buildEntry(
+                              ContextUtils.getEngineTime() + postStep.getDelay());
                         } else if (postStep.getType() == StepActionEnum.MSG) {
                           ContextUtils.addAction(
-                              estimateEngineTime + postStep.getDelay(),
+                              ContextUtils.getEngineTime() + postStep.getDelay(),
                               new MessageAction(
                                   postStep.getMsg(),
                                   postStep.getCorrelationKey(),
@@ -228,7 +227,7 @@ public class ScenarioExecService {
   }
 
   public void initClock(Long clock) {
-    estimateEngineTime = this.zeebeService.setClock(clock);
+    ContextUtils.setEngineTime(this.zeebeService.setClock(clock));
   }
 
   public void execute() {
@@ -242,10 +241,9 @@ public class ScenarioExecService {
 
   public void stop() {
     running = false;
+    HistoUtils.addHisto("Plan execution stopped");
     ContextUtils.endPlan();
     zeebeService.deleteControlledClock();
-    HistoUtils.updateProgress(0);
-    HistoUtils.addHisto("Plan execution stopped");
   }
 
   public void resume() {}

@@ -2,7 +2,7 @@
   <div class="col-12">
     <div class="input-group mb-3">
       <span class="input-group-text">Scenario name</span>
-      <input type="text" class="form-control" [ngModel]="execPlanService.scenario!.name">
+      <input type="text" class="form-control" [(ngModel)]="execPlanService.scenario!.name">
     </div>
   </div>
 </div>
@@ -10,13 +10,13 @@
   <div class="col-6">
     <div class="input-group mb-3">
       <span class="input-group-text">First day (FEEL)</span>
-      <input type="text" class="form-control" [ngModel]="execPlanService.scenario!.firstDayFeelExpression">
+      <input type="text" class="form-control" [(ngModel)]="execPlanService.scenario!.firstDayFeelExpression">
     </div>
   </div>
   <div class="col-6">
     <div class="input-group mb-3">
       <span class="input-group-text">Last day (FEEL)</span>
-      <input type="text" class="form-control" [ngModel]="execPlanService.scenario!.lastDayFeelExpression">
+      <input type="text" class="form-control" [(ngModel)]="execPlanService.scenario!.lastDayFeelExpression">
     </div>
   </div>
 </div>
@@ -24,13 +24,13 @@
   <div class="col-6">
     <div class="input-group mb-3">
       <span class="input-group-text">Day time start (hour)</span>
-      <input type="number" class="form-control" [ngModel]="execPlanService.scenario!.dayTimeStart" min="0" max="23">
+      <input type="number" class="form-control" [(ngModel)]="execPlanService.scenario!.dayTimeStart" min="0" max="23">
     </div>
   </div>
   <div class="col-6">
     <div class="input-group mb-3">
       <span class="input-group-text">Day end time (our)</span>
-      <input type="number" class="form-control" [ngModel]="execPlanService.scenario!.dayTimeEnd" min="0" max="23">
+      <input type="number" class="form-control" [(ngModel)]="execPlanService.scenario!.dayTimeEnd" min="0" max="23">
     </div>
   </div>
 </div>
@@ -39,13 +39,13 @@
   <div class="col-6">
     <div class="input-group mb-3">
       <span class="input-group-text">Number of instances at start</span>
-      <input type="number" class="form-control" [ngModel]="execPlanService.scenario!.nbInstancesStart" min="0">
+      <input type="number" class="form-control" [(ngModel)]="execPlanService.scenario!.nbInstancesStart" min="0">
     </div>
   </div>
   <div class="col-6">
     <div class="input-group mb-3">
       <span class="input-group-text">Number of instances at end</span>
-      <input type="number" class="form-control" [ngModel]="execPlanService.scenario!.nbInstancesEnd" min="0">
+      <input type="number" class="form-control" [(ngModel)]="execPlanService.scenario!.nbInstancesEnd" min="0">
     </div>
   </div>
 </div>
@@ -63,13 +63,13 @@
   <div class="col-4">
     <div class="input-group mb-3" *ngIf="execPlanService.scenario.evolution=='LINEAR_SALTED'">
       <span class="input-group-text">Salt (min)</span>
-      <input type="number" class="form-control" [ngModel]="execPlanService.scenario!.saltMin" min="0">
+      <input type="number" class="form-control" [(ngModel)]="execPlanService.scenario!.saltMin" min="0">
     </div>
   </div>
   <div class="col-4">
     <div class="input-group mb-3 " *ngIf="execPlanService.scenario.evolution=='LINEAR_SALTED'">
       <span class="input-group-text">Salt (max)</span>
-      <input type="number" class="form-control" [ngModel]="execPlanService.scenario!.saltMin" min="0">
+      <input type="number" class="form-control" [(ngModel)]="execPlanService.scenario!.saltMin" min="0">
     </div>
   </div>
 </div>

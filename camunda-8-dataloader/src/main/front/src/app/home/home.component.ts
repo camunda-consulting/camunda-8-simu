@@ -14,9 +14,15 @@ export class HomeComponent implements OnInit {
 
   definitions: any[] = [];
   executions: any[] = [];
-  histo: string[] = []
+  histo: any = {};
   execMap: any;
+  public filter: any = { "size":10, "engineDate": { "from": "2020-01-01T00:00:00", "to": new Date().toISOString().substring(0, 11) + new Date().toLocaleTimeString('fr-FR') }, "realDate": { "from": new Date().toISOString().substring(0, 11) + "00:00:00", "to": new Date().toISOString().substring(0, 11) + new Date().toLocaleTimeString('fr-FR') } };
+
   ngOnInit(): void {
+    this.filter.engineDate.fromTxt = this.tmpStmpToString(this.filter.engineDate.from);
+    this.filter.engineDate.toTxt = this.tmpStmpToString(this.filter.engineDate.to);
+    this.filter.realDate.fromTxt = this.tmpStmpToString(this.filter.realDate.from);
+    this.filter.realDate.toTxt = this.tmpStmpToString(this.filter.realDate.to);
     this.processService.definitions().subscribe((response: any[]) => {
       this.definitions = response;
     });
@@ -47,11 +53,48 @@ export class HomeComponent implements OnInit {
 
 
   openHisto(plan: string) {
-    this.histoService.histo(plan).subscribe((resp: string[]) => {
+    this.filter.planCode = '"' + plan + '"';
+    this.searchHisto(true, true);
+  }
+
+  search() {
+    this.searchHisto(true, false);
+  }
+  nextPage() {
+    this.filter.after = this.histo.sortValues[1];
+    this.searchHisto(false, false);
+  }
+
+  searchHisto(resetPAgination: boolean, openPopup: boolean) {
+    if (resetPAgination) {
+      delete this.filter.after;
+    }
+    this.histoService.histo(this.filter).subscribe((resp: any) => {
       this.histo = resp;
-      (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById('planHisto')).show();
+      for (let line of this.histo.items) {
+        line.engineDate = new Date(line.engineDate).toLocaleString('fr');
+        line.realDate = new Date(line.realDate).toLocaleString('fr');
+      }
+      if (openPopup) {
+        (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById('planHisto')).show();
+      }
     });
   }
+  changeFilterDate() {
+    this.filter.engineDate.fromTxt = this.tmpStmpToString(this.filter.engineDate.from);
+    this.filter.engineDate.toTxt = this.tmpStmpToString(this.filter.engineDate.to);
+    this.searchHisto(true, false);
+  }
+
+
+  tmpStmpToString(timestamp: number): string {
+    return new Date(timestamp).toLocaleString("en-US", {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    });
+  }
+
   closeHistoModal() {
     (window as any).bootstrap.Modal.getInstance(document.getElementById('planHisto')).hide();
   }
