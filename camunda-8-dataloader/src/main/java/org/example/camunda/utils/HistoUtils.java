@@ -83,11 +83,13 @@ public class HistoUtils {
     }
   }
 
-  private static String getPlanCode() {
+  public static String getPlanCode() {
     if (planCode == null) {
       ExecutionPlan plan = ContextUtils.getPlan();
-      planCode = plan.getDefinition().getBpmnProcessId() + "_" + Instant.now().toString();
-      plans.put(planCode, plan);
+      if (plan != null) {
+        planCode = plan.getDefinition().getBpmnProcessId() + "_" + Instant.now().toString();
+        plans.put(planCode, plan);
+      }
     }
     return planCode;
   }

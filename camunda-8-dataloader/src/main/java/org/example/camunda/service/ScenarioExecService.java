@@ -12,7 +12,6 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import org.example.camunda.core.ZeebeService;
 import org.example.camunda.core.actions.Action;
 import org.example.camunda.core.actions.CompleteJobAction;
@@ -47,19 +46,19 @@ public class ScenarioExecService {
 
   public void start(ExecutionPlan plan) {
 
-    start(plan, null /*"Green scenario"*/);
+    start(plan, null);
   }
 
   public void start(ExecutionPlan plan, String scenarioName) {
-    initClock(System.currentTimeMillis());
     ContextUtils.setPlan(plan);
-    prepareTimerCatchEvents(plan);
+    initClock(System.currentTimeMillis());
+    // prepareTimerCatchEvents(plan);
     prepareInstances(plan, scenarioName);
     prepareWorkers(plan);
     execute();
   }
 
-  private void prepareTimerCatchEvents(ExecutionPlan plan) {
+  /*private void prepareTimerCatchEvents(ExecutionPlan plan) {
     Map<String, String> timers = BpmnUtils.getTimerCatchEvents(plan.getXml());
     for (Map.Entry<String, String> timer : timers.entrySet()) {
       String flowNodeId = timer.getKey();
@@ -70,7 +69,7 @@ public class ScenarioExecService {
         ContextUtils.addDurationTimer(flowNodeId, wait.substring(9));
       }
     }
-  }
+  }*/
 
   private void prepareWorkers(ExecutionPlan plan) {
     List<String> jobTypes = BpmnUtils.getJobTypes(plan.getXml());

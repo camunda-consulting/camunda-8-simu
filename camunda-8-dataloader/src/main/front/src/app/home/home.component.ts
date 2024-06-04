@@ -16,15 +16,19 @@ export class HomeComponent implements OnInit {
   executions: any[] = [];
   histo: any = {};
   execMap: any;
-  public filter: any = { "size":10, "engineDate": { "from": "2020-01-01T00:00:00", "to": new Date().toISOString().substring(0, 11) + new Date().toLocaleTimeString('fr-FR') }, "realDate": { "from": new Date().toISOString().substring(0, 11) + "00:00:00", "to": new Date().toISOString().substring(0, 11) + new Date().toLocaleTimeString('fr-FR') } };
-
+  runningPlan?: any = null;
+  public filter?: any = null;
   ngOnInit(): void {
-    this.filter.engineDate.fromTxt = this.tmpStmpToString(this.filter.engineDate.from);
-    this.filter.engineDate.toTxt = this.tmpStmpToString(this.filter.engineDate.to);
-    this.filter.realDate.fromTxt = this.tmpStmpToString(this.filter.realDate.from);
-    this.filter.realDate.toTxt = this.tmpStmpToString(this.filter.realDate.to);
+
     this.processService.definitions().subscribe((response: any[]) => {
       this.definitions = response;
+    });
+    this.reload();
+  }
+
+  reload(): void {
+    this.execPlanService.currentlyRunning().subscribe((response: any) => {
+      this.runningPlan = response;
     });
     this.histoService.executions().subscribe((response: any) => {
       this.execMap = response;
@@ -48,11 +52,28 @@ export class HomeComponent implements OnInit {
   }
 
   executePlan(definition: any): void {
-    this.execPlanService.executePlan(definition);
+    this.execPlanService.executePlan(definition).subscribe(() => {
+      this.reload();
+    });
+  }
+
+  stopExecution(): void {
+    this.execPlanService.stopPlan().subscribe(() => {
+      this.reload();
+    });
   }
 
 
   openHisto(plan: string) {
+    if (!this.filter) { 
+      this.filter = {
+        "size": 10, "engineDate": { "from": "2020-01-01T00:00:00", "to": new Date().toISOString().substring(0, 11) + new Date().toLocaleTimeString('fr-FR') }, "realDate": { "from": new Date().toISOString().substring(0, 11) + "00:00:00", "to": new Date().toISOString().substring(0, 11) + new Date().toLocaleTimeString('fr-FR') }
+      };
+      this.filter.engineDate.fromTxt = this.tmpStmpToString(this.filter.engineDate.from);
+      this.filter.engineDate.toTxt = this.tmpStmpToString(this.filter.engineDate.to);
+      this.filter.realDate.fromTxt = this.tmpStmpToString(this.filter.realDate.from);
+      this.filter.realDate.toTxt = this.tmpStmpToString(this.filter.realDate.to);
+    }
     this.filter.planCode = '"' + plan + '"';
     this.searchHisto(true, true);
   }
@@ -62,6 +83,10 @@ export class HomeComponent implements OnInit {
   }
   nextPage() {
     this.filter.after = this.histo.sortValues[1];
+    this.searchHisto(false, false);
+  }
+  firstPage() {
+    delete this.filter.after;
     this.searchHisto(false, false);
   }
 

@@ -26,7 +26,8 @@
               </td>
               <td>
                 <button (click)="openPlan(definition)" class="btn btn-dark mx-1"><i class="bi bi-pen"></i> Prepare</button>
-                <button (click)="executePlan(definition)" class="btn btn-dark mx-1"><i class="bi bi-send"></i> Execute</button>
+                <button (click)="executePlan(definition)" class="btn btn-dark mx-1" [disabled]="runningPlan"><i class="bi bi-send"></i> Execute <i *ngIf="runningPlan && runningPlan.definition.bpmnProcessId==definition.bpmnProcessId && runningPlan.definition.version==definition.version">(running)</i></button>
+                <button (click)="stopExecution()" class="btn btn-dark mx-1" *ngIf="runningPlan && runningPlan.definition.bpmnProcessId==definition.bpmnProcessId && runningPlan.definition.version==definition.version"><i class="bi bi-sign-stop"></i> Stop</button>
               </td>
             </tr>
           </tbody>
@@ -54,7 +55,7 @@
         <h5 class="modal-title">Histo</h5>
         <button type="button" class="btn-close" (click)="closeHistoModal()"></button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body" *ngIf="filter">
         <table class=" table table-striped table-hover">
           <thead class="table-dark ">
             <tr>
@@ -124,7 +125,8 @@
             </div>
           </div>
           <div class="col-4 text-center">
-            <button class="btn btn-outline-primary" (click)="nextPage()">>> Next</button>
+            <button class="btn btn-outline-primary" (click)="firstPage()" *ngIf="filter.after"><i class="bi bi-arrow-left-short"></i> 1st page</button>
+            <button class="btn btn-outline-primary" (click)="nextPage()" *ngIf="histo.count==filter.size"><i class="bi bi-arrow-right-short"></i> Next</button>
           </div>
           <div class="col-4">
             <div class="input-group mb-1">

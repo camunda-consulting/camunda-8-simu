@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -12,21 +12,19 @@ export class ExecPlanService {
     private http: HttpClient) { }
   executionPlan: any | undefined;
   activities: string[] = [];
-  scenario:any={};
+  scenario: any = {};
   currentActivity: string | undefined;
   activitySubject = new BehaviorSubject<string>('');
 
   openExecutionPlan(definition: any): void {
-    this.http.get<any>(environment.backend +"/api/plan/" + definition.bpmnProcessId + "/" + definition.version).subscribe((response: any) => {
+    this.http.get<any>(environment.backend + "/api/plan/" + definition.bpmnProcessId + "/" + definition.version).subscribe((response: any) => {
       this.executionPlan = response;
       this.scenario = this.executionPlan.scenarii[0];
     });
   }
 
-  executePlan(definition: any): void {
-    this.http.get<any>(environment.backend +"/api/plan/" + definition.bpmnProcessId + "/" + definition.version+"/start").subscribe((response: any) => {
-      console.log("status "+response);
-    });
+  executePlan(definition: any): Observable<any> {
+    return this.http.get<any>(environment.backend + "/api/plan/" + definition.bpmnProcessId + "/" + definition.version + "/start");
   }
 
   executeCurrentPlan(): void {
@@ -36,19 +34,25 @@ export class ExecPlanService {
   }
 
   updateDef(xml: string): void {
-    this.http.post<any>(environment.backend +"/api/plan/" + this.executionPlan.definition.bpmnProcessId + "/" + this.executionPlan.definition.version + '/xml', xml).subscribe((response: any) => {
+    this.http.post<any>(environment.backend + "/api/plan/" + this.executionPlan.definition.bpmnProcessId + "/" + this.executionPlan.definition.version + '/xml', xml).subscribe((response: any) => {
       this.executionPlan = response;
     });
   }
   updatePlan(): void {
-    this.http.put<any>(environment.backend +"/api/plan/" + this.executionPlan.definition.bpmnProcessId + "/" + this.executionPlan.definition.version, this.executionPlan).subscribe((response: any) => {
+    this.http.put<any>(environment.backend + "/api/plan/" + this.executionPlan.definition.bpmnProcessId + "/" + this.executionPlan.definition.version, this.executionPlan).subscribe((response: any) => {
       this.executionPlan = response;
     });
   }
   addScenario(): void {
-    this.http.put<any>(environment.backend +"/api/plan/" + this.executionPlan.definition.bpmnProcessId + "/" + this.executionPlan.definition.version+"/newScenario", this.executionPlan).subscribe((response: any) => {
+    this.http.put<any>(environment.backend + "/api/plan/" + this.executionPlan.definition.bpmnProcessId + "/" + this.executionPlan.definition.version + "/newScenario", this.executionPlan).subscribe((response: any) => {
       this.executionPlan = response;
     });
+  }
+  currentlyRunning(): Observable<any> {
+    return this.http.get<any>(environment.backend + "/api/plan/running")
+  }
+  stopPlan(): Observable<any> {
+    return this.http.get<any>(environment.backend + "/api/plan/stop")
   }
 
   clear(): void {
@@ -63,8 +67,8 @@ export class ExecPlanService {
   }
   selectActivity(activity: string): void {
     //if (this.activities.indexOf(activity) >= 0 || activity =='startInstances') {
-      this.currentActivity = activity;
-      this.activitySubject.next(activity);
+    this.currentActivity = activity;
+    this.activitySubject.next(activity);
     //}
   }
 
@@ -95,7 +99,9 @@ export class ExecPlanService {
     this.selectActivity('startInstances');
   }
 
-    deleteScenario(index: number): void {
-      this.executionPlan.scenarii.splice(index, 1);
-    }
+  deleteScenario(index: number): void {
+    this.executionPlan.scenarii.splice(index, 1);
+  }
+
+
 }
