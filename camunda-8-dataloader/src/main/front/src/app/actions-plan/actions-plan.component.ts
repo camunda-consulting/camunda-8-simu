@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ExecPlanService } from '../services/exec-plan.service';
 import { ProcessService } from '../services/process.service';
 
@@ -7,11 +7,20 @@ import { ProcessService } from '../services/process.service';
   templateUrl: './actions-plan.component.html',
   styleUrls: ['./actions-plan.component.css']
 })
-export class ActionsPlanComponent  {
+export class ActionsPlanComponent implements OnInit {
 
   state: string = 'general';
   newStepElementId: string = '';
+  running = false;
   constructor(public execPlanService: ExecPlanService, public processService: ProcessService) { }
+
+  ngOnInit(): void {
+    this.execPlanService.currentlyRunning().subscribe((response: any) => {
+      if (response) {
+        this.running = true;
+      }
+    });
+    }
 
   
 
