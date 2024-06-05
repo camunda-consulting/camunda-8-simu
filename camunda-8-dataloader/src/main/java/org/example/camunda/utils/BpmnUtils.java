@@ -130,6 +130,24 @@ public class BpmnUtils {
     return null;
   }
 
+  public static List<String> getSubProcessBpmnId(String xml) {
+    Document doc = getXmlDocument(xml);
+    List<String> result = new ArrayList<>();
+    for (String tagName : List.of("bpmn2:callActivity", "bpmn:callActivity")) {
+      NodeList nodeList = doc.getElementsByTagName(tagName);
+      for (int i = 0; i < nodeList.getLength(); i++) {
+        result.add(
+            ((Element) nodeList.item(i))
+                .getElementsByTagName("zeebe:calledElement")
+                .item(0)
+                .getAttributes()
+                .getNamedItem("processId")
+                .getNodeValue());
+      }
+    }
+    return result;
+  }
+
   public static List<String> getServiceTasksElementsId(Document xmlDocument) {
     return getElementsIds(xmlDocument, List.of("bpmn2:serviceTask", "bpmn:serviceTask"));
   }

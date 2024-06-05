@@ -11,7 +11,6 @@ export class ExecPlanService {
   constructor(
     private http: HttpClient) { }
   executionPlan: any | undefined;
-  activities: string[] = [];
   scenario: any = {};
   currentActivity: string | undefined;
   activitySubject = new BehaviorSubject<string>('');
@@ -58,18 +57,12 @@ export class ExecPlanService {
   clear(): void {
     this.executionPlan = undefined;
     this.scenario = {};
-    this.activities = [];
     this.currentActivity = undefined;
   }
 
-  addActivity(activity: string) {
-    this.activities.push(activity);
-  }
   selectActivity(activity: string): void {
-    //if (this.activities.indexOf(activity) >= 0 || activity =='startInstances') {
     this.currentActivity = activity;
     this.activitySubject.next(activity);
-    //}
   }
 
   selectScenario(scenario: any): void {

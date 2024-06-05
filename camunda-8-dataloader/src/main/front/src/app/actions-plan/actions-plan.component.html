@@ -41,7 +41,9 @@
       <option value="MINUTES">MINUTES</option>
     </select>
   </div>
- 
+ <div class="alert alert-info">
+   Time precision and instance distribution will impact the realism of the simulation but will negatively impact the simulation performance. Time precision HUNDRED_MILLIS will be more realistic than SECOND (but less efficient). Instance distribution DAYS is more efficient than HOURS (but less realistic)
+ </div>
 </div>
 
 <div *ngFor="let scenario of execPlanService.executionPlan!.scenarii; let i=index">

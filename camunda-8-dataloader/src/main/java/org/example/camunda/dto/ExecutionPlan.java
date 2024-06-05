@@ -4,10 +4,12 @@ import io.camunda.operate.model.ProcessDefinition;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ExecutionPlan {
   private ProcessDefinition definition;
   private String xml;
+  private Map<String, String> xmlDependencies;
   private Boolean xmlModified = false;
   private Integer idleTimeBeforeClockMove = 300;
   private ChronoUnit instanceDistribution = ChronoUnit.DAYS;
@@ -28,6 +30,14 @@ public class ExecutionPlan {
 
   public void setXml(String xml) {
     this.xml = xml;
+  }
+
+  public Map<String, String> getXmlDependencies() {
+    return xmlDependencies;
+  }
+
+  public void setXmlDependencies(Map<String, String> xmlDependencies) {
+    this.xmlDependencies = xmlDependencies;
   }
 
   public Boolean getXmlModified() {

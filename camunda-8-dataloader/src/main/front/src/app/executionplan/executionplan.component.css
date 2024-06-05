@@ -15,3 +15,7 @@ app-actions-plan {
   overflow-y: auto;
   background:white;
 }
+
+app-viewer {
+  position:relative;
+}

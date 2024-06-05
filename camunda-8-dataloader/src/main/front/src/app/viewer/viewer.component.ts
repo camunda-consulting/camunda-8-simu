@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, AfterViewInit, ViewChild, ElementRef, OnInit } from '@angular/core';
 import NavigatedViewer from 'camunda-bpmn-js/lib/camunda-cloud/NavigatedViewer';
 import { ProcessService } from '../services/process.service';
 import { ExecPlanService } from '../services/exec-plan.service';
@@ -8,10 +8,11 @@ import { ExecPlanService } from '../services/exec-plan.service';
   templateUrl: './viewer.component.html',
   styleUrls: ['./viewer.component.css']
 })
-export class ViewerComponent implements AfterViewInit {
+export class ViewerComponent implements AfterViewInit, OnInit {
   @ViewChild('viewer') viewerElt: ElementRef | undefined;
   viewer: NavigatedViewer | undefined;
   previousActivity?: string;
+  xmlDeps = ["Main definition"];
 
   constructor(private processService: ProcessService, public execPlanService: ExecPlanService) {
     this.execPlanService.activitySubject.subscribe((activity: string) => {
@@ -24,6 +25,15 @@ export class ViewerComponent implements AfterViewInit {
       }
     });
   }
+    ngOnInit(): void {
+      if (this.execPlanService.executionPlan.xmlDependencies) {
+        for (let prop in this.execPlanService.executionPlan.xmlDependencies) {
+          this.xmlDeps.push(prop);
+        }
+      }
+    }
+
+
 
   ngAfterViewInit(): void {
 
@@ -32,12 +42,12 @@ export class ViewerComponent implements AfterViewInit {
       height: 400
     });
     this.viewer.importXML(this.execPlanService.executionPlan.xml).then((result: any) => {
-      const eltRegistry: any = this.viewer!.get('elementRegistry');
+      /*const eltRegistry: any = this.viewer!.get('elementRegistry');
       eltRegistry.forEach((elt: any) => {
         if (["bpmn:UserTask", "bpmn:ServiceTask"].indexOf(elt.type) >= 0) {
           this.execPlanService.addActivity(elt.id);
         }
-      })
+      })*/
     })
 
     this.viewer.on('element.click', this.selectActivity);
@@ -45,6 +55,10 @@ export class ViewerComponent implements AfterViewInit {
       //console.log('pouet');
     });
 
+  }
+
+  openDef(dep: string): void {
+    this.viewer!.importXML(this.execPlanService.executionPlan.xmlDependencies[dep]).then((result: any) => {})
   }
 
   selectActivity = (event: any) => {

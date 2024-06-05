@@ -52,27 +52,18 @@ public class ScenarioExecService {
   public void start(ExecutionPlan plan, String scenarioName) {
     ContextUtils.setPlan(plan);
     initClock(System.currentTimeMillis());
-    // prepareTimerCatchEvents(plan);
     prepareInstances(plan, scenarioName);
     prepareWorkers(plan);
     execute();
   }
 
-  /*private void prepareTimerCatchEvents(ExecutionPlan plan) {
-    Map<String, String> timers = BpmnUtils.getTimerCatchEvents(plan.getXml());
-    for (Map.Entry<String, String> timer : timers.entrySet()) {
-      String flowNodeId = timer.getKey();
-      String wait = timer.getValue();
-      if (wait.startsWith("date:")) {
-        ContextUtils.addDateTimer(flowNodeId, wait.substring(5));
-      } else {
-        ContextUtils.addDurationTimer(flowNodeId, wait.substring(9));
-      }
-    }
-  }*/
-
   private void prepareWorkers(ExecutionPlan plan) {
     List<String> jobTypes = BpmnUtils.getJobTypes(plan.getXml());
+    if (plan.getXmlDependencies() != null) {
+      for (String xml : plan.getXmlDependencies().values()) {
+        jobTypes.addAll(BpmnUtils.getJobTypes(xml));
+      }
+    }
     for (String jobType : jobTypes) {
       ContextUtils.addWorker(
           this.zeebeService.createStreamingWorker(
@@ -85,17 +76,9 @@ public class ScenarioExecService {
                   String processUniqueId = (String) variables.get("uniqueProcessIdentifier");
 
                   InstanceContext context = ContextUtils.getContext(processUniqueId);
-                  /*if (context==null) {
-                      Map<String, Object> variables = job.getVariablesAsMap();
-                      if (variables.containsKey("uniqueMsgIdentifier")) {
-                      context =
-                      }
-                  }
-                  while (context == null) {
-                    ThreadUtils.pause(100);
-                    context = ContextUtils.getContext(processInstanceKey);
-                  }*/
+
                   StepExecPlan step = context.getScenario().getSteps().get(job.getElementId());
+
                   if (step.getPreSteps() != null) {
                     for (StepAdditionalAction preStep : step.getPreSteps()) {
                       if (preStep.getType() == StepActionEnum.CLOCK) {

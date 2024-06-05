@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.example.camunda.dto.CustomProcessInstanceFilter;
+import org.example.camunda.utils.BpmnUtils;
 import org.example.camunda.utils.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,6 +117,20 @@ public class OperateService {
             .build();
 
     return getCamundaOperateClient().searchProcessDefinitions(procDefQuery);
+  }
+
+  public ProcessDefinition getLatestProcessDefinitions(String bpmnProcessId)
+      throws OperateException {
+    ProcessDefinitionFilter processDefinitionFilter =
+        ProcessDefinitionFilter.builder().bpmnProcessId(bpmnProcessId).build();
+    SearchQuery procDefQuery =
+        new SearchQuery.Builder()
+            .filter(processDefinitionFilter)
+            .size(1)
+            .sort(new Sort("version", SortOrder.DESC))
+            .build();
+
+    return getCamundaOperateClient().searchProcessDefinitions(procDefQuery).get(0);
   }
 
   @Cacheable("processXmls")
@@ -225,5 +240,17 @@ public class OperateService {
                 .size(30)
                 .searchAfter(searchAfter)
                 .build());
+  }
+
+  public Map<String, String> getDependencies(String xml) throws OperateException {
+    Map<String, String> result = new HashMap<>();
+    List<String> subProcesses = BpmnUtils.getSubProcessBpmnId(xml);
+    for (String subProc : subProcesses) {
+      ProcessDefinition def = getLatestProcessDefinitions(subProc);
+      String xmlSubProc = getProcessDefinitionXmlByKey(def.getKey());
+      result.put(subProc, xmlSubProc);
+      result.putAll(getDependencies(xmlSubProc));
+    }
+    return result;
   }
 }

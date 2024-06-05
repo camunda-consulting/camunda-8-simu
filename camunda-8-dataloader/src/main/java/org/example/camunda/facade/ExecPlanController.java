@@ -60,6 +60,7 @@ public class ExecPlanController {
 
       plan.setDefinition(operateService.getProcessDefinition(bpmnProcessId, version));
       plan.setXml(operateService.getProcessDefinitionXmlByKey(plan.getDefinition().getKey()));
+      plan.setXmlDependencies(operateService.getDependencies(plan.getXml()));
       Scenario s = ScenarioUtils.generateScenario(plan.getXml());
       s.setName("Scenario 1");
       plan.getScenarii().add(s);

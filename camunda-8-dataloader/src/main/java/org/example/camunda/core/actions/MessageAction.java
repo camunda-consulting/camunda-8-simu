@@ -1,7 +1,6 @@
 package org.example.camunda.core.actions;
 
 import java.util.Map;
-import org.example.camunda.core.PayloadGenerator;
 import org.example.camunda.core.ZeebeService;
 
 public class MessageAction extends Action {
@@ -28,9 +27,6 @@ public class MessageAction extends Action {
   @Override
   public void run() {
     this.getZeebeService()
-        .message(
-            message,
-            PayloadGenerator.generatePayload(this.correlationKey, variables),
-            getVariables(this.payloadTemplate, variables));
+        .message(message, correlationKey, getVariables(this.payloadTemplate, variables));
   }
 }
