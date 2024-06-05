@@ -80,20 +80,19 @@ public class ZeebeService {
     }
   }
 
-  public Long startProcessInstance(String bpmnProcessId, Long version, Object variables) {
+  public void startProcessInstance(String bpmnProcessId, Long version, Object variables) {
     zeebeWorks();
     try {
-      return zeebeClient
+      zeebeClient
           .newCreateInstanceCommand()
           .bpmnProcessId(bpmnProcessId)
           .latestVersion()
           .variables(variables)
           .send()
-          .join()
-          .getProcessInstanceKey();
+          .join();
     } catch (ClientException e) {
       ThreadUtils.pause(200);
-      return startProcessInstance(bpmnProcessId, version, variables);
+      startProcessInstance(bpmnProcessId, version, variables);
     }
   }
 

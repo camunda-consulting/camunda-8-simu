@@ -16,6 +16,9 @@ public class Scenario {
   private String lastDayFeelExpression;
   private Integer nbInstancesStart;
   private Integer nbInstancesEnd;
+  private InstanceStartTypeEnum startType;
+  // if start type is msg
+  private String startMsgName;
   private ProgressionEnum evolution;
   private Integer saltMin;
   private Integer saltMax;
@@ -109,6 +112,22 @@ public class Scenario {
 
   public void setNbInstancesEnd(Integer nbInstancesEnd) {
     this.nbInstancesEnd = nbInstancesEnd;
+  }
+
+  public InstanceStartTypeEnum getStartType() {
+    return startType;
+  }
+
+  public void setStartType(InstanceStartTypeEnum startType) {
+    this.startType = startType;
+  }
+
+  public String getStartMsgName() {
+    return startMsgName;
+  }
+
+  public void setStartMsgName(String startMsgName) {
+    this.startMsgName = startMsgName;
   }
 
   public ProgressionEnum getEvolution() {

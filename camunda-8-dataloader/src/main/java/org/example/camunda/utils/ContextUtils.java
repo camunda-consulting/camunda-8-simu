@@ -22,35 +22,35 @@ public class ContextUtils {
   private static Map<String, String> dateTimers = new HashMap<>();
   private static Map<String, String> durationTimers = new HashMap<>();
   private static SortedMap<Long, List<Action>> timedActions = new TreeMap<>();
-  private static Map<Long, InstanceContext> processInstanceScenarioMap = new HashMap<>();
+  private static Map<String, InstanceContext> processInstanceScenarioMap = new HashMap<>();
   private static Set<String> minHandledMap = new HashSet<>();
   private static Set<String> maxHandledMap = new HashSet<>();
-  private static Set<Long> minProcessInstances = new HashSet<>();
-  private static Set<Long> maxProcessInstances = new HashSet<>();
+  private static Set<String> minProcessInstances = new HashSet<>();
+  private static Set<String> maxProcessInstances = new HashSet<>();
   private static List<JobWorker> activeWorkers = new ArrayList<>();
 
-  public static void addInstance(Long processInstanceKey, Scenario scenario, Double progress) {
-    processInstanceScenarioMap.put(processInstanceKey, new InstanceContext(scenario, progress));
-    prepareMinMax(processInstanceKey, scenario, progress);
+  public static void addInstance(String uniqueId, Scenario scenario, Double progress) {
+    processInstanceScenarioMap.put(uniqueId, new InstanceContext(scenario, progress));
+    prepareMinMax(uniqueId, scenario, progress);
   }
 
   private static synchronized void prepareMinMax(
-      Long processInstanceKey, Scenario scenario, Double progress) {
+      String processUniqueId, Scenario scenario, Double progress) {
     if (!minHandledMap.contains(scenario.getName() + progress)) {
       minHandledMap.add(scenario.getName() + progress);
-      minProcessInstances.add(processInstanceKey);
+      minProcessInstances.add(processUniqueId);
     } else if (!maxHandledMap.contains(scenario.getName() + progress)) {
       maxHandledMap.add(scenario.getName() + progress);
-      maxProcessInstances.add(processInstanceKey);
+      maxProcessInstances.add(processUniqueId);
     }
   }
 
-  public static Double getProgress(Long processInstanceKey) {
-    return getContext(processInstanceKey).getProgress();
+  public static Double getProgress(String processUniqueId) {
+    return getContext(processUniqueId).getProgress();
   }
 
-  public static InstanceContext getContext(Long processInstanceKey) {
-    return processInstanceScenarioMap.get(processInstanceKey);
+  public static InstanceContext getContext(String processUniqueId) {
+    return processInstanceScenarioMap.get(processUniqueId);
   }
 
   public static void addWorker(JobWorker worker) {
@@ -111,12 +111,12 @@ public class ContextUtils {
     activeWorkers.clear();
   }
 
-  public static boolean shouldComputeMin(Long processInstanceKey) {
-    return minProcessInstances.contains(processInstanceKey);
+  public static boolean shouldComputeMin(String processUniqueId) {
+    return minProcessInstances.contains(processUniqueId);
   }
 
-  public static boolean shouldComputeMax(Long processInstanceKey) {
-    return maxProcessInstances.contains(processInstanceKey);
+  public static boolean shouldComputeMax(String processUniqueId) {
+    return maxProcessInstances.contains(processUniqueId);
   }
 
   public static void addDateTimer(String flowNodeId, String date) {

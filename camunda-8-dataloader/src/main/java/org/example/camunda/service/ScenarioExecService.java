@@ -12,6 +12,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import org.example.camunda.core.ZeebeService;
 import org.example.camunda.core.actions.Action;
 import org.example.camunda.core.actions.CompleteJobAction;
@@ -27,7 +28,6 @@ import org.example.camunda.utils.BpmnUtils;
 import org.example.camunda.utils.ContextUtils;
 import org.example.camunda.utils.HistoUtils;
 import org.example.camunda.utils.ScenarioUtils;
-import org.example.camunda.utils.ThreadUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,12 +81,20 @@ public class ScenarioExecService {
                 @Override
                 public void handle(JobClient client, ActivatedJob job) throws Exception {
                   zeebeService.zeebeWorks();
-                  Long processInstanceKey = job.getProcessInstanceKey();
-                  InstanceContext context = ContextUtils.getContext(processInstanceKey);
+                  Map<String, Object> variables = job.getVariablesAsMap();
+                  String processUniqueId = (String) variables.get("uniqueProcessIdentifier");
+
+                  InstanceContext context = ContextUtils.getContext(processUniqueId);
+                  /*if (context==null) {
+                      Map<String, Object> variables = job.getVariablesAsMap();
+                      if (variables.containsKey("uniqueMsgIdentifier")) {
+                      context =
+                      }
+                  }
                   while (context == null) {
                     ThreadUtils.pause(100);
                     context = ContextUtils.getContext(processInstanceKey);
-                  }
+                  }*/
                   StepExecPlan step = context.getScenario().getSteps().get(job.getElementId());
                   if (step.getPreSteps() != null) {
                     for (StepAdditionalAction preStep : step.getPreSteps()) {
@@ -97,7 +105,7 @@ public class ScenarioExecService {
                             ContextUtils.getEngineTime() + preStep.getDelay(),
                             new MessageAction(
                                 preStep.getMsg(),
-                                preStep.getCorrelationKey(),
+                                (String) variables.get(preStep.getCorrelationKey()),
                                 preStep.getJsonTemplate(),
                                 job.getVariablesAsMap(),
                                 zeebeService),
@@ -108,7 +116,7 @@ public class ScenarioExecService {
                   if (step.getAction() == StepActionEnum.COMPLETE) {
                     long targetTime =
                         ContextUtils.getEngineTime()
-                            + ScenarioUtils.calculateTaskDuration(step, processInstanceKey);
+                            + ScenarioUtils.calculateTaskDuration(step, processUniqueId);
                     targetTime =
                         ContextUtils.addAction(
                             targetTime,
@@ -122,21 +130,12 @@ public class ScenarioExecService {
                       for (StepAdditionalAction postStep : step.getPostSteps()) {
                         if (postStep.getType() == StepActionEnum.CLOCK) {
                           ContextUtils.buildEntry(targetTime + postStep.getDelay());
-                        }
-                      }
-                    }
-                  } else {
-                    if (step.getPostSteps() != null) {
-                      for (StepAdditionalAction postStep : step.getPostSteps()) {
-                        if (postStep.getType() == StepActionEnum.CLOCK) {
-                          ContextUtils.buildEntry(
-                              ContextUtils.getEngineTime() + postStep.getDelay());
                         } else if (postStep.getType() == StepActionEnum.MSG) {
                           ContextUtils.addAction(
-                              ContextUtils.getEngineTime() + postStep.getDelay(),
+                              targetTime + postStep.getDelay(),
                               new MessageAction(
                                   postStep.getMsg(),
-                                  postStep.getCorrelationKey(),
+                                  (String) variables.get(postStep.getCorrelationKey()),
                                   postStep.getJsonTemplate(),
                                   job.getVariablesAsMap(),
                                   zeebeService),

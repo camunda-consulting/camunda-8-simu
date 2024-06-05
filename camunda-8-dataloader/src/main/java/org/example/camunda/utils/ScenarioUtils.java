@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import org.camunda.feel.syntaxtree.ValDateTime;
 import org.example.camunda.dto.InstanceContext;
+import org.example.camunda.dto.InstanceStartTypeEnum;
 import org.example.camunda.dto.ProgressionEnum;
 import org.example.camunda.dto.Scenario;
 import org.example.camunda.dto.StepDuration;
@@ -26,6 +27,7 @@ public class ScenarioUtils {
     result.setNbInstancesStart(10);
     result.setNbInstancesEnd(100);
     result.setEvolution(ProgressionEnum.LINEAR);
+    result.setStartType(InstanceStartTypeEnum.START);
     result.setSteps(new HashMap<>());
     for (String eltId : userTaskIds) {
       StepExecPlan step = new StepExecPlan();
@@ -61,8 +63,8 @@ public class ScenarioUtils {
     return 0;
   }
 
-  public static long calculateTaskDuration(StepExecPlan step, Long processInstanceKey) {
-    InstanceContext context = ContextUtils.getContext(processInstanceKey);
+  public static long calculateTaskDuration(StepExecPlan step, String processUniqueId) {
+    InstanceContext context = ContextUtils.getContext(processUniqueId);
     StepDuration duration = step.getDuration();
     long desiredAvg =
         duration.getStartDesiredAvg()
@@ -77,10 +79,10 @@ public class ScenarioUtils {
     if (context.getScenario().getInstanceDistribution() == ChronoUnit.DAYS
         || context.getScenario().getInstanceDistribution() == ChronoUnit.HALF_DAYS
         || context.getScenario().getInstanceDistribution() == ChronoUnit.HOURS) {
-      if (ContextUtils.shouldComputeMin(processInstanceKey)) {
+      if (ContextUtils.shouldComputeMin(processUniqueId)) {
         return desiredAvg - duration.getMinMaxPercent() * desiredAvg / 100;
       }
-      if (ContextUtils.shouldComputeMax(processInstanceKey)) {
+      if (ContextUtils.shouldComputeMax(processUniqueId)) {
         return desiredAvg + duration.getMinMaxPercent() * desiredAvg / 100;
       }
 

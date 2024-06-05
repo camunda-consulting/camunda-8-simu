@@ -29,9 +29,9 @@ public class JsonUtils {
     return getObjectMapper().readTree(is);
   }
 
-  public static JsonNode toJsonNode(String json) {
+  public static ObjectNode toJsonNode(String json) {
     try {
-      return getObjectMapper().readTree(json);
+      return (ObjectNode) getObjectMapper().readTree(json);
     } catch (JsonProcessingException e) {
       ObjectNode node = getObjectMapper().createObjectNode();
       node.put("error", "Exception reading the template : " + e.getLocalizedMessage());

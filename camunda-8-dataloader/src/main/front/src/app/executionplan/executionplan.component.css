@@ -12,8 +12,6 @@ nav {
 app-actions-plan {
   position: absolute;
   width:100vW;
-  z-index:1;
   overflow-y: auto;
   background:white;
-  z-index:1;
 }

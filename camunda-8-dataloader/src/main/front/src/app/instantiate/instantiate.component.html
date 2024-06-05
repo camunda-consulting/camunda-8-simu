@@ -52,32 +52,49 @@
 <div class="row">
   <div class="col-4">
     <div class="input-group mb-3">
-      <span class="input-group-text">Progression</span>
-      <select class="form-select" [(ngModel)]="execPlanService.scenario!.evolution">
-        <option selected>Choose...</option>
-        <option value="LINEAR">LINEAR</option>
-        <option value="LINEAR_SALTED">LINEAR_SALTED</option>
+      <span class="input-group-text">Start type</span>
+      <select class="form-select" [(ngModel)]="execPlanService.scenario!.startType">
+        <option value="START">START</option>
+        <option value="MSG">MSG</option>
       </select>
     </div>
   </div>
-  <div class="col-4">
-    <div class="input-group mb-3" *ngIf="execPlanService.scenario.evolution=='LINEAR_SALTED'">
-      <span class="input-group-text">Salt (min)</span>
-      <input type="number" class="form-control" [(ngModel)]="execPlanService.scenario!.saltMin" min="0">
-    </div>
-  </div>
-  <div class="col-4">
-    <div class="input-group mb-3 " *ngIf="execPlanService.scenario.evolution=='LINEAR_SALTED'">
-      <span class="input-group-text">Salt (max)</span>
-      <input type="number" class="form-control" [(ngModel)]="execPlanService.scenario!.saltMin" min="0">
+  <div class="col-8">
+    <div class="input-group mb-3" *ngIf="execPlanService.scenario.startType=='MSG'">
+      <span class="input-group-text">Message name</span>
+      <input type="text" class="form-control" [(ngModel)]="execPlanService.scenario.startMsgName">
     </div>
   </div>
 </div>
-<div class="row">
-  <div class="col-12">
-    <div class="input-group mb-3">
-      <span class="input-group-text">JSON Template</span>
-      <div class="form-control" #jsonTemplate></div>
+  <div class="row">
+    <div class="col-4">
+      <div class="input-group mb-3">
+        <span class="input-group-text">Progression</span>
+        <select class="form-select" [(ngModel)]="execPlanService.scenario!.evolution">
+          <option selected>Choose...</option>
+          <option value="LINEAR">LINEAR</option>
+          <option value="LINEAR_SALTED">LINEAR_SALTED</option>
+        </select>
+      </div>
+    </div>
+    <div class="col-4">
+      <div class="input-group mb-3" *ngIf="execPlanService.scenario.evolution=='LINEAR_SALTED'">
+        <span class="input-group-text">Salt (min)</span>
+        <input type="number" class="form-control" [(ngModel)]="execPlanService.scenario!.saltMin" min="0">
+      </div>
+    </div>
+    <div class="col-4">
+      <div class="input-group mb-3 " *ngIf="execPlanService.scenario.evolution=='LINEAR_SALTED'">
+        <span class="input-group-text">Salt (max)</span>
+        <input type="number" class="form-control" [(ngModel)]="execPlanService.scenario!.saltMin" min="0">
+      </div>
     </div>
   </div>
-</div>
+  <div class="row">
+    <div class="col-12">
+      <div class="input-group mb-3">
+        <span class="input-group-text">JSON Template</span>
+        <div class="form-control" #jsonTemplate></div>
+      </div>
+    </div>
+  </div>
