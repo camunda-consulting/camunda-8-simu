@@ -30,18 +30,22 @@ public class StartInstancesAction extends Action {
       for (long x = 0; x < this.nbInstances; x++) {
         ObjectNode variables = getVariables(this.scenario.getJsonTemplate(), null);
         String uniqueId = UUID.randomUUID().toString();
+        ContextUtils.addInstance(uniqueId, this.scenario, this.progress);
         variables.put("uniqueProcessIdentifier", uniqueId);
         if (InstanceStartTypeEnum.MSG == this.scenario.getStartType()) {
-          ContextUtils.addInstance(uniqueId, this.scenario, this.progress);
           this.getZeebeService().message(this.scenario.getStartMsgName(), uniqueId, variables);
         } else {
           this.getZeebeService()
               .startProcessInstance(
                   this.scenario.getBpmnProcessId(), this.scenario.getVersion(), variables);
-          ContextUtils.addInstance(uniqueId, this.scenario, this.progress);
         }
       }
-      HistoUtils.addHisto("Started " + this.nbInstances + " instances.");
+      HistoUtils.addHisto(
+          "Started "
+              + this.nbInstances
+              + " instances (type = "
+              + this.scenario.getStartType()
+              + ").");
     } catch (Exception e) {
       e.printStackTrace();
     }

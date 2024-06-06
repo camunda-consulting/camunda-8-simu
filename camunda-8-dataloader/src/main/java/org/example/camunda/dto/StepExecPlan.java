@@ -5,13 +5,19 @@ import java.util.List;
 public class StepExecPlan {
   private String elementId;
   private StepActionEnum action = StepActionEnum.COMPLETE;
-  // COMPLETE
+
+  // COMPLETE AND INCIDENT
   private StepDuration duration;
 
-  // MSG or COMPLETE
+  // COMPLETE
   private String jsonTemplate = "{}";
   private List<StepAdditionalAction> postSteps;
+
+  // ANY
   private List<StepAdditionalAction> preSteps;
+
+  // INCIDENT
+  private IncidentTypeEnum incident;
 
   public String getElementId() {
     return elementId;
@@ -59,5 +65,13 @@ public class StepExecPlan {
 
   public void setPreSteps(List<StepAdditionalAction> preSteps) {
     this.preSteps = preSteps;
+  }
+
+  public IncidentTypeEnum getIncident() {
+    return incident;
+  }
+
+  public void setIncident(IncidentTypeEnum incident) {
+    this.incident = incident;
   }
 }

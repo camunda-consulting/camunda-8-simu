@@ -69,9 +69,6 @@ export class ExecPlanService {
     this.selectActivity('startInstances');
     this.scenario = scenario;
   }
-  createCurrentStepInScenario(): void {
-    this.createStepInScenario(this.currentActivity!)
-  }
   createStepInScenario(elementId: string): void {
     this.scenario.steps[elementId] = {
       "elementId": elementId,
@@ -85,6 +82,40 @@ export class ExecPlanService {
       },
       "jsonTemplate": "{}",
     };
+  }
+
+  createPreStepInScenario(parentStep: string, type: string, elementRef: any, time: number): void {
+    if (!this.scenario.steps[parentStep]) {
+      this.scenario.steps[parentStep] = {
+        "elementId": parentStep,
+        "action": "DO_NOTHING",
+        "preSteps": []
+      };
+    }
+    if (!this.scenario.steps[parentStep].preSteps) {
+      this.scenario.steps[parentStep].preSteps = [];
+    }
+    if (type == 'MSG') {
+      this.scenario.steps[parentStep].preSteps.push({
+        "type": type,
+        "msgDelay": time,
+        "msg": elementRef.name,
+        "correlationKey": elementRef.extensionElements.valueOf("correlationKey").values[0].correlationKey.replace("=", "").trim(),
+        "jsonTemplate": "{}"
+      });
+    } else if (type == 'CLOCK') {
+      this.scenario.steps[parentStep].preSteps.push({
+        "type": type,
+        "feelDelay": time
+      });
+    } else if (type == 'BPMN_ERROR') {
+      this.scenario.steps[parentStep].preSteps.push({
+        "type": type,
+        "errorCode": elementRef.errorCode,
+        "errorDelay": time,
+        "jsonTemplate": "{}"
+      });
+    }
   }
 
   deleteCurrentStep(): void {

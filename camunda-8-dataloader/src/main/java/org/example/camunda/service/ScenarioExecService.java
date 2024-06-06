@@ -15,7 +15,9 @@ import java.util.List;
 import java.util.Map;
 import org.example.camunda.core.ZeebeService;
 import org.example.camunda.core.actions.Action;
+import org.example.camunda.core.actions.BpmnErrorAction;
 import org.example.camunda.core.actions.CompleteJobAction;
+import org.example.camunda.core.actions.IncidentJobAction;
 import org.example.camunda.core.actions.MessageAction;
 import org.example.camunda.core.actions.StartInstancesAction;
 import org.example.camunda.dto.ExecutionPlan;
@@ -81,22 +83,20 @@ public class ScenarioExecService {
 
                   if (step.getPreSteps() != null) {
                     for (StepAdditionalAction preStep : step.getPreSteps()) {
-                      if (preStep.getType() == StepActionEnum.CLOCK) {
-                        ContextUtils.buildEntry(ContextUtils.getEngineTime() + preStep.getDelay());
-                      } else if (preStep.getType() == StepActionEnum.MSG) {
-                        ContextUtils.addAction(
-                            ContextUtils.getEngineTime() + preStep.getDelay(),
-                            new MessageAction(
-                                preStep.getMsg(),
-                                (String) variables.get(preStep.getCorrelationKey()),
-                                preStep.getJsonTemplate(),
-                                job.getVariablesAsMap(),
-                                zeebeService),
-                            context.getScenario().getTimePrecision());
-                      }
+                      // pre steps are calculated after current engine time (before completion time)
+                      addAdditionalStep(ContextUtils.getEngineTime(), job, preStep, context);
                     }
                   }
-                  if (step.getAction() == StepActionEnum.COMPLETE) {
+                  // main step action
+                  if (step.getAction() == StepActionEnum.INCIDENT) {
+                    long targetTime =
+                        ContextUtils.getEngineTime()
+                            + ScenarioUtils.calculateTaskDuration(step, processUniqueId);
+                    targetTime =
+                        ContextUtils.addAction(
+                            targetTime,
+                            new IncidentJobAction(job.getKey(), step.getIncident(), zeebeService));
+                  } else if (step.getAction() == StepActionEnum.COMPLETE) {
                     long targetTime =
                         ContextUtils.getEngineTime()
                             + ScenarioUtils.calculateTaskDuration(step, processUniqueId);
@@ -107,23 +107,13 @@ public class ScenarioExecService {
                                 job.getKey(),
                                 step.getJsonTemplate(),
                                 job.getVariablesAsMap(),
-                                zeebeService),
-                            context.getScenario().getTimePrecision());
+                                zeebeService));
+                    // post steps are only managed when main action will complete. Typically
+                    // intermediate catch event coming after.
                     if (step.getPostSteps() != null) {
                       for (StepAdditionalAction postStep : step.getPostSteps()) {
-                        if (postStep.getType() == StepActionEnum.CLOCK) {
-                          ContextUtils.buildEntry(targetTime + postStep.getDelay());
-                        } else if (postStep.getType() == StepActionEnum.MSG) {
-                          ContextUtils.addAction(
-                              targetTime + postStep.getDelay(),
-                              new MessageAction(
-                                  postStep.getMsg(),
-                                  (String) variables.get(postStep.getCorrelationKey()),
-                                  postStep.getJsonTemplate(),
-                                  job.getVariablesAsMap(),
-                                  zeebeService),
-                              context.getScenario().getTimePrecision());
-                        }
+                        // post steps are calculated after completion time
+                        addAdditionalStep(targetTime, job, postStep, context);
                       }
                     }
                   }
@@ -132,13 +122,37 @@ public class ScenarioExecService {
     }
   }
 
+  public void addAdditionalStep(
+      Long baseDate, ActivatedJob job, StepAdditionalAction step, InstanceContext context) {
+    Map<String, Object> variables = job.getVariablesAsMap();
+    if (step.getType() == StepActionEnum.CLOCK) {
+      ContextUtils.buildEntry(ScenarioUtils.getEstimatedTime(baseDate, step.getFeelDelay()));
+    } else if (step.getType() == StepActionEnum.MSG) {
+      ContextUtils.addAction(
+          baseDate + step.getMsgDelay(),
+          new MessageAction(
+              step.getMsg(),
+              (String) variables.get(step.getCorrelationKey()),
+              step.getJsonTemplate(),
+              job.getVariablesAsMap(),
+              zeebeService));
+    } else if (step.getType() == StepActionEnum.BPMN_ERROR) {
+      ContextUtils.addAction(
+          baseDate + step.getErrorDelay(),
+          new BpmnErrorAction(
+              step.getErrorCode(),
+              job.getKey(),
+              step.getJsonTemplate(),
+              job.getVariablesAsMap(),
+              zeebeService));
+    }
+  }
+
   private void prepareInstances(ExecutionPlan plan, String scenarioName) {
     for (Scenario s : plan.getScenarii()) {
       if (scenarioName == null || s.getName().equals(scenarioName)) {
         s.setBpmnProcessId(plan.getDefinition().getBpmnProcessId());
         s.setVersion(plan.getDefinition().getVersion());
-        s.setInstanceDistribution(plan.getInstanceDistribution());
-        s.setTimePrecision(plan.getTimePrecision());
         prepareInstances(s);
       }
     }
@@ -161,23 +175,19 @@ public class ScenarioExecService {
 
   private void addInstancesWithDesiredPrecision(
       long time, long nbInstancesPerDay, Scenario scenario, double progress) {
-    if (scenario.getInstanceDistribution() == ChronoUnit.DAYS) {
+    if (ContextUtils.getInstanceDistribution() == ChronoUnit.DAYS) {
+      ContextUtils.addAction(
+          time, new StartInstancesAction(scenario, nbInstancesPerDay, this.zeebeService, progress));
+    } else if (ContextUtils.getInstanceDistribution() == ChronoUnit.HALF_DAYS) {
       ContextUtils.addAction(
           time,
-          new StartInstancesAction(scenario, nbInstancesPerDay, this.zeebeService, progress),
-          scenario.getTimePrecision());
-    } else if (scenario.getInstanceDistribution() == ChronoUnit.HALF_DAYS) {
-      ContextUtils.addAction(
-          time,
-          new StartInstancesAction(scenario, nbInstancesPerDay / 2, this.zeebeService, progress),
-          scenario.getTimePrecision());
+          new StartInstancesAction(scenario, nbInstancesPerDay / 2, this.zeebeService, progress));
       int nextround = (scenario.getDayTimeEnd() - scenario.getDayTimeStart()) / 2;
       ContextUtils.addAction(
           time + nextround * ChronoUnit.HOURS.getDuration().toMillis(),
-          new StartInstancesAction(scenario, nbInstancesPerDay / 2, this.zeebeService, progress),
-          scenario.getTimePrecision());
+          new StartInstancesAction(scenario, nbInstancesPerDay / 2, this.zeebeService, progress));
 
-    } else if (scenario.getInstanceDistribution() == ChronoUnit.HOURS) {
+    } else if (ContextUtils.getInstanceDistribution() == ChronoUnit.HOURS) {
       int nbHours = scenario.getDayTimeEnd() - scenario.getDayTimeStart();
       long nbInstancesPerHour = nbInstancesPerDay / nbHours;
       long residual = nbInstancesPerDay - nbInstancesPerHour * nbHours;
@@ -186,22 +196,20 @@ public class ScenarioExecService {
         if (nbInstances > 0) {
           ContextUtils.addAction(
               time + i * ChronoUnit.HOURS.getDuration().toMillis(),
-              new StartInstancesAction(scenario, nbInstances, this.zeebeService, progress),
-              scenario.getTimePrecision());
+              new StartInstancesAction(scenario, nbInstances, this.zeebeService, progress));
         }
       }
-    } else if (scenario.getInstanceDistribution() == ChronoUnit.MINUTES) {
+    } else if (ContextUtils.getInstanceDistribution() == ChronoUnit.MINUTES) {
       int nbMinutes = (scenario.getDayTimeEnd() - scenario.getDayTimeStart()) * 60;
       long nbInstancesPerMinute = nbInstancesPerDay / nbMinutes;
       long residual = nbInstancesPerDay - nbInstancesPerMinute * nbMinutes;
       long residualDistrib = nbMinutes / residual;
-      for (int i = 0; i < nbMinutes; i++) {
+      for (long i = 0; i < nbMinutes; i++) {
         long nbInstances = nbInstancesPerMinute + (i % residualDistrib == 0 ? 1 : 0);
         if (nbInstances > 0) {
           ContextUtils.addAction(
               time + i * ChronoUnit.MINUTES.getDuration().toMillis(),
-              new StartInstancesAction(scenario, nbInstances, this.zeebeService, progress),
-              scenario.getTimePrecision());
+              new StartInstancesAction(scenario, nbInstances, this.zeebeService, progress));
         }
       }
     }

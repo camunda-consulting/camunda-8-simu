@@ -20,6 +20,7 @@ export class ActionsPlanComponent implements OnInit {
         this.running = true;
       }
     });
+    this.selectScenario(0);
     }
 
   

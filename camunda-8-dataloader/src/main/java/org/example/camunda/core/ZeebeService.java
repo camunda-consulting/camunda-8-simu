@@ -12,9 +12,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import org.example.camunda.dto.IncidentTypeEnum;
 import org.example.camunda.service.ScenarioExecService;
 import org.example.camunda.utils.ContextUtils;
 import org.example.camunda.utils.FeelUtils;
+import org.example.camunda.utils.IncidentUtils;
 import org.example.camunda.utils.ThreadUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -134,6 +136,27 @@ public class ZeebeService {
     }
   }
 
+  public void bpmnError(String error, Long jobKey, JsonNode variables) {
+    zeebeWorks();
+    try {
+      this.zeebeClient
+          .newThrowErrorCommand(jobKey)
+          .errorCode(error)
+          .variables(variables)
+          .send()
+          .join();
+    } catch (ClientException e) {
+      if (e instanceof ClientStatusException
+              && (((ClientStatusException) e).getStatus().getCode() == Status.Code.NOT_FOUND)
+          || (((ClientStatusException) e).getStatus().getCode() == Status.Code.CANCELLED)) {
+        LOG.error("Error send BpmnError " + error + "for job " + jobKey, e);
+      } else {
+        ThreadUtils.pause(200);
+        bpmnError(error, jobKey, variables);
+      }
+    }
+  }
+
   public void completeJob(Long jobKey, JsonNode variables) {
     zeebeWorks();
     try {
@@ -146,6 +169,28 @@ public class ZeebeService {
       } else {
         ThreadUtils.pause(200);
         completeJob(jobKey, variables);
+      }
+    }
+  }
+
+  public void incidentJob(Long jobKey, IncidentTypeEnum incident) {
+    zeebeWorks();
+    try {
+
+      this.zeebeClient
+          .newFailCommand(jobKey)
+          .retries(0)
+          .errorMessage(IncidentUtils.error(incident))
+          .send()
+          .join();
+    } catch (ClientException e) {
+      if (e instanceof ClientStatusException
+              && (((ClientStatusException) e).getStatus().getCode() == Status.Code.NOT_FOUND)
+          || (((ClientStatusException) e).getStatus().getCode() == Status.Code.CANCELLED)) {
+        LOG.error("Error completing " + jobKey, e);
+      } else {
+        ThreadUtils.pause(200);
+        incidentJob(jobKey, incident);
       }
     }
   }

@@ -1,15 +1,12 @@
 package org.example.camunda.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.time.temporal.ChronoUnit;
 import java.util.Map;
 
 public class Scenario {
   private String name;
   @JsonIgnore private String bpmnProcessId;
   @JsonIgnore private Long version = -1L;
-  @JsonIgnore private ChronoUnit instanceDistribution;
-  @JsonIgnore private TimePrecisionEnum timePrecision = TimePrecisionEnum.HUNDRED_MILLIS;
   private int dayTimeStart = 9;
   private int dayTimeEnd = 18;
   private String firstDayFeelExpression;
@@ -48,22 +45,6 @@ public class Scenario {
 
   public void setVersion(Long version) {
     this.version = version;
-  }
-
-  public ChronoUnit getInstanceDistribution() {
-    return instanceDistribution;
-  }
-
-  public void setInstanceDistribution(ChronoUnit instanceDistribution) {
-    this.instanceDistribution = instanceDistribution;
-  }
-
-  public TimePrecisionEnum getTimePrecision() {
-    return timePrecision;
-  }
-
-  public void setTimePrecision(TimePrecisionEnum timePrecision) {
-    this.timePrecision = timePrecision;
   }
 
   public int getDayTimeStart() {

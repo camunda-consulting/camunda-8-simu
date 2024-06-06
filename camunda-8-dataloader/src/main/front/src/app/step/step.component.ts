@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, ViewChild, ElementRef, Input } from '@angular/core';
+import { Component, AfterViewInit, ViewChild, ElementRef, Input, OnInit } from '@angular/core';
 import { basicSetup, EditorView } from 'codemirror';
 import { json } from '@codemirror/lang-json';
 import { ProcessService } from '../services/process.service';
@@ -8,7 +8,7 @@ import { ExecPlanService } from '../services/exec-plan.service';
   templateUrl: './step.component.html',
   styleUrls: ['./step.component.css']
 })
-export class StepComponent implements AfterViewInit {
+export class StepComponent implements AfterViewInit, OnInit {
 
   @Input() step: any;
   @ViewChild('jsonTemplate') jsonTemplate!: ElementRef;
@@ -19,6 +19,14 @@ export class StepComponent implements AfterViewInit {
   poststep: any;
 
   constructor(private processService: ProcessService, public execPlanService: ExecPlanService) { }
+  ngOnInit(): void {
+    if (this.step.preSteps && this.step.preSteps.length > 0) {
+      this.prestep = this.step.preSteps[0];
+    }
+    if (this.step.postSteps && this.step.postSteps.length > 0) {
+      this.poststep = this.step.postSteps[0];
+    }
+  }
 
   ngAfterViewInit(): void {
     this.codeMirror = new EditorView({
@@ -30,7 +38,7 @@ export class StepComponent implements AfterViewInit {
       ],
       parent: this.jsonTemplate.nativeElement,
     });
-    
+
     var tooltips = document.querySelectorAll('.btn-tooltip')
     for (let i = 0; i < tooltips.length; i++) {
       (window as any).bootstrap.Tooltip.getOrCreateInstance(tooltips[i]);
@@ -38,7 +46,7 @@ export class StepComponent implements AfterViewInit {
   }
 
   buildPreStepJsonEditor(): void {
-    if (this.prestep.type == 'MSG' && !this.preStepcodeMirror) {
+    if ((this.prestep.type == 'MSG' || this.prestep.type == 'BPMN_ERROR') && !this.preStepcodeMirror) {
       if (!this.prestep.jsonTemplate) {
         this.prestep.jsonTemplate = '{}';
       }
@@ -55,7 +63,7 @@ export class StepComponent implements AfterViewInit {
   }
 
   buildPostStepJsonEditor(): void {
-    if (this.poststep.type == 'MSG' && !this.postStepcodeMirror) {
+    if ((this.poststep.type == 'MSG' || this.poststep.type == 'BPMN_ERROR') && !this.postStepcodeMirror) {
       if (!this.poststep.jsonTemplate) {
         this.poststep.jsonTemplate = '{}';
       }
@@ -71,8 +79,6 @@ export class StepComponent implements AfterViewInit {
     }
   }
 
-
-
   prettify(template: string): string {
     try {
       return JSON.stringify(JSON.parse(template), null, 2);
@@ -85,6 +91,16 @@ export class StepComponent implements AfterViewInit {
     this.step.jsonTemplate = v.state.doc.toString();
   });
 
+  displayAdditionalStep(step: any): string {
+    if (step.type == 'CLOCK') {
+      return 'CLOCK at ' + step.feelDelay;
+    }
+    if (step.type == 'MSG') {
+      return 'Publish ' + step.msg + ' after ' + step.msgDelay + 'ms';
+    }
+    return 'Error ' + step.errorCode + ' after ' + step.errorDelay + 'ms';
+  }
+
   updatePreStep = EditorView.updateListener.of((v) => {
     this.prestep.jsonTemplate = v.state.doc.toString();
   });
@@ -94,14 +110,15 @@ export class StepComponent implements AfterViewInit {
   });
 
   openDurationModal() {
-    (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById(this.step.elementId +'-durationModal')).show();
+    (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById(this.step.elementId + '-durationModal')).show();
   }
   closeDurationModal() {
     (window as any).bootstrap.Modal.getInstance(document.getElementById(this.step.elementId + '-durationModal')).hide();
   }
 
-  openPreStepModal(index:number) {
+  openPreStepModal(index: number) {
     this.prestep = this.step.preSteps[index];
+    this.buildPreStepJsonEditor();
     (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById(this.step.elementId + '-prestep')).show();
   }
   closePreStepModal() {
@@ -109,6 +126,7 @@ export class StepComponent implements AfterViewInit {
   }
   openPostStepModal(index: number) {
     this.poststep = this.step.postSteps[index];
+    this.buildPostStepJsonEditor();
     (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById(this.step.elementId + '-poststep')).show();
   }
   closePostStepModal() {
@@ -116,19 +134,27 @@ export class StepComponent implements AfterViewInit {
   }
 
   addPreStep() {
+    this.prestep = { "type": "CLOCK", "feelDelay": "PT5M" };
     if (!this.step.preSteps) {
       this.step.preSteps = [];
     }
-    this.step.preSteps.push({ "type": "CLOCK", "delay": 360000 });
-    this.openPreStepModal(this.step.preSteps.length-1);
+    this.step.preSteps.push(this.prestep);
+    this.openPreStepModal(this.step.preSteps.length - 1);
   }
-
   addPostStep() {
+    this.poststep = { "type": "CLOCK", "feelDelay": "PT5M" };
     if (!this.step.postSteps) {
       this.step.postSteps = [];
     }
-    this.step.postSteps.push({ "type": "CLOCK", "delay": 360000 });
+    this.step.postSteps.push(this.poststep);
     this.openPostStepModal(this.step.postSteps.length - 1);
+  }
+
+  deletePreStep(i: number): void {
+    this.step.preSteps.splice(i, 1);
+  }
+  deletePostStep(i: number): void {
+    this.step.postSteps.splice(i, 1);
   }
 
 }

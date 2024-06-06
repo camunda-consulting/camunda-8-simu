@@ -13,6 +13,7 @@ export class ViewerComponent implements AfterViewInit, OnInit {
   viewer: NavigatedViewer | undefined;
   previousActivity?: string;
   xmlDeps = ["Main definition"];
+  selectedElt: any = null;
 
   constructor(private processService: ProcessService, public execPlanService: ExecPlanService) {
     this.execPlanService.activitySubject.subscribe((activity: string) => {
@@ -58,12 +59,18 @@ export class ViewerComponent implements AfterViewInit, OnInit {
   }
 
   openDef(dep: string): void {
-    this.viewer!.importXML(this.execPlanService.executionPlan.xmlDependencies[dep]).then((result: any) => {})
+    if (dep == "Main definition") {
+      this.viewer!.importXML(this.execPlanService.executionPlan.xml).then((result: any) => { });
+    } else {
+      this.viewer!.importXML(this.execPlanService.executionPlan.xmlDependencies[dep]).then((result: any) => { });
+    }
   }
 
+  managedActivities = ["bpmn:ServiceTask", "bpmn:UserTask", "bpmn: SendTask", "bpmn:IntermediateCatchEvent", "bpmn:BoundaryEvent"];
   selectActivity = (event: any) => {
-    this.execPlanService.selectActivity(event.element.id);
-    if (!this.execPlanService.scenario.steps[event.element.id]) {
+    this.selectedElt = event.element;
+    console.log(this.selectedElt);
+    if (this.managedActivities.indexOf(this.selectedElt.type)>=0 && !this.execPlanService.scenario.steps[event.element.id]) {
       this.opennewstepModal();
     }
   }
@@ -89,7 +96,26 @@ export class ViewerComponent implements AfterViewInit, OnInit {
     (window as any).bootstrap.Modal.getInstance(document.getElementById('newstep')).hide();
   }
   createStep() {
-    this.execPlanService.createCurrentStepInScenario();
+    if (this.selectedElt.type == 'bpmn:BoundaryEvent') {
+      let type = this.selectedElt.businessObject.eventDefinitions[0].$type;
+      let parentStep = this.selectedElt.businessObject.attachedToRef.id;
+
+      if (type == 'bpmn:MessageEventDefinition') {
+        let messageRef = this.selectedElt.businessObject.eventDefinitions[0].messageRef;
+        this.execPlanService.createPreStepInScenario(parentStep, 'MSG', messageRef, 3600);
+      } else if (type == 'bpmn:TimerEventDefinition') {
+        let timer = this.selectedElt.businessObject.eventDefinitions[0].timeDuration.body;
+        this.execPlanService.createPreStepInScenario(parentStep, 'CLOCK', null, timer);
+      } else if (type == 'bpmn:ErrorEventDefinition') {
+        let errorRef = this.selectedElt.businessObject.eventDefinitions[0].errorRef;
+        this.execPlanService.createPreStepInScenario(parentStep, 'BPMN_ERROR', errorRef, 1000);
+      }
+      else {
+        alert('Implementation for the type ' + type + ' is missing.');
+      }
+    } else {
+      this.execPlanService.createStepInScenario(this.selectedElt.id);
+    }
     this.closenewstepModal();
   }
 }

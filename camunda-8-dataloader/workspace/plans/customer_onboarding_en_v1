@@ -20,7 +20,7 @@
     "lastDayFeelExpression" : "now()",
     "nbInstancesStart" : 10,
     "nbInstancesEnd" : 100,
-    "startType" : null,
+    "startType" : "START",
     "startMsgName" : null,
     "evolution" : "LINEAR",
     "saltMin" : null,
@@ -69,7 +69,7 @@
         "preSteps" : null
       }
     },
-    "jsonTemplate" : "{\"applicationNumber\":\"[( ${templateUtils.generateUUID()} )]\", \"applicant\":{\"name\":\"[( ${templateUtils.firstname()} )]\", \"email\":\"[( ${templateUtils.firstname()} )]@gmail.com\", \"birthday\":\"1986-11-24 13:12:00.000+00:00\", \"age\":38}, \"employment\":\"Salaried\", \"category\":\"Basic Package\"}"
+    "jsonTemplate" : "{\n  \"applicationNumber\": \"[( ${templateUtils.generateUUID()} )]\",\n  \"applicant\": {\n    \"name\": \"[( ${templateUtils.firstname()} )]\",\n    \"email\": \"[( ${templateUtils.firstname()} )]@gmail.com\",\n    \"birthday\": \"1986-11-24 13:12:00.000+00:00\",\n    \"age\": 38\n  },\n  \"employment\": \"Salaried\",\n  \"category\": \"Basic Package\"\n}"
   }, {
     "name" : "Red",
     "dayTimeStart" : 9,
@@ -228,10 +228,7 @@
         "postSteps" : null,
         "preSteps" : [ {
           "type" : "CLOCK",
-          "delay" : 172800000,
-          "msg" : "MSG",
-          "correlationKey" : null,
-          "jsonTemplate" : "{}"
+          "feelDelay" : "P2D"
         } ]
       },
       "ServiceTask_RejectPolicy" : {

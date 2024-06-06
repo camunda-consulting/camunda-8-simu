@@ -3,13 +3,18 @@ package org.example.camunda.dto;
 public class StepAdditionalAction {
   private StepActionEnum type = StepActionEnum.CLOCK;
 
-  // CLOCK AND MSG
-  private Long delay = 1000L;
+  // CLOCK
+  private String feelDelay = "PT5M";
 
   // MSG
   private String msg = "MSG";
+  private Long msgDelay = 1000L;
   private String correlationKey;
   private String jsonTemplate = "{}";
+
+  // BPMN_ERROR
+  private String errorCode;
+  private Long errorDelay = 1000L;
 
   public StepActionEnum getType() {
     return type;
@@ -19,12 +24,20 @@ public class StepAdditionalAction {
     this.type = type;
   }
 
-  public Long getDelay() {
-    return delay;
+  public String getFeelDelay() {
+    return feelDelay;
   }
 
-  public void setDelay(Long delay) {
-    this.delay = delay;
+  public void setFeelDelay(String feelDelay) {
+    this.feelDelay = feelDelay;
+  }
+
+  public Long getMsgDelay() {
+    return msgDelay;
+  }
+
+  public void setMsgDelay(Long msgDelay) {
+    this.msgDelay = msgDelay;
   }
 
   public String getMsg() {
@@ -49,5 +62,21 @@ public class StepAdditionalAction {
 
   public void setJsonTemplate(String jsonTemplate) {
     this.jsonTemplate = jsonTemplate;
+  }
+
+  public String getErrorCode() {
+    return errorCode;
+  }
+
+  public void setErrorCode(String errorCode) {
+    this.errorCode = errorCode;
+  }
+
+  public Long getErrorDelay() {
+    return errorDelay;
+  }
+
+  public void setErrorDelay(Long errorDelay) {
+    this.errorDelay = errorDelay;
   }
 }

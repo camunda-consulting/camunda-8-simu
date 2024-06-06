@@ -14,11 +14,12 @@
         <option selected>Choose...</option>
         <option value="COMPLETE">COMPLETE</option>
         <option value="DO_NOTHING">DO_NOTHING</option>
+        <option value="INCIDENT">INCIDENT</option>
       </select>
     </div>
   </div>
 </div>
-<div class="row" *ngIf="step.action=='COMPLETE'">
+<div class="row" *ngIf="step.action=='COMPLETE' || step.action=='INCIDENT'">
   <div class="col">
     <div class="input-group mb-3 ">
       <span class="input-group-text">Completion time</span>
@@ -26,18 +27,38 @@
     </div>
   </div>
 </div>
-<div class="row">
+<div class="row" *ngIf="step.action=='COMPLETE'">
   <div class="input-group mb-3">
     <span class="input-group-text">JSON Template</span>
     <div class="form-control" #jsonTemplate></div>
   </div>
 </div>
+<div class="row" *ngIf="step.action=='INCIDENT'">
+  <div class="input-group mb-3 ">
+    <span class="input-group-text">Incident</span>
+    <select class="form-select" [(ngModel)]="step.incident">
+      <option selected>Choose...</option>
+      <option value="NULLPOINTER">NULLPOINTER</option>
+      <option value="ARITHMETIC">ARITHMETIC</option>
+      <option value="OUT_OF_BOUND">OUT_OF_BOUND</option>
+      <option value="OUT_OF_BOUND">ILLEGAL_ARGUMENT</option>
+      <option value="OUT_OF_BOUND">TIME_OUT</option>
+    </select>
+  </div>
+</div>
 <div class="row">
   <div class="col-6">
-    <h4>Pre-steps <button type="button" class="btn btn-outline-primary btn-tooltip" data-bs-toggle="tooltip" data-bs-placement="top" title="Steps time will be calculated based on the main task creation time">?</button>
-    <button type="button" class="btn btn-outline-warning btn-icon" (click)="addPreStep()">+</button></h4>
+    <h4>
+      Pre-steps <button type="button" class="btn btn-outline-primary btn-tooltip" data-bs-toggle="tooltip" data-bs-placement="top" title="Steps time will be calculated based on the main task creation time">?</button>
+      <button type="button" class="btn btn-outline-warning btn-icon" (click)="addPreStep()">+</button>
+    </h4>
     <ul>
-      <li *ngFor="let prestep of step.preSteps; let i=index"><button class="btn btn-outline-primary" (click)="openPreStepModal(i)"><i class="bi bi-pencil"></i> {{prestep.type}} at {{prestep.delay}}ms</button></li>
+      <li *ngFor="let prestep of step.preSteps; let i=index">
+        <div class="btn-group">
+          <button class="btn btn-outline-primary" (click)="openPreStepModal(i)"><i class="bi bi-pencil"></i> {{displayAdditionalStep(prestep)}}</button>
+          <button class="btn btn-danger" (click)="deletePreStep(i)"><i class="bi bi-trash"></i></button>
+        </div>
+      </li>
     </ul>
   </div>
   <div class="col-6" *ngIf="step.action=='COMPLETE'">
@@ -46,14 +67,19 @@
       <button type="button" class="btn btn-outline-warning btn-icon" (click)="addPostStep()">+</button>
     </h4>
     <ul>
-      <li *ngFor="let postep of step.postSteps; let i=index"><button class="btn btn-outline-primary" (click)="openPostStepModal(i)"><i class="bi bi-pencil"></i> {{postep.type}} at {{postep.delay}}ms</button></li>
+      <li *ngFor="let postep of step.postSteps; let i=index">
+        <div class="btn-group">
+          <button class="btn btn-outline-primary" (click)="openPostStepModal(i)"><i class="bi bi-pencil"></i> {{displayAdditionalStep(postep)}}</button>
+          <button class="btn btn-danger" (click)="deletePostStep(i)"><i class="bi bi-trash"></i></button>
+        </div>
+      </li>
     </ul>
   </div>
 
 </div>
 
 
-<div class="modal fade" id="{{step.elementId}}-durationModal" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" id="{{step.elementId}}-durationModal" tabindex="-1" role="dialog" aria-hidden="true" *ngIf="step.action=='COMPLETE' || step.action=='INCIDENT'">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -108,11 +134,16 @@
             <option selected>Choose...</option>
             <option value="CLOCK">CLOCK</option>
             <option value="MSG">MSG</option>
+            <option value="BPMN_ERROR">BPMN_ERROR</option>
           </select>
         </div>
-        <div class="input-group mb-3 ">
-          <span class="input-group-text">Delay</span>
-          <input type="number" class="form-control" min=0 [(ngModel)]="prestep.delay">
+        <div class="input-group mb-3 " *ngIf="prestep.type=='CLOCK'">
+          <span class="input-group-text">Delay (FEEL)</span>
+          <input type="text" class="form-control" [(ngModel)]="prestep.feelDelay">
+        </div>
+        <div class="input-group mb-3 " *ngIf="prestep.type=='MSG'">
+          <span class="input-group-text">Delay (ms)</span>
+          <input type="number" class="form-control" min=0 [(ngModel)]="prestep.msgDelay">
         </div>
         <div class="input-group mb-3 " *ngIf="prestep.type=='MSG'">
           <span class="input-group-text">Message</span>
@@ -122,7 +153,15 @@
           <span class="input-group-text">Correlation Key</span>
           <input type="text" class="form-control" [(ngModel)]="prestep.correlationKey">
         </div>
-        <div class="input-group mb-3" [ngClass]="prestep.type=='MSG' ? '' : 'hidden'">
+        <div class="input-group mb-3 " *ngIf="prestep.type=='BPMN_ERROR'">
+          <span class="input-group-text">Delay (ms)</span>
+          <input type="number" class="form-control" min=0 [(ngModel)]="prestep.errorDelay">
+        </div>
+        <div class="input-group mb-3 " *ngIf="prestep.type=='BPMN_ERROR'">
+          <span class="input-group-text">Error Code</span>
+          <input type="text" class="form-control" [(ngModel)]="prestep.errorCode">
+        </div>
+        <div class="input-group mb-3" [ngClass]="prestep.type=='MSG' || prestep.type=='BPMN_ERROR' ? '' : 'hidden'">
           <span class="input-group-text">JSON Template</span>
           <div class="form-control" id="preStepJsonTemplate"></div>
         </div>
@@ -148,11 +187,16 @@
             <option selected>Choose...</option>
             <option value="CLOCK">CLOCK</option>
             <option value="MSG">MSG</option>
+            <option value="BPMN_ERROR">BPMN_ERROR</option>
           </select>
         </div>
-        <div class="input-group mb-3 ">
-          <span class="input-group-text">Delay</span>
-          <input type="number" class="form-control" min=0 [(ngModel)]="poststep.delay">
+        <div class="input-group mb-3 " *ngIf="poststep.type=='CLOCK'">
+          <span class="input-group-text">Delay (FEEL)</span>
+          <input type="text" class="form-control" [(ngModel)]="poststep.feelDelay">
+        </div>
+        <div class="input-group mb-3 " *ngIf="poststep.type=='MSG'">
+          <span class="input-group-text">Delay (ms)</span>
+          <input type="number" class="form-control" min=0 [(ngModel)]="poststep.msgDelay">
         </div>
         <div class="input-group mb-3 " *ngIf="poststep.type=='MSG'">
           <span class="input-group-text">Message</span>
@@ -162,7 +206,15 @@
           <span class="input-group-text">Correlation Key</span>
           <input type="text" class="form-control" [(ngModel)]="poststep.correlationKey">
         </div>
-        <div class="input-group mb-3" [ngClass]="poststep.type=='MSG' ? '' : 'hidden'">
+        <div class="input-group mb-3 " *ngIf="poststep.type=='BPMN_ERROR'">
+          <span class="input-group-text">Delay (ms)</span>
+          <input type="number" class="form-control" min=0 [(ngModel)]="poststep.errorDelay">
+        </div>
+        <div class="input-group mb-3 " *ngIf="poststep.type=='BPMN_ERROR'">
+          <span class="input-group-text">Error Code</span>
+          <input type="text" class="form-control" [(ngModel)]="poststep.errorCode">
+        </div>
+        <div class="input-group mb-3" [ngClass]="poststep.type=='MSG' || poststep.type=='BPMN_ERROR' ? '' : 'hidden'">
           <span class="input-group-text">JSON Template</span>
           <div class="form-control" id="postStepJsonTemplate"></div>
         </div>

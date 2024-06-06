@@ -1,6 +1,7 @@
 package org.example.camunda.utils;
 
 import io.camunda.zeebe.client.api.worker.JobWorker;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,7 +14,6 @@ import org.example.camunda.core.actions.Action;
 import org.example.camunda.dto.ExecutionPlan;
 import org.example.camunda.dto.InstanceContext;
 import org.example.camunda.dto.Scenario;
-import org.example.camunda.dto.TimePrecisionEnum;
 
 public class ContextUtils {
 
@@ -57,9 +57,9 @@ public class ContextUtils {
     activeWorkers.add(worker);
   }
 
-  public static long addAction(long time, Action action, TimePrecisionEnum timePrecision) {
+  public static long addAction(long time, Action action) {
     if (time < System.currentTimeMillis()) {
-      long realTime = buildEntry(timePrecision.round(time));
+      long realTime = buildEntry(ContextUtils.getPlan().getTimePrecision().round(time));
       timedActions.get(realTime).add(action);
       return realTime;
     } else {
@@ -161,5 +161,9 @@ public class ContextUtils {
 
   public static void setEngineTime(long estimateEngineTime) {
     ContextUtils.estimateEngineTime = estimateEngineTime;
+  }
+
+  public static ChronoUnit getInstanceDistribution() {
+    return currentPlan.getInstanceDistribution();
   }
 }

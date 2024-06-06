@@ -7,14 +7,20 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Create new step</h5>
+        <h5 class="modal-title">Prepare step</h5>
         <button type="button" class="btn-close" (click)="closenewstepModal()"></button>
       </div>
-      <div class="modal-body">
-        Do you want to add a step for {{execPlanService.currentActivity}} into the current scenario ?
+      <div class="modal-body" *ngIf="selectedElt && selectedElt.type!=='bpmn:IntermediateCatchEvent' &&  selectedElt.type!=='bpmn:BoundaryEvent'">
+        Do you want to add a step for {{selectedElt.id}} into the current scenario ?
+      </div>
+      <div class="modal-body" *ngIf="selectedElt && selectedElt.type=='bpmn:IntermediateCatchEvent'">
+        To manage Intermediate catch event, you should add a Post Step activity in the previous task.
+      </div>
+      <div class="modal-body" *ngIf="selectedElt && selectedElt.type=='bpmn:BoundaryEvent'">
+        To manage a boundary event, you should add a Pre Step activity in the parent task. Do you want to create that Pre Step ?
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-warning" (click)="createStep()"><i class="bi bi-plus-circle"></i> Create</button>
+        <button type="button" class="btn btn-warning" (click)="createStep()" *ngIf="selectedElt && selectedElt.type!=='bpmn:IntermediateCatchEvent'"><i class="bi bi-plus-circle"></i> Create</button>
         <button type="button" class="btn btn-secondary" (click)="closenewstepModal()">Close</button>
       </div>
     </div>

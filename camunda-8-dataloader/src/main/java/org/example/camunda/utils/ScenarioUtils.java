@@ -76,9 +76,9 @@ public class ScenarioUtils {
       long salt = Math.round(Math.random() * duration.getProgressionSalt() * multiplier);
       desiredAvg = desiredAvg + salt;
     }
-    if (context.getScenario().getInstanceDistribution() == ChronoUnit.DAYS
-        || context.getScenario().getInstanceDistribution() == ChronoUnit.HALF_DAYS
-        || context.getScenario().getInstanceDistribution() == ChronoUnit.HOURS) {
+    if (ContextUtils.getInstanceDistribution() == ChronoUnit.DAYS
+        || ContextUtils.getInstanceDistribution() == ChronoUnit.HALF_DAYS
+        || ContextUtils.getInstanceDistribution() == ChronoUnit.HOURS) {
       if (ContextUtils.shouldComputeMin(processUniqueId)) {
         return desiredAvg - duration.getMinMaxPercent() * desiredAvg / 100;
       }
@@ -113,6 +113,18 @@ public class ScenarioUtils {
               ValDateTime.class));
     }
     return null;
+  }
+
+  public static Long getEstimatedTime(long date, String feelDuration) {
+    return getMillis(
+        FeelUtils.evaluate(
+            "date and time(\""
+                + Instant.ofEpochMilli(date).toString()
+                + "\") + duration(\""
+                + feelDuration
+                + "\")",
+            new HashMap<>(),
+            ValDateTime.class));
   }
 
   public static Long getMillis(ValDateTime valDate) {
