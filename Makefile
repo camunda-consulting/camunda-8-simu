@@ -1,15 +1,34 @@
 .PHONY: all
-all: build-jars build-loader-docker-image run
+all: buildall build-docker-image run
 
-.PHONY: build-jars
-build-jars:
-	cd exporter; ./mvnw clean package
-	cd camunda-8-dataloader; make buildall
 	
-.PHONY: build-audit-docker-image
-build-loader-docker-image:
-	cd camunda-8-dataloader; docker build -t camunda-community/loader .
+.PHONY: build-docker-image
+build-docker-image:
+	docker build -t camunda-community/loader .
 	
 .PHONY: run
 run:
 	docker-compose up -d
+
+runfront:
+	cd src/main/front; npm run start
+
+buildall: buildfront package
+
+buildfront:
+ifeq ("$(wildcard src/main/front/node_modules)","")
+	cd src/main/front; npm install
+endif
+	cd src/main/front; npm run build
+	-rm -rf src/main/resources/static
+	cp -r src/main/front/dist/front src/main/resources/static
+	-rm -rf target
+
+package:	
+	mvnw clean package
+
+runjava:
+	mvnw spring-boot:run
+
+npminstall:
+	cd src/main/front; npm install

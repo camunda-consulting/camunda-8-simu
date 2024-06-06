@@ -3,22 +3,20 @@
 [![](https://img.shields.io/badge/Lifecycle-Incubating-blue)](https://github.com/Camunda-Community-Hub/community/blob/main/extension-lifecycle.md#incubating-)
 
 
-# Camunda Platform 8 example for long term auditability
+# Camunda Platform 8 data simulator
 
-This project is made to provide an example of storing Camunda Operate information in a relational database and displaying it in a custom front-end using the bpmn-js library (as Operate)
+This project is made to populate data into a C8 installation to provide meaningfull data in Optimize, Operate and Tasklist.
 
-:information_source: This is a community project that you can use during exploration phase, PoCs, trainings, etc. It's **not production ready** and you should not use it in production.
+:information_source: This is a draft project. It's **not production ready** and you should not use it in production.
 
 ## Repository content
 
-This repository contains a [Java application](auditapp) that stores Operate history in a H2 db and display it in a custom front-end. This is built with Spring Boot, the Operate Client and a [React front-end](auditapp/src/main/front/) that you can execute independently (npm run start) or serve from the spring boot application (you should first run a `mvnw package` at the project root).
-
-It also contains an [exporter](exporter) that triggers an endpoint from the auditapp application to store the process instance history once completed.
+This repository contains a [Java application](src/main/java) built with Spring Boot and an [Angular front-end](src/main/front/) that you can execute independently (npm run start) or serve from the spring boot application (you should first run a `mvnw package` at the project root).
 
 Finally, there is a Makefile to execute this example on a local setup. The Makefile will :
-- package the 2 java projects. 
-- It will build a docker image from the auditapp application.
-- it will start the docker-compose that contains a Camunda 8 platform preconfigured to have the custom exporter in zeebe and the auditapp running in the same cluster.
+- package the front-end and java project. 
+- build a docker image from the auditapp application.
+- start the docker-compose that contains a Camunda 8 platform and the loader running in the same cluster.
 
 ## First steps with the application
 
@@ -29,17 +27,29 @@ make
 
 To do so, you need a proper JDK, Make, docker-compose.
 
-If you don't change any configuration, you should be able to access the audit app UI at [http://localhost:8090/](http://localhost:8090/)
-The credentials are demo/demo.
+If you don't change any configuration, you should be able to access the Simulator UI at [http://localhost:8080/](http://localhost:8080/).
 
-To start populating your application, you should start and complete process instances against your cluster.
+To start populating your application, you should execute a plan.
 
-## Configurations
-To make the audit app works on SaaS clusters (or on a zeebe engine that you don't want to extend with a custom exporter), there is a configuration available in the yaml file :
+## Other options
+You can also build and run the simulation application locally 
 ```
-operate.sync.scheduled: true
+make buildall
 ```
 
-In such case:
-- the audit endpoint exposed to the exporter will discard incoming messages.
-- A scheduled task (every 4 hours) is executed to get all completed instances by chunks (100) from the Operate's API. The last "sortValues" is stored in the DB as the next sync point. 
+```
+make runjava
+```
+Just pay attention to the configurations to connect to Operate and Zeebe in the [application.yaml](src/main/resources/application.yaml) file.
+
+You can connect it to any Self-Managed cluster. Just pay attention to :
+- add the configuration ZEEBE_CLOCK_CONTROLLED=true in Zeebe
+- Create the client/secret that allows the Simulation application to speak with Operate (from Identity UI or from configs):
+```
+KEYCLOAK_CLIENTS_1_NAME: dataloader
+KEYCLOAK_CLIENTS_1_ID: dataloader
+KEYCLOAK_CLIENTS_1_SECRET: Tcx9kFqVwxlnWMZOhjYCemnLvBr1Gvs3
+KEYCLOAK_CLIENTS_1_TYPE: M2M
+KEYCLOAK_CLIENTS_1_PERMISSIONS_0_RESOURCE_SERVER_ID: operate-api
+KEYCLOAK_CLIENTS_1_PERMISSIONS_0_DEFINITION: read:*
+```

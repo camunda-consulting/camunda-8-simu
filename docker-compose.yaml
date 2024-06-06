@@ -41,8 +41,6 @@ services:
       start_period: 30s
     volumes:
       - zeebe:/usr/local/zeebe/data
-      - "./exporter/target/loader-exporter-0.0.1-SNAPSHOT-jar-with-dependencies.jar:/usr/local/zeebe/lib/loader-exporter.jar:rw"
-      - "./zeebe.config:/usr/local/zeebe/config/application.yaml:rw"
     networks:
       - camunda-platform
     depends_on:
@@ -331,7 +329,7 @@ services:
     image: camunda-community/loader
     container_name: loader
     ports:
-      - 9090:8080
+      - 8080:8080
     environment:
       TIMERS_FROM: exporter
       ZEEBE_CLIENT_BROKER_GATEWAYADDRESS: zeebe:26500
