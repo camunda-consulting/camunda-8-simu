@@ -36,9 +36,13 @@
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000
         },
-        "jsonTemplate" : "{\"score\":[( ${templateUtils.range(96,100)} )]}",
+        "jsonTemplate" : {
+          "template" : "{\"score\":templateUtils.range(96,100)}",
+          "exampleContext" : { }
+        },
         "postSteps" : null,
-        "preSteps" : null
+        "preSteps" : null,
+        "incident" : null
       },
       "SendTask_SendPolicy" : {
         "elementId" : "SendTask_SendPolicy",
@@ -50,9 +54,13 @@
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000
         },
-        "jsonTemplate" : "{}",
+        "jsonTemplate" : {
+          "template" : "{}",
+          "exampleContext" : { }
+        },
         "postSteps" : null,
-        "preSteps" : null
+        "preSteps" : null,
+        "incident" : null
       },
       "ServiceTask_DeliverPolicy" : {
         "elementId" : "ServiceTask_DeliverPolicy",
@@ -64,12 +72,19 @@
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000
         },
-        "jsonTemplate" : "{}",
+        "jsonTemplate" : {
+          "template" : "{}",
+          "exampleContext" : { }
+        },
         "postSteps" : null,
-        "preSteps" : null
+        "preSteps" : null,
+        "incident" : null
       }
     },
-    "jsonTemplate" : "{\n  \"applicationNumber\": \"[( ${templateUtils.generateUUID()} )]\",\n  \"applicant\": {\n    \"name\": \"[( ${templateUtils.firstname()} )]\",\n    \"email\": \"[( ${templateUtils.firstname()} )]@gmail.com\",\n    \"birthday\": \"1986-11-24 13:12:00.000+00:00\",\n    \"age\": 38\n  },\n  \"employment\": \"Salaried\",\n  \"category\": \"Basic Package\"\n}"
+    "jsonTemplate" : {
+      "template" : "{\n  \"applicationNumber\": templateUtils.generateUUID(\"A-\"),\n  \"applicant\": {\n    \"name\": templateUtils.firstname(),\n    \"email\": templateUtils.firstname(),\n    \"birthday\": \"1986-11-24 13:12:00.000+00:00\",\n    \"age\": 38\n  },\n  \"employment\": \"Salaried\",\n  \"category\": \"Basic Package\"\n}",
+      "exampleContext" : { }
+    }
   }, {
     "name" : "Red",
     "dayTimeStart" : 9,
@@ -94,9 +109,13 @@
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000
         },
-        "jsonTemplate" : "{}",
+        "jsonTemplate" : {
+          "template" : "{}",
+          "exampleContext" : { }
+        },
         "postSteps" : null,
-        "preSteps" : null
+        "preSteps" : null,
+        "incident" : null
       },
       "ServiceTask_0tixwo5" : {
         "elementId" : "ServiceTask_0tixwo5",
@@ -108,9 +127,13 @@
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000
         },
-        "jsonTemplate" : "{\"score\":[( ${templateUtils.range(50,85)} )]}",
+        "jsonTemplate" : {
+          "template" : "{\"score\":templateUtils.range(50,85)}",
+          "exampleContext" : { }
+        },
         "postSteps" : null,
-        "preSteps" : null
+        "preSteps" : null,
+        "incident" : null
       },
       "SendTask_SendRejection" : {
         "elementId" : "SendTask_SendRejection",
@@ -122,12 +145,19 @@
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000
         },
-        "jsonTemplate" : "{}",
+        "jsonTemplate" : {
+          "template" : "{}",
+          "exampleContext" : { }
+        },
         "postSteps" : null,
-        "preSteps" : null
+        "preSteps" : null,
+        "incident" : null
       }
     },
-    "jsonTemplate" : "{\"applicationNumber\":\"[( ${templateUtils.generateUUID(\"A-\")} )]\", \"applicant\":{\"name\":\"[( ${templateUtils.firstname()} )]\", \"email\":\"[( ${templateUtils.firstname()} )]@gmail.com\", \"birthday\":\"1986-11-24 13:12:00.000+00:00\", \"age\":38}, \"employment\":\"Unemployed\", \"category\":\"Premium Package\"}"
+    "jsonTemplate" : {
+      "template" : "{\"applicationNumber\":templateUtils.generateUUID(\"A-\"), \"applicant\":{\"name\":templateUtils.firstname(), \"email\":templateUtils.firstname(), \"birthday\":\"1986-11-24 13:12:00.000+00:00\", \"age\":38}, \"employment\":\"Unemployed\", \"category\":\"Premium Package\"}",
+      "exampleContext" : { }
+    }
   }, {
     "name" : "Yellow",
     "dayTimeStart" : 9,
@@ -152,9 +182,13 @@
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000
         },
-        "jsonTemplate" : "{}",
+        "jsonTemplate" : {
+          "template" : "{}",
+          "exampleContext" : { }
+        },
         "postSteps" : null,
-        "preSteps" : null
+        "preSteps" : null,
+        "incident" : null
       },
       "UserTask_DecideOnApplication" : {
         "elementId" : "UserTask_DecideOnApplication",
@@ -166,9 +200,13 @@
           "avgProgression" : "LINEAR_SALTED",
           "progressionSalt" : 1000
         },
-        "jsonTemplate" : "{\"approved\":true}",
+        "jsonTemplate" : {
+          "template" : "{\"approved\":true}",
+          "exampleContext" : { }
+        },
         "postSteps" : null,
-        "preSteps" : null
+        "preSteps" : null,
+        "incident" : null
       },
       "ServiceTask_DeliverPolicy" : {
         "elementId" : "ServiceTask_DeliverPolicy",
@@ -180,9 +218,13 @@
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000
         },
-        "jsonTemplate" : "{}",
+        "jsonTemplate" : {
+          "template" : "{}",
+          "exampleContext" : { }
+        },
         "postSteps" : null,
-        "preSteps" : null
+        "preSteps" : null,
+        "incident" : null
       },
       "ServiceTask_0tixwo5" : {
         "elementId" : "ServiceTask_0tixwo5",
@@ -194,12 +236,19 @@
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000
         },
-        "jsonTemplate" : "{\"score\":[( ${templateUtils.range(86,95)} )]}",
+        "jsonTemplate" : {
+          "template" : "{\"score\":templateUtils.range(86,95)",
+          "exampleContext" : { }
+        },
         "postSteps" : null,
-        "preSteps" : null
+        "preSteps" : null,
+        "incident" : null
       }
     },
-    "jsonTemplate" : "{\"applicationNumber\":\"[( ${templateUtils.generateUUID(\"A-\")} )]\", \"applicant\":{\"name\":\"[( ${templateUtils.firstname()} )]\", \"email\":\"[( ${templateUtils.firstname()} )]@gmail.com\", \"birthday\":\"1984-11-24 13:12:00.000+00:00\", \"age\":38}, \"employment\":\"Freelancer\", \"category\":\"Basic Package\"}"
+    "jsonTemplate" : {
+      "template" : "{\"applicationNumber\":templateUtils.generateUUID(\"A-\"), \"applicant\":{\"name\":templateUtils.firstname(), \"email\":templateUtils.firstname(), \"birthday\":\"1984-11-24 13:12:00.000+00:00\", \"age\":38}, \"employment\":\"Freelancer\", \"category\":\"Basic Package\"}",
+      "exampleContext" : { }
+    }
   }, {
     "name" : "YellowPlus",
     "dayTimeStart" : 9,
@@ -224,12 +273,22 @@
           "avgProgression" : "LINEAR_SALTED",
           "progressionSalt" : 43200000
         },
-        "jsonTemplate" : "{\"approved\":false}",
+        "jsonTemplate" : {
+          "template" : "{\"approved\":false}",
+          "exampleContext" : { }
+        },
         "postSteps" : null,
         "preSteps" : [ {
           "type" : "CLOCK",
-          "feelDelay" : "P2D"
-        } ]
+          "feelDelay" : "P2D",
+          "msg" : "MSG",
+          "msgDelay" : 1000,
+          "correlationKey" : null,
+          "jsonTemplate" : null,
+          "errorCode" : null,
+          "errorDelay" : 1000
+        } ],
+        "incident" : null
       },
       "ServiceTask_RejectPolicy" : {
         "elementId" : "ServiceTask_RejectPolicy",
@@ -241,9 +300,13 @@
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000
         },
-        "jsonTemplate" : "{}",
+        "jsonTemplate" : {
+          "template" : "{}",
+          "exampleContext" : { }
+        },
         "postSteps" : null,
-        "preSteps" : null
+        "preSteps" : null,
+        "incident" : null
       },
       "ServiceTask_0tixwo5" : {
         "elementId" : "ServiceTask_0tixwo5",
@@ -255,9 +318,13 @@
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000
         },
-        "jsonTemplate" : "{\"score\":[( ${templateUtils.range(86,95)} )]}",
+        "jsonTemplate" : {
+          "template" : "{\"score\":templateUtils.range(86,95)}",
+          "exampleContext" : { }
+        },
         "postSteps" : null,
-        "preSteps" : null
+        "preSteps" : null,
+        "incident" : null
       },
       "UserTask_AccelerateDecision" : {
         "elementId" : "UserTask_AccelerateDecision",
@@ -269,9 +336,13 @@
           "avgProgression" : "LINEAR_SALTED",
           "progressionSalt" : 300000
         },
-        "jsonTemplate" : "{}",
+        "jsonTemplate" : {
+          "template" : "{}",
+          "exampleContext" : { }
+        },
         "postSteps" : null,
-        "preSteps" : null
+        "preSteps" : null,
+        "incident" : null
       },
       "SendTask_SendRejection" : {
         "elementId" : "SendTask_SendRejection",
@@ -283,11 +354,18 @@
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000
         },
-        "jsonTemplate" : "{}",
+        "jsonTemplate" : {
+          "template" : "{}",
+          "exampleContext" : { }
+        },
         "postSteps" : null,
-        "preSteps" : null
+        "preSteps" : null,
+        "incident" : null
       }
     },
-    "jsonTemplate" : "{\"applicationNumber\":\"[( ${templateUtils.generateUUID(\"A-\")} )]\", \"applicant\":{\"name\":\"[( ${templateUtils.firstname()} )]\", \"email\":\"[( ${templateUtils.firstname()} )]@gmail.com\", \"birthday\":\"1984-11-24 13:12:00.000+00:00\", \"age\":38}, \"employment\":\"Freelancer\", \"category\":\"Basic Package\"}"
+    "jsonTemplate" : {
+      "template" : "{\"applicationNumber\":templateUtils.generateUUID(\"A-\"), \"applicant\":{\"name\":templateUtils.firstname(), \"email\":templateUtils.firstname(), \"birthday\":\"1984-11-24 13:12:00.000+00:00\", \"age\":38}, \"employment\":\"Freelancer\", \"category\":\"Basic Package\"}",
+      "exampleContext" : { }
+    }
   } ]
 }

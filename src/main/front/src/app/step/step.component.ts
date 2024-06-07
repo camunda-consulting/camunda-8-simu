@@ -30,7 +30,7 @@ export class StepComponent implements AfterViewInit, OnInit {
 
   ngAfterViewInit(): void {
     this.codeMirror = new EditorView({
-      doc: this.prettify(this.step.jsonTemplate),
+      doc: this.execPlanService.prettifyJsonTemplate(this.step.jsonTemplate.template),
       extensions: [
         basicSetup,
         json(),
@@ -47,11 +47,11 @@ export class StepComponent implements AfterViewInit, OnInit {
 
   buildPreStepJsonEditor(): void {
     if ((this.prestep.type == 'MSG' || this.prestep.type == 'BPMN_ERROR') && !this.preStepcodeMirror) {
-      if (!this.prestep.jsonTemplate) {
-        this.prestep.jsonTemplate = '{}';
+      if (!this.prestep.jsonTemplate.template) {
+        this.prestep.jsonTemplate.template = '{}';
       }
       this.preStepcodeMirror = new EditorView({
-        doc: this.prestep.jsonTemplate,
+        doc: this.execPlanService.prettifyJsonTemplate(this.prestep.jsonTemplate.template),
         extensions: [
           basicSetup,
           json(),
@@ -64,11 +64,11 @@ export class StepComponent implements AfterViewInit, OnInit {
 
   buildPostStepJsonEditor(): void {
     if ((this.poststep.type == 'MSG' || this.poststep.type == 'BPMN_ERROR') && !this.postStepcodeMirror) {
-      if (!this.poststep.jsonTemplate) {
-        this.poststep.jsonTemplate = '{}';
+      if (!this.poststep.jsonTemplate.template) {
+        this.poststep.jsonTemplate.template = '{}';
       }
       this.preStepcodeMirror = new EditorView({
-        doc: this.poststep.jsonTemplate,
+        doc: this.execPlanService.prettifyJsonTemplate(this.poststep.jsonTemplate.template),
         extensions: [
           basicSetup,
           json(),
@@ -79,16 +79,8 @@ export class StepComponent implements AfterViewInit, OnInit {
     }
   }
 
-  prettify(template: string): string {
-    try {
-      return JSON.stringify(JSON.parse(template), null, 2);
-    } catch (error) {
-      return this.step.jsonTemplate;
-    }
-  }
-
   updateListenerExtension = EditorView.updateListener.of((v) => {
-    this.step.jsonTemplate = v.state.doc.toString();
+    this.step.jsonTemplate.template = v.state.doc.toString();
   });
 
   displayAdditionalStep(step: any): string {
@@ -102,11 +94,11 @@ export class StepComponent implements AfterViewInit, OnInit {
   }
 
   updatePreStep = EditorView.updateListener.of((v) => {
-    this.prestep.jsonTemplate = v.state.doc.toString();
+    this.prestep.jsonTemplate.template = v.state.doc.toString();
   });
 
   updatePostStep = EditorView.updateListener.of((v) => {
-    this.poststep.jsonTemplate = v.state.doc.toString();
+    this.poststep.jsonTemplate.template = v.state.doc.toString();
   });
 
   openDurationModal() {

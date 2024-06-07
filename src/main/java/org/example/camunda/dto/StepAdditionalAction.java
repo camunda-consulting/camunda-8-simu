@@ -1,5 +1,7 @@
 package org.example.camunda.dto;
 
+import org.example.camunda.dto.templating.JsonTemplate;
+
 public class StepAdditionalAction {
   private StepActionEnum type = StepActionEnum.CLOCK;
 
@@ -10,7 +12,7 @@ public class StepAdditionalAction {
   private String msg = "MSG";
   private Long msgDelay = 1000L;
   private String correlationKey;
-  private String jsonTemplate = "{}";
+  private JsonTemplate jsonTemplate;
 
   // BPMN_ERROR
   private String errorCode;
@@ -56,11 +58,11 @@ public class StepAdditionalAction {
     this.correlationKey = correlationKey;
   }
 
-  public String getJsonTemplate() {
+  public JsonTemplate getJsonTemplate() {
     return jsonTemplate;
   }
 
-  public void setJsonTemplate(String jsonTemplate) {
+  public void setJsonTemplate(JsonTemplate jsonTemplate) {
     this.jsonTemplate = jsonTemplate;
   }
 

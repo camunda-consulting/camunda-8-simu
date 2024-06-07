@@ -12,6 +12,7 @@ import org.example.camunda.dto.ProgressionEnum;
 import org.example.camunda.dto.Scenario;
 import org.example.camunda.dto.StepDuration;
 import org.example.camunda.dto.StepExecPlan;
+import org.example.camunda.dto.templating.JsonTemplate;
 import org.w3c.dom.Document;
 
 public class ScenarioUtils {
@@ -22,6 +23,7 @@ public class ScenarioUtils {
     List<String> serviceTaskIds = BpmnUtils.getServiceTasksElementsId(doc);
 
     Scenario result = new Scenario();
+    result.setJsonTemplate(new JsonTemplate());
     result.setFirstDayFeelExpression("now() - duration(\"P3M\")");
     result.setLastDayFeelExpression("now()");
     result.setNbInstancesStart(10);

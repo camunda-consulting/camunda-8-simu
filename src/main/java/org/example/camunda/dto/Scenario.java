@@ -2,6 +2,7 @@ package org.example.camunda.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Map;
+import org.example.camunda.dto.templating.JsonTemplate;
 
 public class Scenario {
   private String name;
@@ -21,7 +22,7 @@ public class Scenario {
   private Integer saltMax;
   private Map<String, StepExecPlan> steps;
   // start template
-  private String jsonTemplate = "{}";
+  private JsonTemplate jsonTemplate;
 
   public String getName() {
     return name;
@@ -143,11 +144,11 @@ public class Scenario {
     this.steps = steps;
   }
 
-  public String getJsonTemplate() {
+  public JsonTemplate getJsonTemplate() {
     return jsonTemplate;
   }
 
-  public void setJsonTemplate(String jsonTemplate) {
+  public void setJsonTemplate(JsonTemplate jsonTemplate) {
     this.jsonTemplate = jsonTemplate;
   }
 }

@@ -28,7 +28,7 @@ public class StartInstancesAction extends Action {
 
     try {
       for (long x = 0; x < this.nbInstances; x++) {
-        ObjectNode variables = getVariables(this.scenario.getJsonTemplate(), null);
+        ObjectNode variables = getVariables(this.scenario.getJsonTemplate().getTemplate(), null);
         String uniqueId = UUID.randomUUID().toString();
         ContextUtils.addInstance(uniqueId, this.scenario, this.progress);
         variables.put("uniqueProcessIdentifier", uniqueId);

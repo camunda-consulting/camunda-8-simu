@@ -18,7 +18,7 @@ export class InstantiateComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     this.codeMirror = new EditorView({
-      doc: this.prettify(),
+      doc: this.execPlanService.prettifyJsonTemplate(this.execPlanService.scenario.jsonTemplate.template),
       extensions: [
         basicSetup,
         json(),
@@ -28,15 +28,7 @@ export class InstantiateComponent implements AfterViewInit {
     });
   }
 
-  prettify():string {
-    try {
-      return JSON.stringify(JSON.parse(this.execPlanService.scenario.jsonTemplate), null, 2);
-    } catch(error) {
-      return this.execPlanService.scenario.jsonTemplate;
-    }
-  }
-
   updateListenerExtension = EditorView.updateListener.of((v) => {
-    this.execPlanService.scenario.jsonTemplate =v.state.doc.toString();
+    this.execPlanService.scenario.jsonTemplate.template =v.state.doc.toString();
   });
 }

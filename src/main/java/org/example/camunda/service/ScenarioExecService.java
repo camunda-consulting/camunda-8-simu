@@ -105,7 +105,7 @@ public class ScenarioExecService {
                             targetTime,
                             new CompleteJobAction(
                                 job.getKey(),
-                                step.getJsonTemplate(),
+                                step.getJsonTemplate().getTemplate(),
                                 job.getVariablesAsMap(),
                                 zeebeService));
                     // post steps are only managed when main action will complete. Typically
@@ -133,7 +133,7 @@ public class ScenarioExecService {
           new MessageAction(
               step.getMsg(),
               (String) variables.get(step.getCorrelationKey()),
-              step.getJsonTemplate(),
+              step.getJsonTemplate().getTemplate(),
               job.getVariablesAsMap(),
               zeebeService));
     } else if (step.getType() == StepActionEnum.BPMN_ERROR) {
@@ -142,7 +142,7 @@ public class ScenarioExecService {
           new BpmnErrorAction(
               step.getErrorCode(),
               job.getKey(),
-              step.getJsonTemplate(),
+              step.getJsonTemplate().getTemplate(),
               job.getVariablesAsMap(),
               zeebeService));
     }

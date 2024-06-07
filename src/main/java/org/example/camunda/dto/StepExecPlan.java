@@ -1,6 +1,7 @@
 package org.example.camunda.dto;
 
 import java.util.List;
+import org.example.camunda.dto.templating.JsonTemplate;
 
 public class StepExecPlan {
   private String elementId;
@@ -10,7 +11,7 @@ public class StepExecPlan {
   private StepDuration duration;
 
   // COMPLETE
-  private String jsonTemplate = "{}";
+  private JsonTemplate jsonTemplate;
   private List<StepAdditionalAction> postSteps;
 
   // ANY
@@ -43,11 +44,11 @@ public class StepExecPlan {
     this.duration = duration;
   }
 
-  public String getJsonTemplate() {
+  public JsonTemplate getJsonTemplate() {
     return jsonTemplate;
   }
 
-  public void setJsonTemplate(String jsonTemplate) {
+  public void setJsonTemplate(JsonTemplate jsonTemplate) {
     this.jsonTemplate = jsonTemplate;
   }
 

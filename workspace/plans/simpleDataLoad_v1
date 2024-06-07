@@ -39,14 +39,14 @@
           "avgProgression" : "LINEAR_SALTED",
           "progressionSalt" : 1000
         },
-        "jsonTemplate" : "{}",
+        "jsonTemplate" : {"exampleContext":{}, "template" : "{}"},
         "postSteps" : [ {
           "type" : "MSG",
           "feelDelay" : "PT5M",
           "msg" : "MSG_WAIT",
           "msgDelay" : 360000,
           "correlationKey" : "businessKey",
-          "jsonTemplate" : "{}",
+          "jsonTemplate" : {"exampleContext":{}, "template" : "{}"},
           "errorCode" : null,
           "errorDelay" : 1000
         } ],
@@ -63,7 +63,7 @@
           "avgProgression" : "LINEAR",
           "progressionSalt" : 0
         },
-        "jsonTemplate" : "{}",
+        "jsonTemplate" : {"exampleContext":{}, "template" : "{}"},
         "postSteps" : null,
         "preSteps" : null,
         "incident" : null
@@ -78,7 +78,7 @@
           "avgProgression" : "LINEAR",
           "progressionSalt" : 0
         },
-        "jsonTemplate" : "{}",
+        "jsonTemplate" : {"exampleContext":{}, "template" : "{}"},
         "postSteps" : null,
         "preSteps" : null,
         "incident" : null
@@ -93,7 +93,7 @@
           "avgProgression" : "LINEAR",
           "progressionSalt" : 0
         },
-        "jsonTemplate" : "{}",
+        "jsonTemplate" : {"exampleContext":{}, "template" : "{}"},
         "postSteps" : null,
         "preSteps" : null,
         "incident" : null
@@ -108,13 +108,13 @@
           "avgProgression" : "LINEAR",
           "progressionSalt" : 0
         },
-        "jsonTemplate" : "{}",
+        "jsonTemplate" : {"exampleContext":{}, "template" : "{}"},
         "postSteps" : null,
         "preSteps" : null,
         "incident" : null
       }
     },
-    "jsonTemplate" : "{\n  \"input\": \"manual\",\n  \"businessKey\": \"[( ${templateUtils.generateUUID()} )]\"\n}"
+    "jsonTemplate" : {"exampleContext":{}, "template" : "{\n  \"input\": \"manual\",\n  \"businessKey\": templateUtils.generateUUID(\"A-\")\n}"}
   }, {
     "name" : "High branch",
     "dayTimeStart" : 9,
@@ -139,14 +139,14 @@
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000
         },
-        "jsonTemplate" : "{}",
+        "jsonTemplate" : {"exampleContext":{}, "template" : "{}"},
         "postSteps" : [ {
           "type" : "CLOCK",
           "feelDelay" : "P1D",
           "msg" : "MSG",
           "msgDelay" : 1000,
           "correlationKey" : null,
-          "jsonTemplate" : "{}",
+          "jsonTemplate" : {"exampleContext":{}, "template" : "{}"},
           "errorCode" : null,
           "errorDelay" : 1000
         } ],
@@ -163,13 +163,13 @@
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000
         },
-        "jsonTemplate" : "{}",
+        "jsonTemplate" : {"exampleContext":{}, "template" : "{}"},
         "postSteps" : null,
         "preSteps" : null,
         "incident" : null
       }
     },
-    "jsonTemplate" : "{\n  \"input\": \"automatic\",\n  \"businessKey\": \"[( ${templateUtils.generateUUID()} )]\"\n}"
+    "jsonTemplate" : {"exampleContext":{}, "template" : "{\n  \"input\": \"automatic\",\n  \"businessKey\": templateUtils.generateUUID(\"A-\")\n}"}
   }, {
     "name" : "Error scenario",
     "dayTimeStart" : 9,
@@ -194,7 +194,7 @@
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000
         },
-        "jsonTemplate" : "{}",
+        "jsonTemplate" : {"exampleContext":{}, "template" : "{}"},
         "postSteps" : null,
         "preSteps" : [ {
           "type" : "BPMN_ERROR",
@@ -202,14 +202,14 @@
           "msg" : "MSG",
           "msgDelay" : 1000,
           "correlationKey" : null,
-          "jsonTemplate" : "{}",
+          "jsonTemplate" : {"exampleContext":{}, "template" : "{}"},
           "errorCode" : "404",
           "errorDelay" : 1000
         } ],
         "incident" : null
       }
     },
-    "jsonTemplate" : "{\n  \"input\": \"automatic\",\n  \"businessKey\": \"[( ${templateUtils.generateUUID()} )]\"\n}"
+    "jsonTemplate" : {"exampleContext":{}, "template" : "{\n  \"input\": \"automatic\",\n  \"businessKey\": templateUtils.generateUUID(\"A-\")\n}"}
   }, {
     "name" : "Incident",
     "dayTimeStart" : 9,
@@ -234,7 +234,7 @@
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000
         },
-        "jsonTemplate" : "{}",
+        "jsonTemplate" : {"exampleContext":{}, "template" : "{}"},
         "postSteps" : null,
         "preSteps" : null,
         "incident" : null
@@ -249,12 +249,12 @@
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000
         },
-        "jsonTemplate" : "{}",
+        "jsonTemplate" : {"exampleContext":{}, "template" : "{}"},
         "postSteps" : null,
         "preSteps" : null,
         "incident" : "OUT_OF_BOUND"
       }
     },
-    "jsonTemplate" : "{\n  \"input\": \"automatic\",\n  \"businessKey\": \"[( ${templateUtils.generateUUID()} )]\"\n}"
+    "jsonTemplate" : {"exampleContext":{}, "template" : "{\n  \"input\": \"automatic\",\n  \"businessKey\": templateUtils.generateUUID(\"A-\")\n}"}
   } ]
 }
