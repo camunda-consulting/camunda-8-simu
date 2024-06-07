@@ -3,7 +3,10 @@ package org.example.camunda.utils;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
+import org.apache.commons.math3.distribution.NormalDistribution;
 
 public class TemplatingUtils {
 
@@ -61,5 +64,21 @@ public class TemplatingUtils {
 
   public static long sequentialNumber() {
     return sequence++;
+  }
+
+  private static Map<String, NormalDistribution> normalDistributionRegistry = new HashMap<>();
+
+  private static NormalDistribution getNormalDistribution(double mean, double standardDeviation) {
+    String name = mean + "_" + standardDeviation;
+    NormalDistribution normalDistribution = normalDistributionRegistry.get(name);
+    if (normalDistribution == null) {
+      normalDistribution = new NormalDistribution(mean, standardDeviation);
+      normalDistributionRegistry.put(name, normalDistribution);
+    }
+    return normalDistribution;
+  }
+
+  public static Double normal(double mean, double standardDeviation) {
+    return getNormalDistribution(mean, standardDeviation).sample();
   }
 }

@@ -40,7 +40,7 @@ public class PayloadGenerator {
       templatingMethods = new HashMap<>();
       Method[] methods = TemplatingUtils.class.getMethods();
       for (Method method : methods) {
-        if (Modifier.isStatic(method.getModifiers())) {
+        if (Modifier.isStatic(method.getModifiers()) && Modifier.isPublic(method.getModifiers())) {
           TemplatingMethod tm = new TemplatingMethod();
           tm.setName(method.getName());
           templatingMethods.put(method.getName(), tm);
