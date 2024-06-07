@@ -91,7 +91,16 @@ export class ExecPlanService {
       this.scenario.steps[parentStep] = {
         "elementId": parentStep,
         "action": "DO_NOTHING",
-        "preSteps": []
+        "duration": {
+          "startDesiredAvg": 1000,
+          "endDesiredAvg": 1000,
+          "minMaxPercent": 0,
+          "avgProgression": "LINEAR",
+          "progressionSalt": 0
+        },
+        "jsonTemplate": { "template": "", "exampleContext": {}},
+        "preSteps": [],
+        "postSteps": []
       };
     }
     if (!this.scenario.steps[parentStep].preSteps) {
@@ -131,47 +140,6 @@ export class ExecPlanService {
 
   deleteScenario(index: number): void {
     this.executionPlan.scenarii.splice(index, 1);
-  }
-
-
-
-  prettifyJsonTemplate(jsonTemplate: string): string {
-    let copy = jsonTemplate;
-    let tuIndex = copy.indexOf("templateUtils.");
-    let replacements = [];
-    let i = 0;
-    while (tuIndex > 0) {
-      let openingBracket = copy.indexOf("(", tuIndex);
-      let closingBracket = this.findClosingBracket(copy, openingBracket);
-      let replaced = copy.substring(tuIndex, closingBracket+1);
-      copy = copy.substring(0, tuIndex) + "\"R3P1AC^^3|\|T"+(i++)+"\"" + copy.substring(closingBracket+1);
-      replacements.push(replaced);
-      tuIndex = copy.indexOf("templateUtils.");
-    }
-    try {
-      let pretty = JSON.stringify(JSON.parse(copy), null, 2);
-      for (let i = 0; i < replacements.length; i++) {
-       pretty = pretty.replace("\"R3P1AC^^3|\|T" + i + "\"", replacements[i]);
-      }
-      return pretty;
-    } catch (error) {
-      console.log(error);
-      return jsonTemplate;
-    }
-  }
-
-  findClosingBracket(text: string, openPos: number): number {
-    let closePos = openPos;
-    let counter = 1;
-    while (counter > 0) {
-      let c = text.charAt(++closePos);
-      if (c == '(') {
-        counter++;
-      } else if (c == ')') {
-        counter--;
-      }
-    }
-    return closePos;
   }
 
 }

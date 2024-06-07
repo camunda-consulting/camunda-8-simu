@@ -92,9 +92,6 @@
   </div>
   <div class="row">
     <div class="col-12">
-      <div class="input-group mb-3">
-        <span class="input-group-text">JSON Template</span>
-        <div class="form-control" #jsonTemplate></div>
-      </div>
+      <app-json-editor label="JSON template" classnames="mb-3" [(template)]="this.execPlanService.scenario.jsonTemplate"></app-json-editor>
     </div>
   </div>

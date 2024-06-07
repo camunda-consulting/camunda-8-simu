@@ -14,6 +14,7 @@ import { ActionsPlanComponent } from './actions-plan/actions-plan.component';
 import { InstantiateComponent } from './instantiate/instantiate.component';
 import { StepComponent } from './step/step.component';
 import { DraggableComponent } from './draggable/draggable.component';
+import { JsonEditorComponent } from './json-editor/json-editor.component';
 declare module '@bpmn-io/element-template-icon-renderer';
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ declare module '@bpmn-io/element-template-icon-renderer';
     ActionsPlanComponent,
     InstantiateComponent,
     StepComponent,
-    DraggableComponent
+    DraggableComponent,
+    JsonEditorComponent
   ],
   imports: [
     BrowserModule, FormsModule, HttpClientModule

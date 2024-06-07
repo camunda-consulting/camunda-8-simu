@@ -1,5 +1,5 @@
 <app-draggable></app-draggable>
-<ul class="nav nav-tabs navbar-dark bg-dark " >
+<ul class="nav nav-tabs navbar-dark bg-dark ">
   <li class="nav-item">
     <a [ngClass]="state=='general' ? 'nav-link active' : 'nav-link'" (click)="this.state='general'"><i class="bi bi-gear"></i> Global settings</a>
   </li>
@@ -13,10 +13,10 @@
     <a class="nav-link text-light" (click)="save()"><i class="bi bi-floppy"></i> Save</a>
   </li>
   <li class="nav-item" *ngIf="!running">
-    <a class="nav-link text-light text-bold" (click)="execute()" ><i class="bi bi-send"></i> Execute</a>
+    <a class="nav-link text-light text-bold" (click)="execute()"><i class="bi bi-send"></i> Execute</a>
   </li>
 </ul>
-<div *ngIf="state=='general'" class="tab-pane">
+<div *ngIf="state=='general'" class="tab-pane scrollable">
   <div class="input-group mb-3">
     <span class="input-group-text" id="basic-addon1">Milliseconds Idle time before next clock move</span>
     <input type="number" class="form-control" [ngModel]="execPlanService.executionPlan!.idleTimeBeforeClockMove">
@@ -41,12 +41,12 @@
       <option value="MINUTES">MINUTES</option>
     </select>
   </div>
- <div class="alert alert-info">
-   Time precision and instance distribution will impact the realism of the simulation but will negatively impact the simulation performance. Time precision HUNDRED_MILLIS will be more realistic than SECOND (but less efficient). Instance distribution DAYS is more efficient than HOURS (but less realistic)
- </div>
+  <div class="alert alert-info">
+    Time precision and instance distribution will impact the realism of the simulation but will negatively impact the simulation performance. Time precision HUNDRED_MILLIS will be more realistic than SECOND (but less efficient). Instance distribution DAYS is more efficient than HOURS (but less realistic)
+  </div>
 </div>
 
-<div *ngFor="let scenario of execPlanService.executionPlan!.scenarii; let i=index">
+<div *ngFor="let scenario of execPlanService.executionPlan!.scenarii; let i=index" [ngClass]="state==''+i ? 'scrollable' : ''">
   <div class="tab-pane" *ngIf="state==''+i">
     <div class="d-flex align-items-start">
       <div class="nav flex-column nav-pills me-3" role="tablist">

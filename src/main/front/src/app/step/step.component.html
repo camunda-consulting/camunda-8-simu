@@ -28,10 +28,7 @@
   </div>
 </div>
 <div class="row" *ngIf="step.action=='COMPLETE'">
-  <div class="input-group mb-3">
-    <span class="input-group-text">JSON Template</span>
-    <div class="form-control" #jsonTemplate></div>
-  </div>
+  <app-json-editor label="JSON template" classnames="mb-3" [(template)]="this.step.jsonTemplate"></app-json-editor>
 </div>
 <div class="row" *ngIf="step.action=='INCIDENT'">
   <div class="input-group mb-3 ">
@@ -130,7 +127,7 @@
       <div class="modal-body" *ngIf="prestep">
         <div class="input-group mb-3 ">
           <span class="input-group-text">Type</span>
-          <select class="form-select" [(ngModel)]="prestep.type" (ngModelChange)="buildPreStepJsonEditor()">
+          <select class="form-select" [(ngModel)]="prestep.type">
             <option selected>Choose...</option>
             <option value="CLOCK">CLOCK</option>
             <option value="MSG">MSG</option>
@@ -161,10 +158,8 @@
           <span class="input-group-text">Error Code</span>
           <input type="text" class="form-control" [(ngModel)]="prestep.errorCode">
         </div>
-        <div class="input-group mb-3" [ngClass]="prestep.type=='MSG' || prestep.type=='BPMN_ERROR' ? '' : 'hidden'">
-          <span class="input-group-text">JSON Template</span>
-          <div class="form-control" id="preStepJsonTemplate"></div>
-        </div>
+
+        <app-json-editor *ngIf="prestep.type=='MSG' || prestep.type=='BPMN_ERROR'" label="JSON template" classnames="mb-3" [(template)]="prestep.jsonTemplate"></app-json-editor>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="closePreStepModal()">Close</button>
@@ -183,7 +178,7 @@
       <div class="modal-body" *ngIf="poststep">
         <div class="input-group mb-3 ">
           <span class="input-group-text">Type</span>
-          <select class="form-select" [(ngModel)]="poststep.type" (ngModelChange)="buildPostStepJsonEditor()">
+          <select class="form-select" [(ngModel)]="poststep.type">
             <option selected>Choose...</option>
             <option value="CLOCK">CLOCK</option>
             <option value="MSG">MSG</option>
@@ -214,10 +209,7 @@
           <span class="input-group-text">Error Code</span>
           <input type="text" class="form-control" [(ngModel)]="poststep.errorCode">
         </div>
-        <div class="input-group mb-3" [ngClass]="poststep.type=='MSG' || poststep.type=='BPMN_ERROR' ? '' : 'hidden'">
-          <span class="input-group-text">JSON Template</span>
-          <div class="form-control" id="postStepJsonTemplate"></div>
-        </div>
+        <app-json-editor *ngIf="poststep.type=='MSG' || poststep.type=='BPMN_ERROR'" label="JSON template" classnames="mb-3" [(template)]="poststep.jsonTemplate"></app-json-editor>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="closePostStepModal()">Close</button>

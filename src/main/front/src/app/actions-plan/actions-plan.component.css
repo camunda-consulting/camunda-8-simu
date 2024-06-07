@@ -12,3 +12,7 @@
   width: 100%;
   padding: 0px 20px;
 }
+.scrollable {
+  height:calc(100% - 42px);
+  overflow-y: auto;
+}

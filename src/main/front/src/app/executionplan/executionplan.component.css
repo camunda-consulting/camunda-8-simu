@@ -11,9 +11,9 @@ nav {
 
 app-actions-plan {
   position: absolute;
-  width:100vW;
-  overflow-y: auto;
-  background:white;
+  width: 100vW;
+  height: calc(100vh - 445px);
+  background: white;
 }
 
 app-viewer {

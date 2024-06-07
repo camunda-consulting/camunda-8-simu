@@ -1,0 +1,17 @@
+<div [ngClass]="classnames">
+  <div class="input-group">
+    <span class="input-group-text">{{label}} <i class="bi bi-question-circle text-info" (click)="help()"></i><i class="bi bi-check2-circle text-success" (click)="toggleCheck()"></i></span>
+    <div class="form-control" #jsonTemplate></div>
+  </div>
+  <div class="alert alert-info" *ngIf="displayHelp">
+    List of available methods (click on its name to have an example) :<br /><span *ngFor="let method of templatingMethods; let i=index"><a (click)="showExample(i)"><b>{{method.name}}</b> <span *ngIf="method.showExample">(e.g. <b>{{method.example}}</b>)</span></a>, </span>
+
+    <button type="button" class="btn-close" aria-label="Close" (click)="closeHelp()"></button>
+  </div>
+  <div class="input-group" [ngClass]="displayCheck ? '' : 'hidden'">
+    <span class="input-group-text">Test context</span>
+    <div class="form-control" #contextTemplate></div>
+    <button type="button" class="btn btn-outline-primary" (click)="checkTemplate()"><i class="bi bi-check2-circle"></i> Check template</button>
+  </div>
+  <div class="alert alert-success" *ngIf="checkResult"><pre>{{checkResult}}</pre></div>
+</div>

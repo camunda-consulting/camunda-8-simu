@@ -21,7 +21,7 @@ public class TemplatingController {
     return PayloadGenerator.getTemplatingMethods().values();
   }
 
-  @PostMapping
+  @PostMapping("test")
   public String evaluateTemplate(@RequestBody JsonTemplate jsonTemplate) {
     return PayloadGenerator.generatePayload(
         jsonTemplate.getTemplate(), jsonTemplate.getExampleContext());

@@ -128,7 +128,7 @@
           "progressionSalt" : 1000
         },
         "jsonTemplate" : {
-          "template" : "{\"score\":templateUtils.range(50,85)}",
+          "template" : "{\n  \"score\": templateUtils.range(50,85)\n}",
           "exampleContext" : { }
         },
         "postSteps" : null,
@@ -155,7 +155,7 @@
       }
     },
     "jsonTemplate" : {
-      "template" : "{\"applicationNumber\":templateUtils.generateUUID(\"A-\"), \"applicant\":{\"name\":templateUtils.firstname(), \"email\":templateUtils.firstname(), \"birthday\":\"1986-11-24 13:12:00.000+00:00\", \"age\":38}, \"employment\":\"Unemployed\", \"category\":\"Premium Package\"}",
+      "template" : "{\n  \"applicationNumber\": templateUtils.generateUUID(\"A-\"),\n  \"applicant\": {\n    \"name\": templateUtils.firstname(),\n    \"email\": templateUtils.firstname(),\n    \"birthday\": \"1986-11-24 13:12:00.000+00:00\",\n    \"age\": 38\n  },\n  \"employment\": \"Unemployed\",\n  \"category\": \"Premium Package\"\n}",
       "exampleContext" : { }
     }
   }, {
@@ -201,7 +201,7 @@
           "progressionSalt" : 1000
         },
         "jsonTemplate" : {
-          "template" : "{\"approved\":true}",
+          "template" : "{\n  \"approved\": true\n}",
           "exampleContext" : { }
         },
         "postSteps" : null,
@@ -237,7 +237,7 @@
           "progressionSalt" : 1000
         },
         "jsonTemplate" : {
-          "template" : "{\"score\":templateUtils.range(86,95)",
+          "template" : "{\"score\":templateUtils.range(86,95)}",
           "exampleContext" : { }
         },
         "postSteps" : null,
@@ -246,7 +246,7 @@
       }
     },
     "jsonTemplate" : {
-      "template" : "{\"applicationNumber\":templateUtils.generateUUID(\"A-\"), \"applicant\":{\"name\":templateUtils.firstname(), \"email\":templateUtils.firstname(), \"birthday\":\"1984-11-24 13:12:00.000+00:00\", \"age\":38}, \"employment\":\"Freelancer\", \"category\":\"Basic Package\"}",
+      "template" : "{\n  \"applicationNumber\": templateUtils.generateUUID(\"A-\"),\n  \"applicant\": {\n    \"name\": templateUtils.firstname(),\n    \"email\": templateUtils.firstname(),\n    \"birthday\": \"1984-11-24 13:12:00.000+00:00\",\n    \"age\": 38\n  },\n  \"employment\": \"Freelancer\",\n  \"category\": \"Basic Package\"\n}",
       "exampleContext" : { }
     }
   }, {
@@ -274,7 +274,7 @@
           "progressionSalt" : 43200000
         },
         "jsonTemplate" : {
-          "template" : "{\"approved\":false}",
+          "template" : "{\n  \"approved\": false\n}",
           "exampleContext" : { }
         },
         "postSteps" : null,
@@ -319,7 +319,7 @@
           "progressionSalt" : 1000
         },
         "jsonTemplate" : {
-          "template" : "{\"score\":templateUtils.range(86,95)}",
+          "template" : "{\n  \"score\": templateUtils.range(86,95)\n}",
           "exampleContext" : { }
         },
         "postSteps" : null,
@@ -364,7 +364,7 @@
       }
     },
     "jsonTemplate" : {
-      "template" : "{\"applicationNumber\":templateUtils.generateUUID(\"A-\"), \"applicant\":{\"name\":templateUtils.firstname(), \"email\":templateUtils.firstname(), \"birthday\":\"1984-11-24 13:12:00.000+00:00\", \"age\":38}, \"employment\":\"Freelancer\", \"category\":\"Basic Package\"}",
+      "template" : "{\n  \"applicationNumber\": templateUtils.generateUUID(\"A-\"),\n  \"applicant\": {\n    \"name\": templateUtils.firstname(),\n    \"email\": templateUtils.firstname(),\n    \"birthday\": \"1984-11-24 13:12:00.000+00:00\",\n    \"age\": 38\n  },\n  \"employment\": \"Freelancer\",\n  \"category\": \"Basic Package\"\n}",
       "exampleContext" : { }
     }
   } ]

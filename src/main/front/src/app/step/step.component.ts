@@ -11,10 +11,6 @@ import { ExecPlanService } from '../services/exec-plan.service';
 export class StepComponent implements AfterViewInit, OnInit {
 
   @Input() step: any;
-  @ViewChild('jsonTemplate') jsonTemplate!: ElementRef;
-  codeMirror?: EditorView;
-  preStepcodeMirror?: EditorView;
-  postStepcodeMirror?: EditorView;
   prestep: any;
   poststep: any;
 
@@ -29,59 +25,12 @@ export class StepComponent implements AfterViewInit, OnInit {
   }
 
   ngAfterViewInit(): void {
-    this.codeMirror = new EditorView({
-      doc: this.execPlanService.prettifyJsonTemplate(this.step.jsonTemplate.template),
-      extensions: [
-        basicSetup,
-        json(),
-        this.updateListenerExtension
-      ],
-      parent: this.jsonTemplate.nativeElement,
-    });
 
     var tooltips = document.querySelectorAll('.btn-tooltip')
     for (let i = 0; i < tooltips.length; i++) {
       (window as any).bootstrap.Tooltip.getOrCreateInstance(tooltips[i]);
     }
   }
-
-  buildPreStepJsonEditor(): void {
-    if ((this.prestep.type == 'MSG' || this.prestep.type == 'BPMN_ERROR') && !this.preStepcodeMirror) {
-      if (!this.prestep.jsonTemplate.template) {
-        this.prestep.jsonTemplate.template = '{}';
-      }
-      this.preStepcodeMirror = new EditorView({
-        doc: this.execPlanService.prettifyJsonTemplate(this.prestep.jsonTemplate.template),
-        extensions: [
-          basicSetup,
-          json(),
-          this.updatePreStep
-        ],
-        parent: document.getElementById('preStepJsonTemplate')!,
-      });
-    }
-  }
-
-  buildPostStepJsonEditor(): void {
-    if ((this.poststep.type == 'MSG' || this.poststep.type == 'BPMN_ERROR') && !this.postStepcodeMirror) {
-      if (!this.poststep.jsonTemplate.template) {
-        this.poststep.jsonTemplate.template = '{}';
-      }
-      this.preStepcodeMirror = new EditorView({
-        doc: this.execPlanService.prettifyJsonTemplate(this.poststep.jsonTemplate.template),
-        extensions: [
-          basicSetup,
-          json(),
-          this.updatePostStep
-        ],
-        parent: document.getElementById('postStepJsonTemplate')!,
-      });
-    }
-  }
-
-  updateListenerExtension = EditorView.updateListener.of((v) => {
-    this.step.jsonTemplate.template = v.state.doc.toString();
-  });
 
   displayAdditionalStep(step: any): string {
     if (step.type == 'CLOCK') {
@@ -110,7 +59,6 @@ export class StepComponent implements AfterViewInit, OnInit {
 
   openPreStepModal(index: number) {
     this.prestep = this.step.preSteps[index];
-    this.buildPreStepJsonEditor();
     (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById(this.step.elementId + '-prestep')).show();
   }
   closePreStepModal() {
@@ -118,7 +66,6 @@ export class StepComponent implements AfterViewInit, OnInit {
   }
   openPostStepModal(index: number) {
     this.poststep = this.step.postSteps[index];
-    this.buildPostStepJsonEditor();
     (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById(this.step.elementId + '-poststep')).show();
   }
   closePostStepModal() {
@@ -126,7 +73,7 @@ export class StepComponent implements AfterViewInit, OnInit {
   }
 
   addPreStep() {
-    this.prestep = { "type": "CLOCK", "feelDelay": "PT5M" };
+    this.prestep = { "type": "CLOCK", "feelDelay": "PT5M", "jsonTemplate": {"template": "", "exampleContext": {}}};
     if (!this.step.preSteps) {
       this.step.preSteps = [];
     }
@@ -134,7 +81,7 @@ export class StepComponent implements AfterViewInit, OnInit {
     this.openPreStepModal(this.step.preSteps.length - 1);
   }
   addPostStep() {
-    this.poststep = { "type": "CLOCK", "feelDelay": "PT5M" };
+    this.poststep = { "type": "CLOCK", "feelDelay": "PT5M", "jsonTemplate": { "template": "", "exampleContext": {} } };
     if (!this.step.postSteps) {
       this.step.postSteps = [];
     }
