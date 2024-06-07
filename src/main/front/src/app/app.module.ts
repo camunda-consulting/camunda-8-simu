@@ -15,6 +15,7 @@ import { InstantiateComponent } from './instantiate/instantiate.component';
 import { StepComponent } from './step/step.component';
 import { DraggableComponent } from './draggable/draggable.component';
 import { JsonEditorComponent } from './json-editor/json-editor.component';
+import { DatasetComponent } from './dataset/dataset.component';
 declare module '@bpmn-io/element-template-icon-renderer';
 @NgModule({
   declarations: [
@@ -29,7 +30,8 @@ declare module '@bpmn-io/element-template-icon-renderer';
     InstantiateComponent,
     StepComponent,
     DraggableComponent,
-    JsonEditorComponent
+    JsonEditorComponent,
+    DatasetComponent
   ],
   imports: [
     BrowserModule, FormsModule, HttpClientModule

@@ -2,7 +2,7 @@ import { Component, Input, Output, AfterViewInit, EventEmitter, ViewChild, Eleme
 import { basicSetup, EditorView } from 'codemirror';
 import { json } from '@codemirror/lang-json';
 import { environment } from '../../environments/environment';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { TemplatingService } from '../services/templating.service';
 
 @Component({
   selector: 'app-json-editor',
@@ -22,14 +22,13 @@ export class JsonEditorComponent implements AfterViewInit {
   displayCheck = false;
   checkResult?: string;
   templatingMethods?: any[];
-  constructor(
-    private http: HttpClient) { }
+  constructor(private templatingService: TemplatingService) { }
 
   help(): void {
     if (this.templatingMethods) {
       this.displayHelp = true;
     } else {
-      this.http.get<any>(environment.backend + "/api/templating").subscribe((response: any[]) => {
+      this.templatingService.listTemplatingMethods().subscribe((response: any[]) => {
         this.templatingMethods = response;
         this.displayHelp = true;
       });
@@ -50,7 +49,7 @@ export class JsonEditorComponent implements AfterViewInit {
   }
 
   checkTemplate(): void {
-    this.http.post<any>(environment.backend + "/api/templating/test", this.template).subscribe((response: any) => {
+    this.templatingService.checkTemplate(this.template).subscribe((response: any) => {
       this.checkResult = JSON.stringify(response, null, 2);
     });
   }

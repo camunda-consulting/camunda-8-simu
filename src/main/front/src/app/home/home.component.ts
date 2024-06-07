@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ProcessService } from '../services/process.service';
 import { ExecPlanService } from '../services/exec-plan.service';
 import { HistoService } from '../services/histo.service';
+import { TemplatingService } from '../services/templating.service';
 
 @Component({
   selector: 'app-home',
@@ -10,20 +11,23 @@ import { HistoService } from '../services/histo.service';
 })
 export class HomeComponent implements OnInit {
 
-  constructor(private processService: ProcessService, private execPlanService: ExecPlanService, private histoService: HistoService) { }
+  constructor(private processService: ProcessService, private execPlanService: ExecPlanService, private histoService: HistoService, private templatingService: TemplatingService) { }
 
   definitions: any[] = [];
   executions: any[] = [];
   histo: any = {};
   execMap: any;
   runningPlan?: any = null;
-  public filter?: any = null;
+  filter?: any = null;
+  datasets: string[]=[];
   ngOnInit(): void {
-
     this.processService.definitions().subscribe((response: any[]) => {
       this.definitions = response;
     });
     this.reload();
+    this.templatingService.listDatasets().subscribe((response: string[]) => {
+      this.datasets = response;
+    });
   }
 
   reload(): void {
@@ -122,5 +126,15 @@ export class HomeComponent implements OnInit {
 
   closeHistoModal() {
     (window as any).bootstrap.Modal.getInstance(document.getElementById('planHisto')).hide();
+  }
+
+  addDataset(): void {
+    this.templatingService.newDataset();
+  }
+  editDataset(name: string): void {
+
+  }
+  deleteDataset(name: string): void {
+
   }
 }

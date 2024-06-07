@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { ProcessService } from './services/process.service';
 import { ExecPlanService } from './services/exec-plan.service';
+import { TemplatingService } from './services/templating.service';
 
 @Component({
   selector: 'app-root',
@@ -9,5 +10,5 @@ import { ExecPlanService } from './services/exec-plan.service';
 })
 export class AppComponent {
   title = 'data loader';
-  constructor(public processService: ProcessService, public execPlanService: ExecPlanService) { }
+  constructor(public processService: ProcessService, public execPlanService: ExecPlanService, public templatingService: TemplatingService) { }
 }

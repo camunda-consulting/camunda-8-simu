@@ -71,6 +71,11 @@ public class JsonUtils {
     return getObjectMapper().readValue(path.toFile(), type);
   }
 
+  public static <T> T fromJsonFile(Path path, TypeReference<T> type)
+      throws StreamReadException, DatabindException, IOException {
+    return getObjectMapper().readValue(path.toFile(), type);
+  }
+
   private static ObjectMapper getObjectMapper() {
     if (mapper == null) {
       mapper = new ObjectMapper();

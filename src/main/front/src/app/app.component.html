@@ -1,2 +1,3 @@
-<app-home *ngIf="!execPlanService.executionPlan"></app-home>
+<app-home *ngIf="!execPlanService.executionPlan && !templatingService.dataset"></app-home>
 <app-executionplan *ngIf="execPlanService.executionPlan"></app-executionplan>
+<app-dataset *ngIf="templatingService.dataset"></app-dataset>
