@@ -25,15 +25,20 @@ export class TemplatingService {
   listDatasets(): Observable<string[]> {
     return this.http.get<string[]>(environment.backend + "/api/templating/datasets");
   }
-  getDataset(name:string): Observable<string[]> {
-    return this.http.get<string[]>(environment.backend + "/api/templating/dataset/name");
+  getDataset(name: string): void {
+    this.http.get<any>(environment.backend + "/api/templating/dataset/"+name).subscribe((response: any) => {
+      this.dataset = response;
+    });
+  }
+  deleteDataset(name: string): Observable<any> {
+    return this.http.delete<any>(environment.backend + "/api/templating/dataset/name");
   }
   saveDataset(dataSet:any): Observable<any> {
     return this.http.post<any>(environment.backend + "/api/templating/datasets", dataSet);
   }
   newDataset() {
     this.dataset = {
-      "name": "dataset", localizedData: { "en": [] }
+      "name": "dataset", categorizedData: { "en": [] }
     };
   }
   clear() {

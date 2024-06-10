@@ -7,8 +7,8 @@ import { TemplatingService } from '../services/templating.service';
   styleUrls: ['./dataset.component.css']
 })
 export class DatasetComponent implements OnInit {
-  language: string = 'en';
-  newLanguage: string = 'LN1';
+  category: string = 'en';
+  newCategory: string = 'Cat1';
   constructor(public templatingService: TemplatingService) { }
 
   ngOnInit(): void {
@@ -17,17 +17,23 @@ export class DatasetComponent implements OnInit {
   back(): void {
     this.templatingService.clear();
   }
-  addLanguage(): void {
-    this.templatingService.dataset.localizedData[this.newLanguage] = [];
-    this.newLanguage = 'LN' + Object.keys(this.templatingService.dataset.localizedData).length;
+  addCategory(): void {
+    this.templatingService.dataset.categorizedData[this.newCategory] = [];
+    this.newCategory = 'Cat' + Object.keys(this.templatingService.dataset.categorizedData).length;
   }
   save(): void {
-
+    this.templatingService.saveDataset(this.templatingService.dataset).subscribe();
   }
-  selectLanguage(ln: any): void {
-    this.language = ln;
+  selectCategory(cat: any): void {
+    this.category = cat;
   }
-  deleteLanguage(ln: any): void {
-    delete this.templatingService.dataset.localizedData[ln];
+  deleteCategory(cat: any): void {
+    delete this.templatingService.dataset.categorizedData[cat];
+  }
+  addValue(): void {
+    this.templatingService.dataset.categorizedData[this.category].push("");
+  }
+  updateVal(i: number, event: any): void {
+    this.templatingService.dataset.categorizedData[this.category][i] = event.target.value;
   }
 }

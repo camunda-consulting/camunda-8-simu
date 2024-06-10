@@ -25,6 +25,10 @@ export class HomeComponent implements OnInit {
       this.definitions = response;
     });
     this.reload();
+    this.loadDatasets();
+  }
+
+  loadDatasets(): void {
     this.templatingService.listDatasets().subscribe((response: string[]) => {
       this.datasets = response;
     });
@@ -132,9 +136,11 @@ export class HomeComponent implements OnInit {
     this.templatingService.newDataset();
   }
   editDataset(name: string): void {
-
+    this.templatingService.getDataset(name);
   }
   deleteDataset(name: string): void {
-
+    this.templatingService.deleteDataset(name).subscribe(() => {
+      this.loadDatasets();
+    });
   }
 }

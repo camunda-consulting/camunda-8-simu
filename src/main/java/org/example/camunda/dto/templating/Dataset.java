@@ -5,8 +5,7 @@ import java.util.Map;
 
 public class Dataset {
   String name;
-  List<Object> data;
-  Map<String, List<Object>> localizedData;
+  Map<String, List<Object>> categorizedData;
 
   public String getName() {
     return name;
@@ -16,19 +15,11 @@ public class Dataset {
     this.name = name;
   }
 
-  public List<Object> getData() {
-    return data;
+  public Map<String, List<Object>> getCategorizedData() {
+    return categorizedData;
   }
 
-  public void setData(List<Object> data) {
-    this.data = data;
-  }
-
-  public Map<String, List<Object>> getLocalizedData() {
-    return localizedData;
-  }
-
-  public void setLocalizedData(Map<String, List<Object>> localizedData) {
-    this.localizedData = localizedData;
+  public void setCategorizedData(Map<String, List<Object>> categorizedData) {
+    this.categorizedData = categorizedData;
   }
 }

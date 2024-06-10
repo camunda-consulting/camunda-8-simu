@@ -4,7 +4,6 @@
   </div>
 </nav>
 <div class="mainContent mx-4 mt-4">
-  THIS IS A DRAFT
   <div class="row">
     <div class="col-6">
       <div class="input-group mb-3">
@@ -14,43 +13,35 @@
     </div>
     <div class="col-6">
       <div class="input-group">
-        <span class="input-group-text"><i class="bi bi-plus-circle"></i></span>
-        <input type="text" class="form-control" [(ngModel)]="newLanguage">
-        <a class="btn btn-primary" (click)="addLanguage()">Add ln</a>
+        <span class="input-group-text">Category code</span>
+        <input type="text" class="form-control" [(ngModel)]="newCategory">
+        <a class="btn btn-primary" (click)="addCategory()"><i class="bi bi-plus-circle"></i> Add Category</a>
       </div>
     </div>
   </div>
   <ul class="nav nav-tabs navbar-dark bg-dark ">
-    <li *ngFor="let ln of templatingService.dataset!.localizedData | keyvalue" class="nav-item">
-      <a [ngClass]="language==ln.key ? 'nav-link active' : 'nav-link'" (click)="selectLanguage(ln.key)"><i class="bi bi-translate"></i> {{ln.key}}</a>
+    <li *ngFor="let cat of templatingService.dataset!.categorizedData | keyvalue" class="nav-item">
+      <a (click)="selectCategory(cat.key)" [ngClass]="category==cat.key ? 'nav-link active' : 'nav-link'"> {{cat.key}} </a>
+
     </li>
     <li class="nav-item">
       <a class="nav-link text-light" (click)="save()"><i class="bi bi-floppy"></i> Save</a>
     </li>
   </ul>
-  <div *ngFor="let ln of templatingService.dataset!.localizedData | keyvalue">
-    <div class="tab-pane" *ngIf="language==ln.key">
-      <button (click)="deleteLanguage(ln.key)" class="btn btn-danger"><i class="bi bi-trash text-danger"></i> Delete</button>
-      <table class=" table table-striped table-hover">
-        <thead class="table-dark ">
-          <tr>
-            <th scope="col">Values</th>
-            <th scope="col">
-              <button class="btn btn-success"><i class="bi bi-plus"></i></button>
-            </th>
-          </tr>
-        </thead>
-        <tbody class="table-group-divider">
-          <tr *ngFor="let val of $any(ln.value); let i=index">
-            <td>
-              <input type="text" [ngModel]="val" />
-            </td>
-            <td>
-              <button  class="btn btn-danger"><i class="bi bi-trash"></i></button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+  <div *ngFor="let cat of templatingService.dataset!.categorizedData | keyvalue">
+    <div class="tab-pane" *ngIf="category==cat.key">
+      <div class="alert alert-info">You can add values for the dataset <b>{{templatingService.dataset.name}}</b> in the <b>{{cat.key}}</b> category. If you want to remove this category, just press the following button <button class="btn btn-danger" (click)="deleteCategory(cat.key)"><i class="bi bi-trash"></i></button></div>
+
+      <button class="btn btn-success" (click)="addValue()"><i class="bi bi-plus"></i></button> Values
+
+
+      <div class="input-group mb-1" *ngFor="let val of $any(cat.value); let i=index">
+        <span class="input-group-text">
+          <button class="btn btn-danger"><i class="bi bi-trash"></i></button>
+        </span>
+        <input type="text" class="form-control" [value]="val" (change)="updateVal(i, $event)">
+      </div>
+      
     </div>
   </div>
 </div>

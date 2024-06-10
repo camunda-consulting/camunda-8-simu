@@ -350,13 +350,13 @@ services:
 
 volumes:
   zeebe:
-  loader:
   elastic:
   postgres:
   keycloak-theme:
   kibana:
   operate_tmp:
   tasklist_tmp:
+  loader:
 
 networks:
   # Note there are two bridge networks: One for Camunda Platform and one for Identity.
