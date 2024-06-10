@@ -5,6 +5,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.example.camunda.dto.templating.MethodArg;
 import org.example.camunda.dto.templating.TemplatingMethod;
@@ -19,7 +20,7 @@ public class PayloadGenerator {
   public static final String TEMPLATING_PREFIX = "templateUtils.";
   private static TemplatingUtils tuInstance = new TemplatingUtils();
   private static TemplateEngine templateEngine;
-  private static Map<String, TemplatingMethod> templatingMethods = null;
+  private static Map<String, List<TemplatingMethod>> templatingMethods = null;
 
   private PayloadGenerator() {}
 
@@ -35,7 +36,7 @@ public class PayloadGenerator {
     return templateEngine;
   }
 
-  public static Map<String, TemplatingMethod> getTemplatingMethods() {
+  public static Map<String, List<TemplatingMethod>> getTemplatingMethods() {
     if (templatingMethods == null) {
       templatingMethods = new HashMap<>();
       Method[] methods = TemplatingUtils.class.getMethods();
@@ -43,7 +44,10 @@ public class PayloadGenerator {
         if (Modifier.isStatic(method.getModifiers()) && Modifier.isPublic(method.getModifiers())) {
           TemplatingMethod tm = new TemplatingMethod();
           tm.setName(method.getName());
-          templatingMethods.put(method.getName(), tm);
+          if (!templatingMethods.containsKey(tm.getName())) {
+            templatingMethods.put(tm.getName(), new ArrayList<>());
+          }
+          templatingMethods.get(method.getName()).add(tm);
           String example = TEMPLATING_PREFIX + tm.getName() + "(";
           tm.setResultType(method.getReturnType().getName());
           tm.setArgs(new ArrayList<>());
@@ -57,12 +61,16 @@ public class PayloadGenerator {
               example += ", ";
             }
             if (arg.getType().equals("java.lang.String")) {
-              example += "\"Hello\"";
+              example += "\"" + arg.getName() + "\"";
             } else if (arg.getType().equals("long") || arg.getType().equals("java.lang.Long")) {
-              example += "1";
+              example += "1 /*" + arg.getName() + "*/";
             } else if (arg.getType().equals("boolean")
                 || arg.getType().equals("java.lang.Boolean")) {
-              example += "true";
+              example += "true /*" + arg.getName() + "*/";
+            } else if (arg.getType().equals("double") || arg.getType().equals("java.lang.Double")) {
+              example += "1.0 /*" + arg.getName() + "*/";
+            } else {
+              example += arg.getName() + "(" + arg.getType() + ")";
             }
             i++;
           }
@@ -75,17 +83,18 @@ public class PayloadGenerator {
   }
 
   public static String prepareThymeleafBlocks(String jsonTemplate) {
-    Map<String, TemplatingMethod> methods = getTemplatingMethods();
+    Map<String, List<TemplatingMethod>> methods = getTemplatingMethods();
     int tuIndex = jsonTemplate.indexOf(TEMPLATING_PREFIX);
     while (tuIndex > 0) {
       int openingBracket = jsonTemplate.indexOf("(", tuIndex);
       String methodName =
           jsonTemplate.substring(tuIndex + TEMPLATING_PREFIX.length(), openingBracket);
-      TemplatingMethod tuMethod = methods.get(methodName);
       int closingBracket = findClosingBracket(jsonTemplate, openingBracket);
       String before = jsonTemplate.substring(0, tuIndex);
       String after = jsonTemplate.substring(closingBracket + 1);
       String replace = "[( ${" + jsonTemplate.substring(tuIndex, closingBracket + 1) + "} )]";
+
+      TemplatingMethod tuMethod = methods.get(methodName).get(0);
       if (tuMethod.getResultType().equals("java.lang.String")) {
         replace = "\"" + replace + "\"";
       }

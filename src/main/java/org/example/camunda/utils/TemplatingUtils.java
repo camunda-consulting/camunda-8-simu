@@ -12,12 +12,20 @@ public class TemplatingUtils {
 
   private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
 
-  public static String firstname() {
-    return generateFriendlyString(3 + Math.round(Math.random() * 2));
+  public static String getFrom(String datasetName) {
+    return DataUtils.getDataset(datasetName).getRandom(null, null, null);
   }
 
-  public static String lastname() {
-    return generateFriendlyString(1 + Math.round(Math.random() * 2));
+  public static String getFrom(String datasetName, String category) {
+    return DataUtils.getDataset(datasetName).getRandom(category, null, null);
+  }
+
+  public static String getFrom(String datasetName, String category, String suffix) {
+    return DataUtils.getDataset(datasetName).getRandom(category, suffix, null);
+  }
+
+  public static String getFrom(String datasetName, String category, String suffix, String prefix) {
+    return DataUtils.getDataset(datasetName).getRandom(category, suffix, prefix);
   }
 
   public static String now() {

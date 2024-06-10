@@ -18,8 +18,12 @@ export class TemplatingService {
     return this.http.post<any>(environment.backend + "/api/templating/test", template);
   }
 
-  listTemplatingMethods(): Observable<any[]> {
-    return this.http.get<any[]>(environment.backend + "/api/templating");
+  listTemplatingMethodsNames(): Observable<string[]> {
+    return this.http.get<string[]>(environment.backend + "/api/templating");
+  }
+
+  listTemplatingMethods(name:string): Observable<any[]> {
+    return this.http.get<any[]>(environment.backend + "/api/templating/method/"+name);
   }
 
   listDatasets(): Observable<string[]> {

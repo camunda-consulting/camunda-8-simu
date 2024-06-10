@@ -82,7 +82,7 @@
       }
     },
     "jsonTemplate" : {
-      "template" : "{\n  \"applicationNumber\": templateUtils.generateUUID(\"A-\"),\n  \"applicant\": {\n    \"name\": templateUtils.firstname(),\n    \"email\": templateUtils.firstname(),\n    \"birthday\": \"1986-11-24 13:12:00.000+00:00\",\n    \"age\": 38\n  },\n  \"employment\": \"Salaried\",\n  \"category\": \"Basic Package\"\n}",
+      "template" : "{\n  \"applicationNumber\": templateUtils.generateUUID(\"A-\"),\n  \"applicant\": {\n    \"name\": templateUtils.getFrom(\"firstname\"),\n    \"email\": templateUtils.getFrom(\"firstname\", null, \"@gmail.com\"),\n    \"birthday\": \"1986-11-24 13:12:00.000+00:00\",\n    \"age\": 38\n  },\n  \"employment\": \"Salaried\",\n  \"category\": \"Basic Package\"\n}",
       "exampleContext" : { }
     }
   }, {
@@ -155,7 +155,7 @@
       }
     },
     "jsonTemplate" : {
-      "template" : "{\n  \"applicationNumber\": templateUtils.generateUUID(\"A-\"),\n  \"applicant\": {\n    \"name\": templateUtils.firstname(),\n    \"email\": templateUtils.firstname(),\n    \"birthday\": \"1986-11-24 13:12:00.000+00:00\",\n    \"age\": 38\n  },\n  \"employment\": \"Unemployed\",\n  \"category\": \"Premium Package\"\n}",
+      "template" : "{\n  \"applicationNumber\": templateUtils.generateUUID(\"A-\"),\n  \"applicant\": {\n    \"name\": templateUtils.getFrom(\"firstname\"),\n    \"email\": templateUtils.getFrom(\"firstname\", null, \"@gmail.com\"),\n    \"birthday\": \"1986-11-24 13:12:00.000+00:00\",\n    \"age\": 38\n  },\n  \"employment\": \"Unemployed\",\n  \"category\": \"Premium Package\"\n}",
       "exampleContext" : { }
     }
   }, {
@@ -246,7 +246,7 @@
       }
     },
     "jsonTemplate" : {
-      "template" : "{\n  \"applicationNumber\": templateUtils.generateUUID(\"A-\"),\n  \"applicant\": {\n    \"name\": templateUtils.firstname(),\n    \"email\": templateUtils.firstname(),\n    \"birthday\": \"1984-11-24 13:12:00.000+00:00\",\n    \"age\": 38\n  },\n  \"employment\": \"Freelancer\",\n  \"category\": \"Basic Package\"\n}",
+      "template" : "{\n  \"applicationNumber\": templateUtils.generateUUID(\"A-\"),\n  \"applicant\": {\n    \"name\": templateUtils.getFrom(\"firstname\"),\n    \"email\": templateUtils.getFrom(\"firstname\", null, \"@gmail.com\"),\n    \"birthday\": \"1984-11-24 13:12:00.000+00:00\",\n    \"age\": 38\n  },\n  \"employment\": \"Freelancer\",\n  \"category\": \"Basic Package\"\n}",
       "exampleContext" : { }
     }
   }, {
@@ -364,7 +364,7 @@
       }
     },
     "jsonTemplate" : {
-      "template" : "{\n  \"applicationNumber\": templateUtils.generateUUID(\"A-\"),\n  \"applicant\": {\n    \"name\": templateUtils.firstname(),\n    \"email\": templateUtils.firstname(),\n    \"birthday\": \"1984-11-24 13:12:00.000+00:00\",\n    \"age\": 38\n  },\n  \"employment\": \"Freelancer\",\n  \"category\": \"Basic Package\"\n}",
+      "template" : "{\n  \"applicationNumber\": templateUtils.generateUUID(\"A-\"),\n  \"applicant\": {\n    \"name\": templateUtils.getFrom(\"firstname\"),\n    \"email\": templateUtils.getFrom(\"firstname\", null, \"@gmail.com\"),\n    \"birthday\": \"1984-11-24 13:12:00.000+00:00\",\n    \"age\": 38\n  },\n  \"employment\": \"Freelancer\",\n  \"category\": \"Basic Package\"\n}",
       "exampleContext" : { }
     }
   } ]

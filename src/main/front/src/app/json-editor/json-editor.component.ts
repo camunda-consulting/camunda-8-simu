@@ -28,8 +28,12 @@ export class JsonEditorComponent implements AfterViewInit {
     if (this.templatingMethods) {
       this.displayHelp = true;
     } else {
-      this.templatingService.listTemplatingMethods().subscribe((response: any[]) => {
-        this.templatingMethods = response;
+      this.templatingService.listTemplatingMethodsNames().subscribe((response: string[]) => {
+        this.templatingMethods = [];
+        for (let resp of response) {
+          this.templatingMethods.push({ "name": resp });
+        }
+        
         this.displayHelp = true;
       });
     }
@@ -40,7 +44,12 @@ export class JsonEditorComponent implements AfterViewInit {
   }
 
   showExample(i: number): void {
-    this.templatingMethods![i].showExample = !this.templatingMethods![i].showExample;
+    if (this.templatingMethods![i].methods) {
+      this.templatingMethods![i].showExample = !this.templatingMethods![i].showExample;
+    } else this.templatingService.listTemplatingMethods(this.templatingMethods![i].name).subscribe((response: any[]) => {
+      this.templatingMethods![i].methods = response;
+      this.templatingMethods![i].showExample = true;
+    });
   }
 
   toggleCheck(): void {

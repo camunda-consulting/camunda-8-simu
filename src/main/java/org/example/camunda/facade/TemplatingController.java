@@ -22,8 +22,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class TemplatingController {
 
   @GetMapping
-  public Collection<TemplatingMethod> getTemplatingMethods() {
-    return PayloadGenerator.getTemplatingMethods().values();
+  public Collection<String> getTemplatingMethodNames() {
+    return PayloadGenerator.getTemplatingMethods().keySet();
+  }
+
+  @GetMapping("method/{methodName}")
+  public Collection<TemplatingMethod> getTemplatingMethods(@PathVariable String methodName) {
+    return PayloadGenerator.getTemplatingMethods().get(methodName);
   }
 
   @PostMapping("test")

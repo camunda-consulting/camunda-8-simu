@@ -4,7 +4,7 @@
     <div class="form-control" #jsonTemplate></div>
   </div>
   <div class="alert alert-info" *ngIf="displayHelp">
-    List of available methods (click on its name to have an example) :<br /><span *ngFor="let method of templatingMethods; let i=index"><a (click)="showExample(i)"><b>{{method.name}}</b> <span *ngIf="method.showExample">(e.g. <b>{{method.example}}</b>)</span></a>, </span>
+    List of available methods (click on its name to have an example) :<br /><span *ngFor="let method of templatingMethods; let i=index"><a (click)="showExample(i)"><b>{{method.name}}</b> <span *ngIf="method.showExample">(e.g. <i *ngFor="let m of method.methods">{{m.example}}. </i>)</span></a>, </span>
 
     <button type="button" class="btn-close" aria-label="Close" (click)="closeHelp()"></button>
   </div>
