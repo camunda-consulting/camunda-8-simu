@@ -84,6 +84,7 @@ export class ExecPlanService {
         template: "{}", exampleContext: {}
       },
     };
+    this.selectActivity(elementId);
   }
 
   createPreStepInScenario(parentStep: string, type: string, elementRef: any, time: number): void {
@@ -131,6 +132,7 @@ export class ExecPlanService {
         }
       });
     }
+    this.selectActivity(parentStep);
   }
 
   deleteCurrentStep(): void {

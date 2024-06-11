@@ -17,14 +17,18 @@ export class ViewerComponent implements AfterViewInit, OnInit {
 
   constructor(private processService: ProcessService, public execPlanService: ExecPlanService) {
     this.execPlanService.activitySubject.subscribe((activity: string) => {
-      if (this.viewer) {
-        if (this.previousActivity) {
-          this.colorActivity(this.previousActivity, "#000000");
-        }
-        this.previousActivity = activity;
-        this.colorActivity(activity, "#00CCFF");
-      }
+      this.colorSelectedActivity(activity);
     });
+  }
+
+  colorSelectedActivity(activity: string) {
+    if (this.viewer) {
+      if (this.previousActivity) {
+        this.colorActivity(this.previousActivity, "#000000");
+      }
+      this.previousActivity = activity;
+      this.colorActivity(activity, "#00CCFF");
+    }
   }
     ngOnInit(): void {
       if (this.execPlanService.executionPlan.xmlDependencies) {
@@ -69,9 +73,10 @@ export class ViewerComponent implements AfterViewInit, OnInit {
   managedActivities = ["bpmn:ServiceTask", "bpmn:UserTask", "bpmn: SendTask", "bpmn:IntermediateCatchEvent", "bpmn:BoundaryEvent"];
   selectActivity = (event: any) => {
     this.selectedElt = event.element;
-    console.log(this.selectedElt);
-    if (this.managedActivities.indexOf(this.selectedElt.type)>=0 && !this.execPlanService.scenario.steps[event.element.id]) {
+    if (this.managedActivities.indexOf(this.selectedElt.type) >= 0 && !this.execPlanService.scenario.steps[event.element.id]) {
       this.opennewstepModal();
+    } else {
+      this.execPlanService.selectActivity(this.selectedElt.id);
     }
   }
   
