@@ -18,7 +18,7 @@ export class ExecPlanService {
   openExecutionPlan(definition: any): void {
     this.http.get<any>(environment.backend + "/api/plan/" + definition.bpmnProcessId + "/" + definition.version).subscribe((response: any) => {
       this.executionPlan = response;
-      this.scenario = this.executionPlan.scenarii[0];
+      this.selectScenario(response.scenarii[0]);
     });
   }
 
@@ -66,8 +66,8 @@ export class ExecPlanService {
   }
 
   selectScenario(scenario: any): void {
-    this.selectActivity('startInstances');
     this.scenario = scenario;
+    this.selectActivity('startInstances');
   }
   createStepInScenario(elementId: string): void {
     this.scenario.steps[elementId] = {

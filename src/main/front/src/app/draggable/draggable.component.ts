@@ -19,7 +19,6 @@ export class DraggableComponent implements AfterViewInit, OnDestroy {
   private readonly cdRef = inject(ChangeDetectorRef);
   public dragging = false;
   ngAfterViewInit(): void {
-    console.log(this.scenarioNav);
     let nativeElement = this.scenarioNav!.nativeElement;
 
     this.cdRef.detach(); // we take care of our own Change Detection.

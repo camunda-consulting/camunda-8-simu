@@ -23,20 +23,30 @@ export class ViewerComponent implements AfterViewInit, OnInit {
 
   colorSelectedActivity(activity: string) {
     if (this.viewer) {
-      if (this.previousActivity) {
-        this.colorActivity(this.previousActivity, "#000000");
+      if (this.execPlanService.scenario) {
+        let stepScenar: string[] = [];
+        for (let prop in this.execPlanService.scenario.steps) {
+          this.colorActivity(prop, "#009900");
+          stepScenar.push(prop);
+        }
+        const eltRegistry: any = this.viewer!.get('elementRegistry');
+        eltRegistry.forEach((elt: any) => {
+          if (stepScenar.indexOf(elt.id) < 0) {
+            this.colorActivity(elt.id, "#000000");
+          }
+        });
+        this.previousActivity = activity;
+        this.colorActivity(activity, "#00CCFF");
       }
-      this.previousActivity = activity;
-      this.colorActivity(activity, "#00CCFF");
     }
   }
-    ngOnInit(): void {
-      if (this.execPlanService.executionPlan.xmlDependencies) {
-        for (let prop in this.execPlanService.executionPlan.xmlDependencies) {
-          this.xmlDeps.push(prop);
-        }
+  ngOnInit(): void {
+    if (this.execPlanService.executionPlan.xmlDependencies) {
+      for (let prop in this.execPlanService.executionPlan.xmlDependencies) {
+        this.xmlDeps.push(prop);
       }
     }
+  }
 
 
 
@@ -47,19 +57,13 @@ export class ViewerComponent implements AfterViewInit, OnInit {
       height: 400
     });
     this.viewer.importXML(this.execPlanService.executionPlan.xml).then((result: any) => {
-      /*const eltRegistry: any = this.viewer!.get('elementRegistry');
-      eltRegistry.forEach((elt: any) => {
-        if (["bpmn:UserTask", "bpmn:ServiceTask"].indexOf(elt.type) >= 0) {
-          this.execPlanService.addActivity(elt.id);
-        }
-      })*/
+      this.colorSelectedActivity('blop');
     })
 
     this.viewer.on('element.click', this.selectActivity);
     this.viewer.on('canvas.viewbox.changing', () => {
       //console.log('pouet');
     });
-
   }
 
   openDef(dep: string): void {
@@ -79,10 +83,10 @@ export class ViewerComponent implements AfterViewInit, OnInit {
       this.execPlanService.selectActivity(this.selectedElt.id);
     }
   }
-  
+
   colorActivity(id: string, color: string): void {
-    const elementRegistry:any = this.viewer?.get('elementRegistry');
-    const graphicsFactory:any = this.viewer?.get('graphicsFactory');
+    const elementRegistry: any = this.viewer?.get('elementRegistry');
+    const graphicsFactory: any = this.viewer?.get('graphicsFactory');
     const element = elementRegistry?.get(id);
     if (element?.di !== undefined) {
       element.di.set('stroke', color);
