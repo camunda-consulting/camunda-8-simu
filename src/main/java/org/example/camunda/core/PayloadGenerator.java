@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import org.example.camunda.dto.templating.MethodArg;
 import org.example.camunda.dto.templating.TemplatingMethod;
-import org.example.camunda.utils.TemplatingUtils;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
@@ -18,7 +17,6 @@ import org.thymeleaf.templateresolver.StringTemplateResolver;
 
 public class PayloadGenerator {
   public static final String TEMPLATING_PREFIX = "templateUtils.";
-  private static TemplatingUtils tuInstance = new TemplatingUtils();
   private static TemplateEngine templateEngine;
   private static Map<String, List<TemplatingMethod>> templatingMethods = null;
 
@@ -41,7 +39,7 @@ public class PayloadGenerator {
       templatingMethods = new HashMap<>();
       Method[] methods = TemplatingUtils.class.getMethods();
       for (Method method : methods) {
-        if (Modifier.isStatic(method.getModifiers()) && Modifier.isPublic(method.getModifiers())) {
+        if (Modifier.isPublic(method.getModifiers())) {
           TemplatingMethod tm = new TemplatingMethod();
           tm.setName(method.getName());
           if (!templatingMethods.containsKey(tm.getName())) {
@@ -120,7 +118,7 @@ public class PayloadGenerator {
 
   public static String generatePayload(String template, Map<String, Object> variables) {
     Context context = new Context();
-    context.setVariable("templateUtils", tuInstance);
+    context.setVariable("templateUtils", new TemplatingUtils());
     if (variables != null) {
       for (Map.Entry<String, Object> entry : variables.entrySet()) {
         context.setVariable(entry.getKey(), entry.getValue());
