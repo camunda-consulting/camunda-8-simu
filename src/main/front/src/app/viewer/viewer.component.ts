@@ -14,6 +14,8 @@ export class ViewerComponent implements AfterViewInit, OnInit {
   previousActivity?: string;
   xmlDeps = ["Main definition"];
   selectedElt: any = null;
+  addDepModal = false;
+  newDepXml?: string;
 
   constructor(private processService: ProcessService, public execPlanService: ExecPlanService) {
     this.execPlanService.activitySubject.subscribe((activity: string) => {
@@ -126,5 +128,46 @@ export class ViewerComponent implements AfterViewInit, OnInit {
       this.execPlanService.createStepInScenario(this.selectedElt.id);
     }
     this.closenewstepModal();
+  }
+
+
+  toggleAddDep(): void {
+    this.addDepModal = !this.addDepModal;
+    if (this.addDepModal) {
+      (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById('addDepModal')).show();
+    } else {
+      this.newDepXml = undefined;
+      (window as any).bootstrap.Modal.getInstance(document.getElementById('addDepModal')).hide();
+    }
+  }
+  loadBpmnFile(event: any): void {
+    var file = event.target.files[0];
+    if (file) {
+      var reader = new FileReader();
+      reader.readAsText(file, "UTF-8");
+      reader.onload = this._handleReaderLoaded.bind(this);
+      reader.onerror = this._handleReaderError.bind(this);
+    }
+  }
+  _handleReaderLoaded(evt: any) {
+    this.newDepXml = evt.target.result;
+  }
+  _handleReaderError() {
+    this.newDepXml = undefined;
+  }
+  addDep(): void {
+    let xml = this.newDepXml!;
+    this.viewer!.importXML(xml).then((result: any) => {
+      const eltRegistry: any = this.viewer!.get('elementRegistry');
+      eltRegistry.forEach((elt: any) => {
+        if (elt.type == "bpmn:Process") {
+          this.execPlanService.executionPlan.xmlDependencies[elt.id] = xml;
+          this.xmlDeps.push(elt.id);
+        }
+      });
+      console.log(this.execPlanService.executionPlan);
+    });
+
+    this.toggleAddDep();
   }
 }
