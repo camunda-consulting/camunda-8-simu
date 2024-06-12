@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -63,14 +64,19 @@ public class BpmnUtils {
     return null;
   }
 
-  public static String getProcessName(String xml, String bpmnProcessId) {
-    LOG.info("get ProcessName for " + bpmnProcessId);
-    String processName = bpmnProcessId;
-    Node processNode = getNodeFromBpmn(xml, bpmnProcessId);
-    if (processNode != null) {
-      processName = processNode.getAttributes().getNamedItem("name").getNodeValue();
+  public static Map<String, String> getProcessIdAndName(String xml) {
+    Document xmlDocument = getXmlDocument(xml);
+
+    for (String tagName : List.of("bpmn2:process", "bpmn:process")) {
+      NodeList nodeList = xmlDocument.getElementsByTagName(tagName);
+      for (int i = 0; i < nodeList.getLength(); i++) {
+        NamedNodeMap attributes = nodeList.item(i).getAttributes();
+        return Map.of(
+            attributes.getNamedItem("id").getNodeValue(),
+            attributes.getNamedItem("name").getNodeValue());
+      }
     }
-    return processName;
+    return null;
   }
 
   public static String getTaskNameFromBpmn(String xml, String activityId) {

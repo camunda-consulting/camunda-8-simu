@@ -15,6 +15,17 @@ export class ExecPlanService {
   currentActivity: string | undefined;
   activitySubject = new BehaviorSubject<string>('');
 
+  list(): Observable<string[]> {
+    return this.http.get<string[]>(environment.backend + "/api/plan");
+  }
+
+  createExecutionPlan(xml: string): void {
+    this.http.post<any>(environment.backend + "/api/plan", xml).subscribe((response: any) => {
+      this.executionPlan = response;
+      this.selectScenario(response.scenarii[0]);
+    });
+  }
+
   openExecutionPlan(definition: any): void {
     this.http.get<any>(environment.backend + "/api/plan/" + definition.bpmnProcessId + "/" + definition.version).subscribe((response: any) => {
       this.executionPlan = response;

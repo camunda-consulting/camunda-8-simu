@@ -38,13 +38,14 @@ public class ScenarioUtils {
       step.getDuration().setStartDesiredAvg(7200000);
       step.getDuration().setEndDesiredAvg(3600000);
       step.getDuration().setAvgProgression(ProgressionEnum.LINEAR_SALTED);
-
+      step.setJsonTemplate(new JsonTemplate());
       result.getSteps().put(eltId, step);
     }
     for (String eltId : serviceTaskIds) {
       StepExecPlan step = new StepExecPlan();
       step.setElementId(eltId);
       step.setDuration(new StepDuration());
+      step.setJsonTemplate(new JsonTemplate());
       result.getSteps().put(eltId, step);
     }
     return result;

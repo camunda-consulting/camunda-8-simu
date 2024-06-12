@@ -13,14 +13,28 @@ export class HomeComponent implements OnInit {
 
   constructor(private processService: ProcessService, private execPlanService: ExecPlanService, private histoService: HistoService, private templatingService: TemplatingService) { }
 
+  plans:any[] = []
   definitions: any[] = [];
   executions: any[] = [];
   histo: any = {};
   execMap: any;
   runningPlan?: any = null;
   filter?: any = null;
-  datasets: string[]=[];
+  datasets: string[] = [];
+  createPlan = false;
+  newPlanXml?: string;
+  loadFromDefinition = false;
+  definitionToLoad?: any;
   ngOnInit(): void {
+    this.execPlanService.list().subscribe((response: string[]) => {
+      this.plans = [];
+      for (let plan of response) {
+        let x = plan.lastIndexOf("_v");
+        let bpmnProcessId = plan.substring(0, x);
+        let v = plan.substring(x+2);
+        this.plans.push({ "bpmnProcessId": bpmnProcessId, "version": v });
+      }
+    });
     this.processService.definitions().subscribe((response: any[]) => {
       this.definitions = response;
     });
@@ -142,5 +156,37 @@ export class HomeComponent implements OnInit {
     this.templatingService.deleteDataset(name).subscribe(() => {
       this.loadDatasets();
     });
+  }
+  toggleCreatePlan(): void {
+    this.createPlan = !this.createPlan;
+    if (this.createPlan) {
+      (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById('createPlanModal')).show();
+    } else {
+      this.newPlanXml = undefined;
+      (window as any).bootstrap.Modal.getInstance(document.getElementById('createPlanModal')).hide();
+    }
+  }
+  loadBpmnFile(event: any): void {
+    var file = event.target.files[0];
+    if (file) {
+      var reader = new FileReader();
+      reader.readAsText(file, "UTF-8");
+      reader.onload = this._handleReaderLoaded.bind(this); 
+      reader.onerror = this._handleReaderError.bind(this); 
+    }
+  }
+  _handleReaderLoaded(evt: any) {
+    this.newPlanXml = evt.target.result;
+  }
+  _handleReaderError() {
+    this.newPlanXml = undefined;
+  }
+  createNewPlan(): void {
+    if (this.loadFromDefinition) {
+      this.execPlanService.openExecutionPlan(this.definitionToLoad);
+    } else {
+      this.execPlanService.createExecutionPlan(this.newPlanXml!);
+    }
+    this.toggleCreatePlan();
   }
 }

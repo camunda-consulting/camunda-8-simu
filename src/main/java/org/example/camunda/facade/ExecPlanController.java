@@ -1,12 +1,16 @@
 package org.example.camunda.facade;
 
 import io.camunda.operate.exception.OperateException;
+import io.camunda.operate.model.ProcessDefinition;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 import org.example.camunda.dto.ExecutionPlan;
 import org.example.camunda.dto.Scenario;
 import org.example.camunda.service.ExecutionPlanService;
 import org.example.camunda.service.OperateService;
 import org.example.camunda.service.ScenarioExecService;
+import org.example.camunda.utils.BpmnUtils;
 import org.example.camunda.utils.ContextUtils;
 import org.example.camunda.utils.ScenarioUtils;
 import org.slf4j.Logger;
@@ -139,5 +143,26 @@ public class ExecPlanController {
       this.scenarioExecService.deploy(plan.getDefinition().getName(), plan.getXml());
     }
     this.scenarioExecService.start(plan, scenarioName);
+  }
+
+  @PostMapping
+  public ExecutionPlan createPlanFromXml(@RequestBody String xml) throws IOException {
+    ProcessDefinition def = new ProcessDefinition();
+    Map<String, String> procIdName = BpmnUtils.getProcessIdAndName(xml);
+    def.setBpmnProcessId(procIdName.keySet().iterator().next());
+    def.setVersion(-1L);
+    def.setName(procIdName.values().iterator().next());
+    ExecutionPlan plan = new ExecutionPlan();
+    plan.setDefinition(def);
+    plan.setXml(xml);
+    Scenario s = ScenarioUtils.generateScenario(xml);
+    s.setName("Scenario 1");
+    plan.getScenarii().add(s);
+    return execPlanService.save(plan);
+  }
+
+  @GetMapping
+  public List<String> list() {
+    return execPlanService.list();
   }
 }
