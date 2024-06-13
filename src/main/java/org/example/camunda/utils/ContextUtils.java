@@ -109,6 +109,7 @@ public class ContextUtils {
       worker.close();
     }
     activeWorkers.clear();
+    estimateEngineTime = 0;
   }
 
   public static boolean shouldComputeMin(String processUniqueId) {

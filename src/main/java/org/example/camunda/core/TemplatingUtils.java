@@ -1,14 +1,21 @@
 package org.example.camunda.core;
 
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.Period;
+import java.time.ZoneId;
+import java.time.temporal.TemporalAmount;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import org.apache.commons.math3.distribution.BetaDistribution;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.example.camunda.dto.templating.Dataset;
+import org.example.camunda.utils.ContextUtils;
 import org.example.camunda.utils.DataUtils;
 
 public class TemplatingUtils {
@@ -53,6 +60,9 @@ public class TemplatingUtils {
   }
 
   public String now() {
+    if (ContextUtils.getEngineTime() > 0) {
+      return sdf.format(new Date(ContextUtils.getEngineTime()));
+    }
     return sdf.format(new Date());
   }
 
@@ -112,5 +122,104 @@ public class TemplatingUtils {
 
   public Double normal(double mean, double standardDeviation) {
     return getNormalDistribution(mean, standardDeviation).sample();
+  }
+
+  public String betaFromArray(int alpha, int beta, String... objects) {
+    BetaDistribution bd = new BetaDistribution(alpha, beta);
+    if (objects == null || objects.length == 0) return null;
+    return objects[(int) (bd.sample() * objects.length)];
+  }
+
+  public String normalFromArray(double mean, double standardDeviation, String... objects) {
+    NormalDistribution nd = null;
+
+    if (mean == 0 && standardDeviation == 0) {
+      nd = new NormalDistribution(0.5, 0.30);
+    } else {
+      nd = new NormalDistribution(mean, standardDeviation);
+    }
+    if (objects == null || objects.length == 0) return null;
+
+    int index = (int) (nd.sample() * objects.length);
+
+    if (index >= objects.length) {
+      return objects[objects.length - 1];
+    } else {
+      if (index < 0) {
+        return objects[0];
+      } else {
+        return objects[index];
+      }
+    }
+  }
+
+  public String uniformBirthdate(int minAge, int maxAge) {
+    Calendar calMin = Calendar.getInstance();
+    calMin.setTimeInMillis(ContextUtils.getEngineTime());
+    calMin.set(Calendar.HOUR_OF_DAY, 0);
+    calMin.set(Calendar.MINUTE, 0);
+    calMin.set(Calendar.SECOND, 0);
+    calMin.set(Calendar.MILLISECOND, 0);
+    Calendar calMax = (Calendar) calMin.clone();
+    calMin.add(Calendar.YEAR, -maxAge);
+    calMax.add(Calendar.YEAR, -minAge);
+    long minMillis = calMin.getTimeInMillis();
+    long maxMillis = calMax.getTimeInMillis();
+    long chosenMillis = minMillis + (long) (Math.random() * (maxMillis - minMillis));
+    return sdf.format(Date.from(Instant.ofEpochMilli(chosenMillis)));
+  }
+
+  public boolean uniformBoolean() {
+    return Math.random() < 0.5;
+  }
+
+  public boolean randBool(double probability) {
+    return uniformBooleanByProbability(probability);
+  }
+
+  public boolean uniformBooleanByProbability(double probability) {
+    return Math.random() < probability;
+  }
+
+  public String nowPlusMillis(int millis) {
+    return nowPlusPeriod(Duration.ofMillis(millis));
+  }
+
+  public String nowPlusSeconds(int seconds) {
+    return nowPlusPeriod(Duration.ofSeconds(seconds));
+  }
+
+  public String nowPlusMinutes(int minutes) {
+    return nowPlusPeriod(Duration.ofMinutes(minutes));
+  }
+
+  public String nowPlusHours(int hours) {
+    return nowPlusPeriod(Duration.ofHours(hours));
+  }
+
+  public String nowPlusDays(int days) {
+    return nowPlusPeriod(Period.ofDays(days));
+  }
+
+  public String nowPlusWeeks(int weeks) {
+    return nowPlusPeriod(Period.ofWeeks(weeks));
+  }
+
+  public String nowPlusMonths(int months) {
+    return nowPlusPeriod(Period.ofMonths(months));
+  }
+
+  public String nowPlusYears(int years) {
+    return nowPlusPeriod(Period.ofYears(years));
+  }
+
+  public String nowPlusPeriod(TemporalAmount amount) {
+    long time =
+        ContextUtils.getEngineTime() > 0
+            ? ContextUtils.getEngineTime()
+            : System.currentTimeMillis();
+    return sdf.format(
+        Date.from(
+            Instant.ofEpochMilli(time).atZone(ZoneId.systemDefault()).plus(amount).toInstant()));
   }
 }

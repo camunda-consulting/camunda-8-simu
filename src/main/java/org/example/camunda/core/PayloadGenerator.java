@@ -60,7 +60,10 @@ public class PayloadGenerator {
             }
             if (arg.getType().equals("java.lang.String")) {
               example += "\"" + arg.getName() + "\"";
-            } else if (arg.getType().equals("long") || arg.getType().equals("java.lang.Long")) {
+            } else if (arg.getType().equals("long")
+                || arg.getType().equals("java.lang.Long")
+                || arg.getType().equals("int")
+                || arg.getType().equals("java.lang.Integer")) {
               example += "1 /*" + arg.getName() + "*/";
             } else if (arg.getType().equals("boolean")
                 || arg.getType().equals("java.lang.Boolean")) {
