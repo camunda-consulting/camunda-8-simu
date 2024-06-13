@@ -48,6 +48,14 @@ public class ScenarioExecService {
 
   public void start(ExecutionPlan plan) {
 
+    if (plan.getXmlModified() || plan.getDefinition().getVersion() < 0) {
+      deploy(plan.getDefinition().getName(), plan.getXml());
+      if (plan.getXmlDependencies() != null) {
+        for (String dep : plan.getXmlDependencies().keySet()) {
+          deploy(dep, plan.getXmlDependencies().get(dep));
+        }
+      }
+    }
     start(plan, null);
   }
 

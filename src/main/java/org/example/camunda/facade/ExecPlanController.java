@@ -125,9 +125,6 @@ public class ExecPlanController {
     if (plan == null) {
       return false;
     }
-    if (plan.getXmlModified()) {
-      this.scenarioExecService.deploy(plan.getDefinition().getName(), plan.getXml());
-    }
     this.scenarioExecService.start(plan);
     return true;
   }
