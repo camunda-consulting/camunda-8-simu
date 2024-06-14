@@ -10,8 +10,7 @@ public class PayloadGeneratorTest {
 
   @Test
   public void generatePayload() {
-    String template =
-        "{\"attr\":[(${templateUtils.sequentialNumber()})],\"attr2\":\"[(${firstname})]\"}";
+    String template = "{\"attr\":templateUtils.sequentialNumber(),\"attr2\":\"[(${firstname})]\"}";
     String result = PayloadGenerator.generatePayload(template, Map.of("firstname", "michel"));
     assertEquals(result, "{\"attr\":0,\"attr2\":\"michel\"}");
 
