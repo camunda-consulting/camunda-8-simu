@@ -25,10 +25,10 @@ endif
 	-rm -rf target
 
 package:	
-	mvnw clean package
+	./mvnw clean package
 
 runjava:
-	mvnw spring-boot:run
+	./mvnw spring-boot:run
 
 npminstall:
 	cd src/main/front; npm install
