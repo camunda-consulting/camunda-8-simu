@@ -2,6 +2,7 @@ package org.example.camunda.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Map;
+import org.example.camunda.dto.progression.Evolution;
 import org.example.camunda.dto.templating.JsonTemplate;
 
 public class Scenario {
@@ -12,14 +13,10 @@ public class Scenario {
   private int dayTimeEnd = 18;
   private String firstDayFeelExpression;
   private String lastDayFeelExpression;
-  private Integer nbInstancesStart;
-  private Integer nbInstancesEnd;
+  private Evolution evolution;
   private InstanceStartTypeEnum startType;
   // if start type is msg
   private String startMsgName;
-  private ProgressionEnum evolution;
-  private Integer saltMin;
-  private Integer saltMax;
   private Map<String, StepExecPlan> steps;
   // start template
   private JsonTemplate jsonTemplate;
@@ -80,20 +77,12 @@ public class Scenario {
     this.lastDayFeelExpression = lastDayFeelExpression;
   }
 
-  public Integer getNbInstancesStart() {
-    return nbInstancesStart;
+  public Evolution getEvolution() {
+    return evolution;
   }
 
-  public void setNbInstancesStart(Integer nbInstancesStart) {
-    this.nbInstancesStart = nbInstancesStart;
-  }
-
-  public Integer getNbInstancesEnd() {
-    return nbInstancesEnd;
-  }
-
-  public void setNbInstancesEnd(Integer nbInstancesEnd) {
-    this.nbInstancesEnd = nbInstancesEnd;
+  public void setEvolution(Evolution evolution) {
+    this.evolution = evolution;
   }
 
   public InstanceStartTypeEnum getStartType() {
@@ -110,30 +99,6 @@ public class Scenario {
 
   public void setStartMsgName(String startMsgName) {
     this.startMsgName = startMsgName;
-  }
-
-  public ProgressionEnum getEvolution() {
-    return evolution;
-  }
-
-  public void setEvolution(ProgressionEnum evolution) {
-    this.evolution = evolution;
-  }
-
-  public Integer getSaltMin() {
-    return saltMin;
-  }
-
-  public void setSaltMin(Integer saltMin) {
-    this.saltMin = saltMin;
-  }
-
-  public Integer getSaltMax() {
-    return saltMax;
-  }
-
-  public void setSaltMax(Integer saltMax) {
-    this.saltMax = saltMax;
   }
 
   public Map<String, StepExecPlan> getSteps() {

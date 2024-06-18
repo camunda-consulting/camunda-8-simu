@@ -10,4 +10,12 @@ import { ExecPlanService } from '../services/exec-plan.service';
 export class InstantiateComponent {
 
   constructor(private processService: ProcessService, public execPlanService: ExecPlanService) { }
+
+
+  openStartPlanModal() {
+    (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById('startPlanModal')).show();
+  }
+  closeStartPlanModal() {
+    (window as any).bootstrap.Modal.getInstance(document.getElementById('startPlanModal')).hide();
+  }
 }

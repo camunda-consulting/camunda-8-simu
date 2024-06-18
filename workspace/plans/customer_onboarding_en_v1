@@ -18,13 +18,15 @@
     "dayTimeEnd" : 18,
     "firstDayFeelExpression" : "now() - duration(\"P1M\")",
     "lastDayFeelExpression" : "now()",
-    "nbInstancesStart" : 10,
-    "nbInstancesEnd" : 100,
+    "evolution" : {
+      "type" : "normal",
+      "min" : 10,
+      "max" : 100,
+      "mean" : 0.3,
+      "derivation" : 0.18
+    },
     "startType" : "START",
     "startMsgName" : null,
-    "evolution" : "LINEAR",
-    "saltMin" : null,
-    "saltMax" : null,
     "steps" : {
       "ServiceTask_0tixwo5" : {
         "elementId" : "ServiceTask_0tixwo5",
@@ -91,13 +93,16 @@
     "dayTimeEnd" : 18,
     "firstDayFeelExpression" : "now() - duration(\"P1M\")",
     "lastDayFeelExpression" : "now()",
-    "nbInstancesStart" : 5,
-    "nbInstancesEnd" : 40,
-    "startType" : null,
+    "evolution" : {
+      "type" : "saltedlinear",
+      "min" : 5,
+      "max" : 40,
+      "decreasing" : false,
+      "saltMin" : 1,
+      "saltMax" : 4
+    },
+    "startType" : "START",
     "startMsgName" : null,
-    "evolution" : "LINEAR_SALTED",
-    "saltMin" : 1,
-    "saltMax" : 4,
     "steps" : {
       "ServiceTask_RejectPolicy" : {
         "elementId" : "ServiceTask_RejectPolicy",
@@ -164,13 +169,14 @@
     "dayTimeEnd" : 18,
     "firstDayFeelExpression" : "now() - duration(\"P15D\")",
     "lastDayFeelExpression" : "now()",
-    "nbInstancesStart" : 30,
-    "nbInstancesEnd" : 5,
-    "startType" : null,
+    "evolution" : {
+      "type" : "linear",
+      "min" : 30,
+      "max" : 5,
+      "decreasing" : false
+    },
+    "startType" : "START",
     "startMsgName" : null,
-    "evolution" : "LINEAR",
-    "saltMin" : null,
-    "saltMax" : null,
     "steps" : {
       "SendTask_SendPolicy" : {
         "elementId" : "SendTask_SendPolicy",
@@ -255,13 +261,14 @@
     "dayTimeEnd" : 18,
     "firstDayFeelExpression" : "now() - duration(\"P1M\")",
     "lastDayFeelExpression" : "now()",
-    "nbInstancesStart" : 2,
-    "nbInstancesEnd" : 10,
-    "startType" : null,
+    "evolution" : {
+      "type" : "linear",
+      "min" : 2,
+      "max" : 10,
+      "decreasing" : false
+    },
+    "startType" : "START",
     "startMsgName" : null,
-    "evolution" : "LINEAR",
-    "saltMin" : null,
-    "saltMax" : null,
     "steps" : {
       "UserTask_DecideOnApplication" : {
         "elementId" : "UserTask_DecideOnApplication",

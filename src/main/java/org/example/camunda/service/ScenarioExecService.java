@@ -174,7 +174,9 @@ public class ScenarioExecService {
 
     long durationInDays = ChronoUnit.DAYS.between(firstDay, lastDay) + 1;
     for (double x = 0; x < durationInDays; x++) {
-      long nbInstancesPerDay = ScenarioUtils.calculateInstancesPerDay(scenario, x / durationInDays);
+      long nbInstancesPerDay =
+          ScenarioUtils.calculateInstancesPerDay(scenario.getEvolution(), x / durationInDays);
+      LOG.info("Instances at day " + x + " : " + nbInstancesPerDay);
       addInstancesWithDesiredPrecision(time, nbInstancesPerDay, scenario, x / durationInDays);
 
       time = time + 86400000;

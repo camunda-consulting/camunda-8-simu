@@ -12,14 +12,14 @@ public class PayloadGeneratorTest {
   public void generatePayload() {
     String template = "{\"attr\":templateUtils.sequentialNumber(),\"attr2\":\"[(${firstname})]\"}";
     String result = PayloadGenerator.generatePayload(template, Map.of("firstname", "michel"));
-    assertEquals(result, "{\"attr\":0,\"attr2\":\"michel\"}");
+    assertEquals("{\"attr\":0,\"attr2\":\"michel\"}", result);
 
     template = "[(${firstname})]";
     result = PayloadGenerator.generatePayload(template, Map.of("firstname", "michel"));
-    assertEquals(result, "michel");
+    assertEquals("michel", result);
 
     template = "bob";
     result = PayloadGenerator.generatePayload(template, Map.of("firstname", "michel"));
-    assertEquals(result, "bob");
+    assertEquals("bob", result);
   }
 }

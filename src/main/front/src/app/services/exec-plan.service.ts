@@ -43,6 +43,12 @@ export class ExecPlanService {
     });
   }
 
+  executeCurrentScenario(): void {
+    this.http.post<any>(environment.backend + "/api/plan/start?scenario=" + this.scenario!.name, this.executionPlan).subscribe((response: any) => {
+      console.log("status " + response);
+    });
+  }
+
   updateDef(xml: string): void {
     this.http.post<any>(environment.backend + "/api/plan/" + this.executionPlan.definition.bpmnProcessId + "/" + this.executionPlan.definition.version + '/xml', xml).subscribe((response: any) => {
       this.executionPlan = response;

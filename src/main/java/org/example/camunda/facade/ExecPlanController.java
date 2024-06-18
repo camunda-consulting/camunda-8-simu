@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @CrossOrigin
@@ -121,25 +122,19 @@ public class ExecPlanController {
   }
 
   @PostMapping("/start")
-  public boolean startPlan(@RequestBody ExecutionPlan plan) throws OperateException, IOException {
+  public boolean startPlan(
+      @RequestBody ExecutionPlan plan,
+      @RequestParam(value = "scenario", required = false) String scenario)
+      throws OperateException, IOException {
     if (plan == null) {
       return false;
     }
-    this.scenarioExecService.start(plan);
-    return true;
-  }
-
-  @GetMapping("/{bpmnProcessId}/{version}/scenario/{scenarioName}/start")
-  public void startScenario(
-      @PathVariable String bpmnProcessId,
-      @PathVariable Long version,
-      @PathVariable String scenarioName)
-      throws OperateException, IOException {
-    ExecutionPlan plan = execPlanService.find(bpmnProcessId, version);
-    if (plan.getXmlModified()) {
-      this.scenarioExecService.deploy(plan.getDefinition().getName(), plan.getXml());
+    if (scenario != null) {
+      this.scenarioExecService.start(plan, scenario);
+    } else {
+      this.scenarioExecService.start(plan);
     }
-    this.scenarioExecService.start(plan, scenarioName);
+    return true;
   }
 
   @PostMapping

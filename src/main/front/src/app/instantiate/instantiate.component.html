@@ -3,6 +3,7 @@
     <div class="input-group mb-3">
       <span class="input-group-text">Scenario name</span>
       <input type="text" class="form-control" [(ngModel)]="execPlanService.scenario!.name">
+      <button class="btn btn-primary" (click)="execPlanService.executeCurrentScenario()"><i class="bi bi-send"></i> Start scenario</button>
     </div>
   </div>
 </div>
@@ -36,18 +37,12 @@
 </div>
 <hr />
 <div class="row">
-  <div class="col-6">
-    <div class="input-group mb-3">
-      <span class="input-group-text">Number of instances at start</span>
-      <input type="number" class="form-control" [(ngModel)]="execPlanService.scenario!.nbInstancesStart" min="0">
+  <div class="col-12">
+    <div class="input-group mb-3 ">
+      <span class="input-group-text">Completion time</span>
+      <button class="btn btn-outline-primary" (click)="openStartPlanModal()"><i class="bi bi-pencil"></i> {{execPlanService.scenario!.evolution.type}} [{{execPlanService.scenario!.evolution.min}} TO {{execPlanService.scenario!.evolution.max}}]</button>
     </div>
-  </div>
-  <div class="col-6">
-    <div class="input-group mb-3">
-      <span class="input-group-text">Number of instances at end</span>
-      <input type="number" class="form-control" [(ngModel)]="execPlanService.scenario!.nbInstancesEnd" min="0">
     </div>
-  </div>
 </div>
 <div class="row">
   <div class="col-4">
@@ -67,31 +62,65 @@
   </div>
 </div>
   <div class="row">
-    <div class="col-4">
-      <div class="input-group mb-3">
-        <span class="input-group-text">Progression</span>
-        <select class="form-select" [(ngModel)]="execPlanService.scenario!.evolution">
-          <option selected>Choose...</option>
-          <option value="LINEAR">LINEAR</option>
-          <option value="LINEAR_SALTED">LINEAR_SALTED</option>
-        </select>
-      </div>
-    </div>
-    <div class="col-4">
-      <div class="input-group mb-3" *ngIf="execPlanService.scenario.evolution=='LINEAR_SALTED'">
-        <span class="input-group-text">Salt (min)</span>
-        <input type="number" class="form-control" [(ngModel)]="execPlanService.scenario!.saltMin" min="0">
-      </div>
-    </div>
-    <div class="col-4">
-      <div class="input-group mb-3 " *ngIf="execPlanService.scenario.evolution=='LINEAR_SALTED'">
-        <span class="input-group-text">Salt (max)</span>
-        <input type="number" class="form-control" [(ngModel)]="execPlanService.scenario!.saltMin" min="0">
-      </div>
-    </div>
-  </div>
-  <div class="row">
     <div class="col-12">
       <app-json-editor label="JSON template" classnames="mb-3" [(template)]="this.execPlanService.scenario.jsonTemplate"></app-json-editor>
+    </div>
+  </div>
+
+  <div class="modal fade" id="startPlanModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Start Plan</h5>
+          <button type="button" class="btn-close" (click)="closeStartPlanModal()"></button>
+        </div>
+        <div class="modal-body">
+          <div class="input-group mb-3">
+            <span class="input-group-text">Progression</span>
+            <select class="form-select" [(ngModel)]="execPlanService.scenario!.evolution.type">
+              <option selected>Choose...</option>
+              <option value="linear">Linear</option>
+              <option value="saltedlinear">Salted linear</option>
+              <option value="exponential">Exponential</option>
+              <option value="normal">Normally distributed</option>
+            </select>
+          </div>
+          <div class="input-group mb-3 ">
+            <span class="input-group-text">Minimum instances</span>
+            <input type="number" class="form-control" min=0 [(ngModel)]="execPlanService.scenario.evolution.min">
+          </div>
+          <div class="input-group mb-3 ">
+            <span class="input-group-text">Maximum instances</span>
+            <input type="number" class="form-control" min=0 [(ngModel)]="execPlanService.scenario.evolution.max">
+          </div>
+          <div class="form-check form-switch mb-3" *ngIf="execPlanService.scenario!.evolution.type!='normal'">
+            <input class="form-check-input" type="checkbox" role="switch" [(ngModel)]="execPlanService.scenario.evolution.decreasing">
+            <label class="form-check-label" for="flexSwitchCheckDefault">Decreasing evolution</label>
+          </div>
+          <div class="input-group mb-3 " *ngIf="execPlanService.scenario!.evolution.type=='saltedlinear'">
+            <span class="input-group-text">Salt (min)</span>
+            <input type="number" class="form-control" min=0 [(ngModel)]="execPlanService.scenario.evolution.saltMin">
+          </div>
+          <div class="input-group mb-3 " *ngIf="execPlanService.scenario!.evolution.type=='saltedlinear'">
+            <span class="input-group-text">Salt (max)</span>
+            <input type="number" class="form-control" min=0 [(ngModel)]="execPlanService.scenario.evolution.saltMax">
+          </div>
+          <div class="input-group mb-3 " *ngIf="execPlanService.scenario!.evolution.type=='exponential'">
+            <span class="input-group-text">Exponent</span>
+            <input type="number" class="form-control" min=0 [(ngModel)]="execPlanService.scenario.evolution.exponent">
+          </div>
+          <div class="input-group mb-3 " *ngIf="execPlanService.scenario!.evolution.type=='normal'">
+            <span class="input-group-text">Mean</span>
+            <input type="number" class="form-control" min=0 step=0.01 max=1 [(ngModel)]="execPlanService.scenario.evolution.mean">
+          </div>
+          <div class="input-group mb-3 " *ngIf="execPlanService.scenario!.evolution.type=='normal'">
+            <span class="input-group-text">Standard derivation</span>
+            <input type="number" class="form-control" min=0 step=0.01 max=1 [(ngModel)]="execPlanService.scenario.evolution.derivation">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeStartPlanModal()">Close</button>
+        </div>
+      </div>
     </div>
   </div>
