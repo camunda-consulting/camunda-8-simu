@@ -209,16 +209,16 @@ public class ExecPlanController {
         lastDay = lastDayTmp;
       }
     }
+    lastDay = lastDay.plusDays(1);
     List<String> labels = new ArrayList<>();
+    List<Long> cumulativeValues = new ArrayList<>();
     ZonedDateTime parcoursDay = firstDay.plusNanos(1);
     while (parcoursDay.isBefore(lastDay)) {
       labels.add(parcoursDay.format(DateTimeFormatter.ISO_OFFSET_DATE).substring(0, 10));
+      cumulativeValues.add(0L);
       parcoursDay = parcoursDay.plusDays(1);
     }
-    /*labels.add("0.05");
-    for (int x = 10; x < 100; x += 5) {
-      labels.add("0." + x);
-    }*/
+
     List<Map<String, Object>> datasets = new ArrayList<>();
     for (Scenario scenario : plan.getScenarii()) {
       ZonedDateTime firstDayTmp =
@@ -226,14 +226,19 @@ public class ExecPlanController {
       ZonedDateTime lastDayTmp = ScenarioUtils.getZonedDateDay(scenario.getLastDayFeelExpression());
       parcoursDay = firstDay.plusNanos(1);
       List<Long> values = new ArrayList<>();
+      int i = 0;
       while (parcoursDay.isBefore(firstDayTmp)) {
         values.add(0L);
+        i++;
         parcoursDay = parcoursDay.plusDays(1);
       }
       long durationInDays = ChronoUnit.DAYS.between(firstDayTmp, lastDayTmp) + 1;
       for (double x = 0; x < durationInDays; x++) {
-        values.add(
-            ScenarioUtils.calculateInstancesPerDay(scenario.getEvolution(), x / durationInDays));
+        Long nb =
+            ScenarioUtils.calculateInstancesPerDay(scenario.getEvolution(), x / durationInDays);
+        values.add(nb);
+        cumulativeValues.set(i, cumulativeValues.get(i) + nb);
+        i++;
       }
       parcoursDay = lastDayTmp.plusNanos(1);
       while (parcoursDay.isBefore(lastDay)) {
@@ -243,6 +248,8 @@ public class ExecPlanController {
       datasets.add(
           Map.of("label", scenario.getName(), "data", values, "fill", false, "tension", 0.3));
     }
+    datasets.add(
+        Map.of("label", "cumulative", "data", cumulativeValues, "fill", false, "tension", 0.3));
     return Map.of("labels", labels, "datasets", datasets);
   }
 }
