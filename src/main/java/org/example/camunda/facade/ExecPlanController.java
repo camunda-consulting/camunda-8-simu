@@ -3,10 +3,12 @@ package org.example.camunda.facade;
 import io.camunda.operate.exception.OperateException;
 import io.camunda.operate.model.ProcessDefinition;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.example.camunda.dto.ExecutionPlan;
 import org.example.camunda.dto.Scenario;
+import org.example.camunda.dto.progression.Evolution;
 import org.example.camunda.service.ExecutionPlanService;
 import org.example.camunda.service.OperateService;
 import org.example.camunda.service.ScenarioExecService;
@@ -156,5 +158,36 @@ public class ExecPlanController {
   @GetMapping
   public List<String> list() {
     return execPlanService.list();
+  }
+
+  @PostMapping("/preview/evol")
+  public Map<String, Object> evolDatasetPreview(@RequestBody Evolution evol) {
+    List<String> labels = new ArrayList<>();
+    List<Long> values = new ArrayList<>();
+
+    labels.add("0.00");
+    values.add(ScenarioUtils.calculateInstancesPerDay(evol, 0));
+    labels.add("0.05");
+    values.add(ScenarioUtils.calculateInstancesPerDay(evol, 0.05));
+    for (int x = 10; x < 100; x += 5) {
+      labels.add("0." + x);
+      values.add(ScenarioUtils.calculateInstancesPerDay(evol, x / 100.0));
+    }
+    return Map.of(
+        "labels",
+        labels,
+        "datasets",
+        List.of(
+            Map.of(
+                "label",
+                "preview",
+                "data",
+                values,
+                "fill",
+                false,
+                "borderColor",
+                "rgb(75, 192, 192)",
+                "tension",
+                0.3)));
   }
 }

@@ -70,6 +70,9 @@ export class ExecPlanService {
   stopPlan(): Observable<any> {
     return this.http.get<any>(environment.backend + "/api/plan/stop")
   }
+  previewEvol(evol: any): Observable<any> {
+    return this.http.post<any>(environment.backend + "/api/plan/preview/evol", evol);
+  }
 
   clear(): void {
     this.executionPlan = undefined;
@@ -116,7 +119,7 @@ export class ExecPlanService {
           "avgProgression": "LINEAR",
           "progressionSalt": 0
         },
-        "jsonTemplate": { "template": "", "exampleContext": {}},
+        "jsonTemplate": { "template": "", "exampleContext": {} },
         "preSteps": [],
         "postSteps": []
       };

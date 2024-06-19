@@ -117,6 +117,8 @@
             <span class="input-group-text">Standard derivation</span>
             <input type="number" class="form-control" min=0 step=0.01 max=1 [(ngModel)]="execPlanService.scenario.evolution.derivation">
           </div>
+          <button class="btn btn-primary" (click)="previewEvol()"><i class="bi bi-eye"></i> Preview</button><br/>
+          <canvas #preview></canvas>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" (click)="closeStartPlanModal()">Close</button>
