@@ -73,6 +73,9 @@ export class ExecPlanService {
   previewEvol(evol: any): Observable<any> {
     return this.http.post<any>(environment.backend + "/api/plan/preview/evol", evol);
   }
+  previewPlan(): Observable<any> {
+    return this.http.post<any>(environment.backend + "/api/plan/preview/plan", this.executionPlan);
+  }
 
   clear(): void {
     this.executionPlan = undefined;

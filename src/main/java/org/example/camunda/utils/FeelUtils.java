@@ -38,6 +38,9 @@ public class FeelUtils {
   }
 
   public static Object evaluate(String expression, Map<String, Object> context) {
+    if (estimatedClock == null) {
+      estimatedClock = System.currentTimeMillis();
+    }
     final Either<FeelEngine.Failure, Object> result = engine.evalExpression(expression, context);
     if (result.isLeft()) {
       return result.left().get().message();

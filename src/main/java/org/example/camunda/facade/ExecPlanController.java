@@ -3,6 +3,9 @@ package org.example.camunda.facade;
 import io.camunda.operate.exception.OperateException;
 import io.camunda.operate.model.ProcessDefinition;
 import java.io.IOException;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -189,5 +192,57 @@ public class ExecPlanController {
                 "rgb(75, 192, 192)",
                 "tension",
                 0.3)));
+  }
+
+  @PostMapping("/preview/plan")
+  public Map<String, Object> evolDatasetPreview(@RequestBody ExecutionPlan plan) {
+    ZonedDateTime firstDay = null;
+    ZonedDateTime lastDay = null;
+    for (Scenario scenario : plan.getScenarii()) {
+      ZonedDateTime firstDayTmp =
+          ScenarioUtils.getZonedDateDay(scenario.getFirstDayFeelExpression());
+      ZonedDateTime lastDayTmp = ScenarioUtils.getZonedDateDay(scenario.getLastDayFeelExpression());
+      if (firstDay == null || firstDay.isAfter(firstDayTmp)) {
+        firstDay = firstDayTmp;
+      }
+      if (lastDay == null || lastDay.isBefore(lastDayTmp)) {
+        lastDay = lastDayTmp;
+      }
+    }
+    List<String> labels = new ArrayList<>();
+    ZonedDateTime parcoursDay = firstDay.plusNanos(1);
+    while (parcoursDay.isBefore(lastDay)) {
+      labels.add(parcoursDay.format(DateTimeFormatter.ISO_OFFSET_DATE).substring(0, 10));
+      parcoursDay = parcoursDay.plusDays(1);
+    }
+    /*labels.add("0.05");
+    for (int x = 10; x < 100; x += 5) {
+      labels.add("0." + x);
+    }*/
+    List<Map<String, Object>> datasets = new ArrayList<>();
+    for (Scenario scenario : plan.getScenarii()) {
+      ZonedDateTime firstDayTmp =
+          ScenarioUtils.getZonedDateDay(scenario.getFirstDayFeelExpression());
+      ZonedDateTime lastDayTmp = ScenarioUtils.getZonedDateDay(scenario.getLastDayFeelExpression());
+      parcoursDay = firstDay.plusNanos(1);
+      List<Long> values = new ArrayList<>();
+      while (parcoursDay.isBefore(firstDayTmp)) {
+        values.add(0L);
+        parcoursDay = parcoursDay.plusDays(1);
+      }
+      long durationInDays = ChronoUnit.DAYS.between(firstDayTmp, lastDayTmp) + 1;
+      for (double x = 0; x < durationInDays; x++) {
+        values.add(
+            ScenarioUtils.calculateInstancesPerDay(scenario.getEvolution(), x / durationInDays));
+      }
+      parcoursDay = lastDayTmp.plusNanos(1);
+      while (parcoursDay.isBefore(lastDay)) {
+        values.add(0L);
+        parcoursDay = parcoursDay.plusDays(1);
+      }
+      datasets.add(
+          Map.of("label", scenario.getName(), "data", values, "fill", false, "tension", 0.3));
+    }
+    return Map.of("labels", labels, "datasets", datasets);
   }
 }
