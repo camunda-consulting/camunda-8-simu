@@ -246,10 +246,30 @@ public class ExecPlanController {
         parcoursDay = parcoursDay.plusDays(1);
       }
       datasets.add(
-          Map.of("label", scenario.getName(), "data", values, "fill", false, "tension", 0.3));
+          Map.of(
+              "type",
+              "line",
+              "label",
+              scenario.getName(),
+              "data",
+              values,
+              "fill",
+              false,
+              "tension",
+              0.3));
     }
     datasets.add(
-        Map.of("label", "cumulative", "data", cumulativeValues, "fill", false, "tension", 0.3));
+        Map.of(
+            "type",
+            "bar",
+            "label",
+            "cumulative",
+            "data",
+            cumulativeValues,
+            "fill",
+            false,
+            "tension",
+            0.3));
     return Map.of("labels", labels, "datasets", datasets);
   }
 }
