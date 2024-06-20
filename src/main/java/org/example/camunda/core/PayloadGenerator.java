@@ -83,7 +83,12 @@ public class PayloadGenerator {
     return templatingMethods;
   }
 
+  private static String prepareVariables(String jsonTemplate) {
+    return jsonTemplate.replaceAll("\\$([a-zA-Z0-9]+)", "[(\\${$1})]");
+  }
+
   public static String prepareThymeleafBlocks(String jsonTemplate) {
+    jsonTemplate = prepareVariables(jsonTemplate);
     Map<String, List<TemplatingMethod>> methods = getTemplatingMethods();
     int tuIndex = jsonTemplate.indexOf(TEMPLATING_PREFIX);
     while (tuIndex > 0) {

@@ -14,9 +14,9 @@ public class PayloadGeneratorTest {
     String result = PayloadGenerator.generatePayload(template, Map.of("firstname", "michel"));
     assertEquals("{\"attr\":0,\"attr2\":\"michel\"}", result);
 
-    template = "[(${firstname})]";
+    template = "\"$firstname\", $firstname, [(${firstname})]";
     result = PayloadGenerator.generatePayload(template, Map.of("firstname", "michel"));
-    assertEquals("michel", result);
+    assertEquals("\"michel\", michel, michel", result);
 
     template = "bob";
     result = PayloadGenerator.generatePayload(template, Map.of("firstname", "michel"));
