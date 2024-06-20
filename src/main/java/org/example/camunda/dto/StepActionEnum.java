@@ -6,5 +6,6 @@ public enum StepActionEnum {
   INCIDENT,
   CLOCK,
   MSG,
+  SIGNAL,
   BPMN_ERROR
 }

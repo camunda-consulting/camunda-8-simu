@@ -136,6 +136,27 @@ public class ZeebeService {
     }
   }
 
+  public void signal(String signal, JsonNode variables) {
+    zeebeWorks();
+    try {
+      this.zeebeClient
+          .newBroadcastSignalCommand()
+          .signalName(signal)
+          .variables(variables)
+          .send()
+          .join();
+    } catch (ClientException e) {
+      if (e instanceof ClientStatusException
+              && (((ClientStatusException) e).getStatus().getCode() == Status.Code.NOT_FOUND)
+          || (((ClientStatusException) e).getStatus().getCode() == Status.Code.CANCELLED)) {
+        LOG.error("Error publishing signal " + signal, e);
+      } else {
+        ThreadUtils.pause(200);
+        signal(signal, variables);
+      }
+    }
+  }
+
   public void bpmnError(String error, Long jobKey, JsonNode variables) {
     zeebeWorks();
     try {

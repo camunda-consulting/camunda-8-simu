@@ -9,6 +9,7 @@ public class StepAdditionalAction {
   private String feelDelay = "PT5M";
 
   // MSG
+  private String signal = "Signal";
   private String msg = "MSG";
   private Long msgDelay = 1000L;
   private String correlationKey;
@@ -40,6 +41,14 @@ public class StepAdditionalAction {
 
   public void setMsgDelay(Long msgDelay) {
     this.msgDelay = msgDelay;
+  }
+
+  public String getSignal() {
+    return signal;
+  }
+
+  public void setSignal(String signal) {
+    this.signal = signal;
   }
 
   public String getMsg() {

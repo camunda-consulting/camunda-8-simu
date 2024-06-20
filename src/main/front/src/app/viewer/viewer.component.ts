@@ -120,6 +120,9 @@ export class ViewerComponent implements AfterViewInit, OnInit {
       } else if (type == 'bpmn:ErrorEventDefinition') {
         let errorRef = this.selectedElt.businessObject.eventDefinitions[0].errorRef;
         this.execPlanService.createPreStepInScenario(parentStep, 'BPMN_ERROR', errorRef, 1000);
+      } else if (type == 'bpmn:SignalEventDefinition') {
+        let signalRef = this.selectedElt.businessObject.eventDefinitions[0].signalRef;
+        this.execPlanService.createPreStepInScenario(parentStep, 'SIGNAL', signalRef, 1000);
       }
       else {
         alert('Implementation for the type ' + type + ' is missing.');

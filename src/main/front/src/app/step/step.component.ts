@@ -39,6 +39,9 @@ export class StepComponent implements AfterViewInit, OnInit {
     if (step.type == 'MSG') {
       return 'Publish ' + step.msg + ' after ' + step.msgDelay + 'ms';
     }
+    if (step.type == 'SIGNAL') {
+      return 'Broadcast ' + step.signal + ' after ' + step.msgDelay + 'ms';
+    }
     return 'Error ' + step.errorCode + ' after ' + step.errorDelay + 'ms';
   }
 

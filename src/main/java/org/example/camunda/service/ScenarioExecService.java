@@ -19,6 +19,7 @@ import org.example.camunda.core.actions.BpmnErrorAction;
 import org.example.camunda.core.actions.CompleteJobAction;
 import org.example.camunda.core.actions.IncidentJobAction;
 import org.example.camunda.core.actions.MessageAction;
+import org.example.camunda.core.actions.SignalAction;
 import org.example.camunda.core.actions.StartInstancesAction;
 import org.example.camunda.dto.ExecutionPlan;
 import org.example.camunda.dto.InstanceContext;
@@ -46,20 +47,23 @@ public class ScenarioExecService {
     return zeebeService.deploy(name, bpmnXml);
   }
 
-  public void start(ExecutionPlan plan) {
-
+  public void deploy(ExecutionPlan plan) {
     if (plan.getXmlModified() || plan.getDefinition().getVersion() < 0) {
-      deploy(plan.getDefinition().getName(), plan.getXml());
+      deploy(plan.getDefinition().getName() + ".bpmn", plan.getXml());
       if (plan.getXmlDependencies() != null) {
         for (String dep : plan.getXmlDependencies().keySet()) {
           deploy(dep, plan.getXmlDependencies().get(dep));
         }
       }
     }
+  }
+
+  public void start(ExecutionPlan plan) {
     start(plan, null);
   }
 
   public void start(ExecutionPlan plan, String scenarioName) {
+    deploy(plan);
     ContextUtils.setPlan(plan);
     initClock(System.currentTimeMillis());
     prepareInstances(plan, scenarioName);
@@ -141,6 +145,14 @@ public class ScenarioExecService {
           new MessageAction(
               step.getMsg(),
               (String) variables.get(step.getCorrelationKey()),
+              step.getJsonTemplate().getTemplate(),
+              job.getVariablesAsMap(),
+              zeebeService));
+    } else if (step.getType() == StepActionEnum.SIGNAL) {
+      ContextUtils.addAction(
+          baseDate + step.getMsgDelay(),
+          new SignalAction(
+              step.getSignal(),
               step.getJsonTemplate().getTemplate(),
               job.getVariablesAsMap(),
               zeebeService));

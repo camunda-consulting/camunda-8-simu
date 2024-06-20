@@ -131,6 +131,7 @@
             <option selected>Choose...</option>
             <option value="CLOCK">CLOCK</option>
             <option value="MSG">MSG</option>
+            <option value="SIGNAL">SIGNAL</option>
             <option value="BPMN_ERROR">BPMN_ERROR</option>
           </select>
         </div>
@@ -138,13 +139,17 @@
           <span class="input-group-text">Delay (FEEL)</span>
           <input type="text" class="form-control" [(ngModel)]="prestep.feelDelay">
         </div>
-        <div class="input-group mb-3 " *ngIf="prestep.type=='MSG'">
+        <div class="input-group mb-3 " *ngIf="prestep.type=='MSG' || prestep.type=='SIGNAL'">
           <span class="input-group-text">Delay (ms)</span>
           <input type="number" class="form-control" min=0 [(ngModel)]="prestep.msgDelay">
         </div>
         <div class="input-group mb-3 " *ngIf="prestep.type=='MSG'">
           <span class="input-group-text">Message</span>
           <input type="text" class="form-control" [(ngModel)]="prestep.msg">
+        </div>
+        <div class="input-group mb-3 " *ngIf="prestep.type=='SIGNAL'">
+          <span class="input-group-text">Signal</span>
+          <input type="text" class="form-control" [(ngModel)]="prestep.signal">
         </div>
         <div class="input-group mb-3 " *ngIf="prestep.type=='MSG'">
           <span class="input-group-text">Correlation Key</span>
@@ -159,7 +164,7 @@
           <input type="text" class="form-control" [(ngModel)]="prestep.errorCode">
         </div>
 
-        <app-json-editor *ngIf="prestep.type=='MSG' || prestep.type=='BPMN_ERROR'" label="JSON template" classnames="mb-3" [(template)]="prestep.jsonTemplate"></app-json-editor>
+        <app-json-editor *ngIf="prestep.type!='CLOCK'" label="JSON template" classnames="mb-3" [(template)]="prestep.jsonTemplate"></app-json-editor>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="closePreStepModal()">Close</button>
@@ -182,6 +187,7 @@
             <option selected>Choose...</option>
             <option value="CLOCK">CLOCK</option>
             <option value="MSG">MSG</option>
+            <option value="SIGNAL">SIGNAL</option>
             <option value="BPMN_ERROR">BPMN_ERROR</option>
           </select>
         </div>
@@ -189,13 +195,17 @@
           <span class="input-group-text">Delay (FEEL)</span>
           <input type="text" class="form-control" [(ngModel)]="poststep.feelDelay">
         </div>
-        <div class="input-group mb-3 " *ngIf="poststep.type=='MSG'">
+        <div class="input-group mb-3 " *ngIf="poststep.type=='MSG' || poststep.type=='SIGNAL'">
           <span class="input-group-text">Delay (ms)</span>
           <input type="number" class="form-control" min=0 [(ngModel)]="poststep.msgDelay">
         </div>
         <div class="input-group mb-3 " *ngIf="poststep.type=='MSG'">
           <span class="input-group-text">Message</span>
           <input type="text" class="form-control" [(ngModel)]="poststep.msg">
+        </div>
+        <div class="input-group mb-3 " *ngIf="poststep.type=='SIGNAL'">
+          <span class="input-group-text">Signal</span>
+          <input type="text" class="form-control" [(ngModel)]="poststep.signal">
         </div>
         <div class="input-group mb-3 " *ngIf="poststep.type=='MSG'">
           <span class="input-group-text">Correlation Key</span>
@@ -209,7 +219,7 @@
           <span class="input-group-text">Error Code</span>
           <input type="text" class="form-control" [(ngModel)]="poststep.errorCode">
         </div>
-        <app-json-editor *ngIf="poststep.type=='MSG' || poststep.type=='BPMN_ERROR'" label="JSON template" classnames="mb-3" [(template)]="poststep.jsonTemplate"></app-json-editor>
+        <app-json-editor *ngIf="poststep.type!='CLOCK'" label="JSON template" classnames="mb-3" [(template)]="poststep.jsonTemplate"></app-json-editor>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="closePostStepModal()">Close</button>

@@ -154,6 +154,15 @@ export class ExecPlanService {
           template: "{}", exampleContext: {}
         }
       });
+    } else if (type == 'SIGNAL') {
+      this.scenario.steps[parentStep].preSteps.push({
+        "type": type,
+        "signal": elementRef.name,
+        "msgDelay": time,
+        "jsonTemplate": {
+          template: "{}", exampleContext: {}
+        }
+      });
     }
     this.selectActivity(parentStep);
   }
