@@ -15,19 +15,24 @@
         Do you want to add a step for {{selectedElt.id}} into the current scenario ?
       </div>
       <div class="modal-body" *ngIf="selectedElt && selectedElt.type=='bpmn:IntermediateCatchEvent'">
-        To manage Intermediate catch event, you should add a Post Step activity in the previous task.
+        To manage Intermediate catch event, you should add a Post Step activity in the previous task. Please select the activity that will "host" this post step :
+        <div class="input-group mb-3">
+          <span class="input-group-text">Hosting activity</span>
+          <select class="form-select" [(ngModel)]="intermediateCatchEventSource">
+            <option *ngFor="let source of origins; let i=index" value={{source.id}}>{{source.name}} ({{source.id}})</option>
+          </select>
+        </div>
       </div>
       <div class="modal-body" *ngIf="selectedElt && selectedElt.type=='bpmn:BoundaryEvent'">
         To manage a boundary event, you should add a Pre Step activity in the parent task. Do you want to create that Pre Step ?
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-warning" (click)="createStep()" *ngIf="selectedElt && selectedElt.type!=='bpmn:IntermediateCatchEvent'"><i class="bi bi-plus-circle"></i> Create</button>
+        <button type="button" class="btn btn-warning" (click)="createStep()" *ngIf="selectedElt"><i class="bi bi-plus-circle"></i> Create</button>
         <button type="button" class="btn btn-secondary" (click)="closenewstepModal()">Close</button>
       </div>
     </div>
   </div>
 </div>
-
 <div class="modal fade modal-xl" id="addDepModal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">

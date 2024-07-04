@@ -58,4 +58,12 @@ export class ActionsPlanComponent implements OnInit {
     this.execPlanService.createStepInScenario(this.newStepElementId);
     this.closeAddStepModal();
   }
+
+  labelStep(id: any): string {
+    let name = this.execPlanService.getActivityName(id);
+    if (name) {
+      return name + " (" + id + ")";
+    }
+    return id;
+  }
 }

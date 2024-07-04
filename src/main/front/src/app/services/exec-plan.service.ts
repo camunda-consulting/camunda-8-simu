@@ -14,9 +14,17 @@ export class ExecPlanService {
   scenario: any = {};
   currentActivity: string | undefined;
   activitySubject = new BehaviorSubject<string>('');
+  activities: any = {};
 
   list(): Observable<string[]> {
     return this.http.get<string[]>(environment.backend + "/api/plan");
+  }
+
+  mapActivityName(id: string, name: string) {
+    this.activities[id] = name;
+  }
+  getActivityName(id: any) {
+    return this.activities[id];
   }
 
   createExecutionPlan(xml: string): void {
@@ -156,6 +164,63 @@ export class ExecPlanService {
       });
     } else if (type == 'SIGNAL') {
       this.scenario.steps[parentStep].preSteps.push({
+        "type": type,
+        "signal": elementRef.name,
+        "msgDelay": time,
+        "jsonTemplate": {
+          template: "{}", exampleContext: {}
+        }
+      });
+    }
+    this.selectActivity(parentStep);
+  }
+
+  createPostStepInScenario(parentStep: string, type: string, elementRef: any, time: number): void {
+    if (!this.scenario.steps[parentStep]) {
+      this.scenario.steps[parentStep] = {
+        "elementId": parentStep,
+        "action": "COMPLETE",
+        "duration": {
+          "startDesiredAvg": 1000,
+          "endDesiredAvg": 1000,
+          "minMaxPercent": 0,
+          "avgProgression": "LINEAR",
+          "progressionSalt": 0
+        },
+        "jsonTemplate": { "template": "{}", "exampleContext": {} },
+        "preSteps": [],
+        "postSteps": []
+      };
+    }
+    if (!this.scenario.steps[parentStep].preSteps) {
+      this.scenario.steps[parentStep].postSteps = [];
+    }
+    if (type == 'MSG') {
+      this.scenario.steps[parentStep].postSteps.push({
+        "type": type,
+        "msgDelay": time,
+        "msg": elementRef.name,
+        "correlationKey": elementRef.extensionElements.valueOf("correlationKey").values[0].correlationKey.replace("=", "").trim(),
+        "jsonTemplate": {
+          template: "{}", exampleContext: {}
+        }
+      });
+    } else if (type == 'CLOCK') {
+      this.scenario.steps[parentStep].postSteps.push({
+        "type": type,
+        "feelDelay": time
+      });
+    } else if (type == 'BPMN_ERROR') {
+      this.scenario.steps[parentStep].postSteps.push({
+        "type": type,
+        "errorCode": elementRef.errorCode,
+        "errorDelay": time,
+        "jsonTemplate": {
+          template: "{}", exampleContext: {}
+        }
+      });
+    } else if (type == 'SIGNAL') {
+      this.scenario.steps[parentStep].postSteps.push({
         "type": type,
         "signal": elementRef.name,
         "msgDelay": time,

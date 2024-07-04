@@ -9,13 +9,17 @@ import { ExecPlanService } from '../services/exec-plan.service';
   styleUrls: ['./viewer.component.css']
 })
 export class ViewerComponent implements AfterViewInit, OnInit {
+  managedActivities = ["bpmn:ServiceTask", "bpmn:UserTask", "bpmn:SendTask", "bpmn:IntermediateCatchEvent", "bpmn:BoundaryEvent"];
+
   @ViewChild('viewer') viewerElt: ElementRef | undefined;
   viewer: NavigatedViewer | undefined;
   previousActivity?: string;
   xmlDeps = ["Main definition"];
   selectedElt: any = null;
+  origins: any[] = [];
   addDepModal = false;
   newDepXml?: string;
+  intermediateCatchEventSource?: any;
 
   constructor(private processService: ProcessService, public execPlanService: ExecPlanService) {
     this.execPlanService.activitySubject.subscribe((activity: string) => {
@@ -33,8 +37,12 @@ export class ViewerComponent implements AfterViewInit, OnInit {
         }
         const eltRegistry: any = this.viewer!.get('elementRegistry');
         eltRegistry.forEach((elt: any) => {
-          if (stepScenar.indexOf(elt.id) < 0) {
-            this.colorActivity(elt.id, "#000000");
+          if (this.managedActivities.indexOf(elt.type) >= 0) {
+            console.log(elt.di.bpmnElement.name);
+            this.execPlanService.mapActivityName(elt.di.bpmnElement.id, elt.di.bpmnElement.name);
+            if (stepScenar.indexOf(elt.id) < 0) {
+              this.colorActivity(elt.id, "#000000");
+            }
           }
         });
         this.previousActivity = activity;
@@ -49,8 +57,6 @@ export class ViewerComponent implements AfterViewInit, OnInit {
       }
     }
   }
-
-
 
   ngAfterViewInit(): void {
 
@@ -70,13 +76,16 @@ export class ViewerComponent implements AfterViewInit, OnInit {
 
   openDef(dep: string): void {
     if (dep == "Main definition") {
-      this.viewer!.importXML(this.execPlanService.executionPlan.xml).then((result: any) => { });
+      this.viewer!.importXML(this.execPlanService.executionPlan.xml).then((result: any) => {
+        this.colorSelectedActivity('blop');
+      });
     } else {
-      this.viewer!.importXML(this.execPlanService.executionPlan.xmlDependencies[dep]).then((result: any) => { });
+      this.viewer!.importXML(this.execPlanService.executionPlan.xmlDependencies[dep]).then((result: any) => {
+        this.colorSelectedActivity('blop');
+      });
     }
   }
 
-  managedActivities = ["bpmn:ServiceTask", "bpmn:UserTask", "bpmn: SendTask", "bpmn:IntermediateCatchEvent", "bpmn:BoundaryEvent"];
   selectActivity = (event: any) => {
     this.selectedElt = event.element;
     if (this.managedActivities.indexOf(this.selectedElt.type) >= 0 && !this.execPlanService.scenario.steps[event.element.id]) {
@@ -100,7 +109,26 @@ export class ViewerComponent implements AfterViewInit, OnInit {
     }
   };
 
+  findOrigins(intermediateCatchEvent: any): string[] {
+    let result: string[] = [];
+    for (let incoming of intermediateCatchEvent.incoming) {
+      if (incoming.sourceRef.$type == 'bpmn:ServiceTask' || incoming.sourceRef.$type == 'bpmn:UserTask') {
+        result.push(incoming.sourceRef);
+      } else {
+        result = result.concat(this.findOrigins(incoming.sourceRef));
+      }
+    }
+    return result;
+  }
+
   opennewstepModal() {
+    this.origins = []
+    if (this.selectedElt.type == 'bpmn:IntermediateCatchEvent') {
+      this.origins = this.findOrigins(this.selectedElt.businessObject);
+      if (this.origins && this.origins.length > 0) {
+        this.intermediateCatchEventSource = this.origins[0].id;
+      }
+    }
     (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById('newstep')).show();
   }
   closenewstepModal() {
@@ -127,7 +155,27 @@ export class ViewerComponent implements AfterViewInit, OnInit {
       else {
         alert('Implementation for the type ' + type + ' is missing.');
       }
-    } else {
+    } else if (this.selectedElt.type == 'bpmn:IntermediateCatchEvent') {
+      let type = this.selectedElt.businessObject.eventDefinitions[0].$type;
+
+      if (type == 'bpmn:MessageEventDefinition') {
+        let messageRef = this.selectedElt.businessObject.eventDefinitions[0].messageRef;
+        this.execPlanService.createPostStepInScenario(this.intermediateCatchEventSource, 'MSG', messageRef, 3600);
+      } else if (type == 'bpmn:TimerEventDefinition') {
+        let timer = this.selectedElt.businessObject.eventDefinitions[0].timeDuration.body;
+        this.execPlanService.createPostStepInScenario(this.intermediateCatchEventSource, 'CLOCK', null, timer);
+      } else if (type == 'bpmn:ErrorEventDefinition') {
+        let errorRef = this.selectedElt.businessObject.eventDefinitions[0].errorRef;
+        this.execPlanService.createPostStepInScenario(this.intermediateCatchEventSource, 'BPMN_ERROR', errorRef, 1000);
+      } else if (type == 'bpmn:SignalEventDefinition') {
+        let signalRef = this.selectedElt.businessObject.eventDefinitions[0].signalRef;
+        this.execPlanService.createPostStepInScenario(this.intermediateCatchEventSource, 'SIGNAL', signalRef, 1000);
+      }
+      else {
+        alert('Implementation for the type ' + type + ' is missing.');
+      }
+
+    }  else {
       this.execPlanService.createStepInScenario(this.selectedElt.id);
     }
     this.closenewstepModal();
@@ -168,7 +216,6 @@ export class ViewerComponent implements AfterViewInit, OnInit {
           this.xmlDeps.push(elt.id);
         }
       });
-      console.log(this.execPlanService.executionPlan);
     });
 
     this.toggleAddDep();
