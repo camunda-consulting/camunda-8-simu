@@ -22,8 +22,8 @@
 <div class="row" *ngIf="step.action=='COMPLETE' || step.action=='INCIDENT'">
   <div class="col">
     <div class="input-group mb-3 ">
-      <span class="input-group-text">Completion time</span>
-      <button class="btn btn-outline-primary" (click)="openDurationModal()"><i class="bi bi-pencil"></i> Avg from {{step.duration.startDesiredAvg}} to {{step.duration.startDesiredAvg}}ms (variation {{step.duration.minMaxPercent}}%). Progression {{step.duration.avgProgression}}</button>
+      <span class="input-group-text">Completion time ({{execPlanService.executionPlan!.durationsType}})</span>
+      <button class="btn btn-outline-primary" (click)="openDurationModal()"><i class="bi bi-pencil"></i> Avg from {{step.duration.startDesiredAvg}} to {{step.duration.endDesiredAvg}} (variation {{step.duration.minMaxPercent}}%). Progression {{step.duration.avgProgression}}</button>
     </div>
   </div>
 </div>
@@ -85,12 +85,14 @@
       </div>
       <div class="modal-body">
         <div class="input-group mb-3 ">
-          <span class="input-group-text">Duration avg at start</span>
-          <input type="number" class="form-control" min=0 [(ngModel)]="step.duration.startDesiredAvg">
+          <span class="input-group-text">Duration avg at start ({{execPlanService.executionPlan!.durationsType}})</span>
+          <input type="number" class="form-control" min=0 [(ngModel)]="step.duration.startDesiredAvg" *ngIf="execPlanService.executionPlan!.durationsType!='FEEL'">
+          <input type="text" class="form-control" [(ngModel)]="step.duration.startDesiredAvg" *ngIf="execPlanService.executionPlan!.durationsType==='FEEL'">
         </div>
         <div class="input-group mb-3 ">
-          <span class="input-group-text">Duration avg at end</span>
-          <input type="number" class="form-control" min=0 [(ngModel)]="step.duration.endDesiredAvg">
+          <span class="input-group-text">Duration avg at end ({{execPlanService.executionPlan!.durationsType}})</span>
+          <input type="number" class="form-control" min=0 [(ngModel)]="step.duration.endDesiredAvg" *ngIf="execPlanService.executionPlan!.durationsType!='FEEL'">
+          <input type="text" class="form-control" [(ngModel)]="step.duration.endDesiredAvg" *ngIf="execPlanService.executionPlan!.durationsType==='FEEL'">
         </div>
         <div class="input-group mb-3 ">
           <span class="input-group-text">Percentage variations</span>
@@ -105,7 +107,7 @@
           </select>
         </div>
         <div class="input-group mb-3" *ngIf="step.duration.avgProgression=='LINEAR_SALTED'">
-          <span class="input-group-text">progression salt</span>
+          <span class="input-group-text">progression salt (MS)</span>
           <input type="number" class="form-control" min=0 [(ngModel)]="step.duration.progressionSalt">
         </div>
       </div>

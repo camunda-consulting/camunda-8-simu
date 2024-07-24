@@ -9,6 +9,7 @@ import org.camunda.feel.FeelEngine;
 import org.camunda.feel.FeelEngineClock;
 import org.camunda.feel.impl.SpiServiceLoader;
 import org.camunda.feel.syntaxtree.Val;
+import org.camunda.feel.syntaxtree.ValDayTimeDuration;
 import scala.util.Either;
 
 public class FeelUtils {
@@ -33,8 +34,8 @@ public class FeelUtils {
     estimatedClock = time;
   }
 
-  public static Object evaluate(String expression) {
-    return evaluate(expression, new HashMap<>());
+  public static <T extends Val> T evaluate(String expression, Class<T> expectedType) {
+    return evaluate(expression, new HashMap<>(), expectedType);
   }
 
   public static Object evaluate(String expression, Map<String, Object> context) {
@@ -48,12 +49,16 @@ public class FeelUtils {
     return result.getOrElse(null);
   }
 
-  public static <T extends Val> T evaluate(String expression, Class<T> expectedType) {
-    return evaluate(expression, new HashMap<>(), expectedType);
-  }
-
   public static <T extends Val> T evaluate(
       String expression, Map<String, Object> context, Class<T> expectedType) {
     return (T) evaluate(expression, context);
+  }
+
+  public static ValDayTimeDuration feelDuration(String duration) {
+    // TODO Auto-generated method stub
+    if (duration.startsWith("P")) {
+      duration = "duration(\"" + duration + "\")";
+    }
+    return evaluate(duration, ValDayTimeDuration.class);
   }
 }

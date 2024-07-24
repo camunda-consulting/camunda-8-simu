@@ -15,6 +15,7 @@
   "idleTimeBeforeClockMove" : 300,
   "instanceDistribution" : "DAYS",
   "timePrecision" : "HUNDRED_MILLIS",
+  "durationsType" : "FEEL",
   "scenarii" : [ {
     "name" : "Low branch",
     "dayTimeStart" : 9,

@@ -1,25 +1,25 @@
 package org.example.camunda.dto;
 
 public class StepDuration {
-  private long startDesiredAvg = 8000;
-  private long endDesiredAvg = 4000;
+  private String startDesiredAvg = "PT8S";
+  private String endDesiredAvg = "PT4S";
   private int minMaxPercent = 20;
   private ProgressionEnum avgProgression = ProgressionEnum.LINEAR;
   private long progressionSalt = 1000;
 
-  public long getStartDesiredAvg() {
+  public String getStartDesiredAvg() {
     return startDesiredAvg;
   }
 
-  public void setStartDesiredAvg(long startDesiredAvg) {
+  public void setStartDesiredAvg(String startDesiredAvg) {
     this.startDesiredAvg = startDesiredAvg;
   }
 
-  public long getEndDesiredAvg() {
+  public String getEndDesiredAvg() {
     return endDesiredAvg;
   }
 
-  public void setEndDesiredAvg(long endDesiredAvg) {
+  public void setEndDesiredAvg(String endDesiredAvg) {
     this.endDesiredAvg = endDesiredAvg;
   }
 

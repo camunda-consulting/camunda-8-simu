@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.camunda.feel.syntaxtree.ValDateTime;
+import org.example.camunda.dto.ExecutionPlan;
 import org.example.camunda.dto.InstanceContext;
 import org.example.camunda.dto.InstanceStartTypeEnum;
 import org.example.camunda.dto.ProgressionEnum;
@@ -24,7 +25,7 @@ import org.w3c.dom.Document;
 
 public class ScenarioUtils {
 
-  public static Scenario generateScenario(String xml) {
+  public static Scenario generateScenario(String xml, ExecutionPlan plan) {
     Document doc = BpmnUtils.getXmlDocument(xml);
     List<String> userTaskIds = BpmnUtils.getUserTasksElementsId(doc);
     List<String> serviceTaskIds = BpmnUtils.getServiceTasksElementsId(doc);
@@ -43,8 +44,17 @@ public class ScenarioUtils {
       StepExecPlan step = new StepExecPlan();
       step.setElementId(eltId);
       step.setDuration(new StepDuration());
-      step.getDuration().setStartDesiredAvg(7200000);
-      step.getDuration().setEndDesiredAvg(3600000);
+      if (plan.getDurationsType().equals("FEEL")) {
+        step.getDuration().setStartDesiredAvg("PT2H");
+        step.getDuration().setEndDesiredAvg("PT1H");
+      } else if (plan.getDurationsType().equals("SECONDS")) {
+        step.getDuration().setStartDesiredAvg("7200");
+        step.getDuration().setEndDesiredAvg("3600");
+
+      } else {
+        step.getDuration().setStartDesiredAvg("7200000");
+        step.getDuration().setEndDesiredAvg("3600000");
+      }
       step.getDuration().setAvgProgression(ProgressionEnum.LINEAR_SALTED);
       step.setJsonTemplate(new JsonTemplate());
       result.getSteps().put(eltId, step);
@@ -118,12 +128,23 @@ public class ScenarioUtils {
 
   public static long calculateTaskDuration(StepExecPlan step, String processUniqueId) {
     InstanceContext context = ContextUtils.getContext(processUniqueId);
+    String durationType = ContextUtils.getPlan().getDurationsType();
     StepDuration duration = step.getDuration();
-    long desiredAvg =
-        duration.getStartDesiredAvg()
-            + Math.round(
-                (duration.getEndDesiredAvg() - duration.getStartDesiredAvg())
-                    * context.getProgress());
+    long startAvg = 0;
+    long endAvg = 0;
+
+    if (durationType.equals("FEEL")) {
+      startAvg = FeelUtils.feelDuration(duration.getStartDesiredAvg()).value().toMillis();
+      endAvg = FeelUtils.feelDuration(duration.getEndDesiredAvg()).value().toMillis();
+    } else if (durationType.equals("SECONDS")) {
+      startAvg = Long.valueOf(duration.getStartDesiredAvg()) * 1000;
+      endAvg = Long.valueOf(duration.getEndDesiredAvg()) * 1000;
+    } else {
+      startAvg = Long.valueOf(duration.getStartDesiredAvg());
+      endAvg = Long.valueOf(duration.getEndDesiredAvg());
+    }
+
+    long desiredAvg = startAvg + Math.round((endAvg - startAvg) * context.getProgress());
     if (duration.getAvgProgression() == ProgressionEnum.LINEAR_SALTED) {
       long multiplier = Math.random() < 0.5 ? -1 : 1;
       long salt = Math.round(Math.random() * duration.getProgressionSalt() * multiplier);

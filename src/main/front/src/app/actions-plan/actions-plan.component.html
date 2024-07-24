@@ -41,6 +41,15 @@
       <option value="MINUTES">MINUTES</option>
     </select>
   </div>
+  <div class="input-group mb-3">
+    <span class="input-group-text" id="basic-addon1">Instance distribution</span>
+    <select class="form-select" [ngModel]="execPlanService.executionPlan!.durationsType">
+      <option selected>Choose...</option>
+      <option value="FEEL">FEEL</option>
+      <option value="SECONDS">SECONDS</option>
+      <option value="MILLIS">MILLIS</option>
+    </select>
+  </div>
   <div class="alert alert-info">
     Time precision and instance distribution will impact the realism of the simulation but will negatively impact the simulation performance. Time precision HUNDRED_MILLIS will be more realistic than SECOND (but less efficient). Instance distribution DAYS is more efficient than HOURS (but less realistic)
   </div>

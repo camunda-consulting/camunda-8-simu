@@ -12,6 +12,7 @@
   "idleTimeBeforeClockMove" : 200,
   "instanceDistribution" : "DAYS",
   "timePrecision" : "HUNDRED_MILLIS",
+  "durationsType" : "FEEL",
   "scenarii" : [ {
     "name" : "Green scenario",
     "dayTimeStart" : 9,
@@ -32,14 +33,14 @@
         "elementId" : "ServiceTask_0tixwo5",
         "action" : "COMPLETE",
         "duration" : {
-          "startDesiredAvg" : 8000,
-          "endDesiredAvg" : 4000,
+          "startDesiredAvg" : "PT8S",
+          "endDesiredAvg" : "PT4S",
           "minMaxPercent" : 20,
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000
         },
         "jsonTemplate" : {
-          "template" : "{\"score\":templateUtils.range(96,100)}",
+          "template" : "{\n  \"score\": templateUtils.range(96,100)\n}",
           "exampleContext" : { }
         },
         "postSteps" : null,
@@ -50,8 +51,8 @@
         "elementId" : "SendTask_SendPolicy",
         "action" : "COMPLETE",
         "duration" : {
-          "startDesiredAvg" : 8000,
-          "endDesiredAvg" : 4000,
+          "startDesiredAvg" : "PT8S",
+          "endDesiredAvg" : "PT4S",
           "minMaxPercent" : 20,
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000
@@ -68,8 +69,8 @@
         "elementId" : "ServiceTask_DeliverPolicy",
         "action" : "COMPLETE",
         "duration" : {
-          "startDesiredAvg" : 8000,
-          "endDesiredAvg" : 4000,
+          "startDesiredAvg" : "PT8S",
+          "endDesiredAvg" : "PT4S",
           "minMaxPercent" : 20,
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000
@@ -108,8 +109,8 @@
         "elementId" : "ServiceTask_RejectPolicy",
         "action" : "COMPLETE",
         "duration" : {
-          "startDesiredAvg" : 8000,
-          "endDesiredAvg" : 4000,
+          "startDesiredAvg" : "PT8S",
+          "endDesiredAvg" : "PT4S",
           "minMaxPercent" : 20,
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000
@@ -126,8 +127,8 @@
         "elementId" : "ServiceTask_0tixwo5",
         "action" : "COMPLETE",
         "duration" : {
-          "startDesiredAvg" : 8000,
-          "endDesiredAvg" : 4000,
+          "startDesiredAvg" : "PT8S",
+          "endDesiredAvg" : "PT4S",
           "minMaxPercent" : 20,
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000
@@ -144,8 +145,8 @@
         "elementId" : "SendTask_SendRejection",
         "action" : "COMPLETE",
         "duration" : {
-          "startDesiredAvg" : 8000,
-          "endDesiredAvg" : 4000,
+          "startDesiredAvg" : "PT8S",
+          "endDesiredAvg" : "PT4S",
           "minMaxPercent" : 20,
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000
@@ -182,8 +183,8 @@
         "elementId" : "SendTask_SendPolicy",
         "action" : "COMPLETE",
         "duration" : {
-          "startDesiredAvg" : 8000,
-          "endDesiredAvg" : 4000,
+          "startDesiredAvg" : "PT8S",
+          "endDesiredAvg" : "PT4S",
           "minMaxPercent" : 20,
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000
@@ -200,8 +201,8 @@
         "elementId" : "UserTask_DecideOnApplication",
         "action" : "COMPLETE",
         "duration" : {
-          "startDesiredAvg" : 7200000,
-          "endDesiredAvg" : 3600000,
+          "startDesiredAvg" : "PT2H",
+          "endDesiredAvg" : "PT1H",
           "minMaxPercent" : 20,
           "avgProgression" : "LINEAR_SALTED",
           "progressionSalt" : 1000
@@ -218,8 +219,8 @@
         "elementId" : "ServiceTask_DeliverPolicy",
         "action" : "COMPLETE",
         "duration" : {
-          "startDesiredAvg" : 8000,
-          "endDesiredAvg" : 4000,
+          "startDesiredAvg" : "PT8S",
+          "endDesiredAvg" : "PT4S",
           "minMaxPercent" : 20,
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000
@@ -236,14 +237,14 @@
         "elementId" : "ServiceTask_0tixwo5",
         "action" : "COMPLETE",
         "duration" : {
-          "startDesiredAvg" : 8000,
-          "endDesiredAvg" : 4000,
+          "startDesiredAvg" : "PT8S",
+          "endDesiredAvg" : "PT4S",
           "minMaxPercent" : 20,
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000
         },
         "jsonTemplate" : {
-          "template" : "{\"score\":templateUtils.range(86,95)}",
+          "template" : "{\n  \"score\": templateUtils.range(86,95)\n}",
           "exampleContext" : { }
         },
         "postSteps" : null,
@@ -274,8 +275,8 @@
         "elementId" : "UserTask_DecideOnApplication",
         "action" : "COMPLETE",
         "duration" : {
-          "startDesiredAvg" : 259200000,
-          "endDesiredAvg" : 236000000,
+          "startDesiredAvg" : "P3D",
+          "endDesiredAvg" : "P3D",
           "minMaxPercent" : 0,
           "avgProgression" : "LINEAR_SALTED",
           "progressionSalt" : 43200000
@@ -288,6 +289,7 @@
         "preSteps" : [ {
           "type" : "CLOCK",
           "feelDelay" : "P2D",
+          "signal" : "Signal",
           "msg" : "MSG",
           "msgDelay" : 1000,
           "correlationKey" : null,
@@ -301,8 +303,8 @@
         "elementId" : "ServiceTask_RejectPolicy",
         "action" : "COMPLETE",
         "duration" : {
-          "startDesiredAvg" : 8000,
-          "endDesiredAvg" : 4000,
+          "startDesiredAvg" : "PT8S",
+          "endDesiredAvg" : "PT8S",
           "minMaxPercent" : 20,
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000
@@ -319,8 +321,8 @@
         "elementId" : "ServiceTask_0tixwo5",
         "action" : "COMPLETE",
         "duration" : {
-          "startDesiredAvg" : 8000,
-          "endDesiredAvg" : 4000,
+          "startDesiredAvg" : "PT8S",
+          "endDesiredAvg" : "PT4S",
           "minMaxPercent" : 20,
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000
@@ -337,8 +339,8 @@
         "elementId" : "UserTask_AccelerateDecision",
         "action" : "COMPLETE",
         "duration" : {
-          "startDesiredAvg" : 3600000,
-          "endDesiredAvg" : 3600000,
+          "startDesiredAvg" : "PT1H",
+          "endDesiredAvg" : "PT1H",
           "minMaxPercent" : 20,
           "avgProgression" : "LINEAR_SALTED",
           "progressionSalt" : 300000
@@ -355,8 +357,8 @@
         "elementId" : "SendTask_SendRejection",
         "action" : "COMPLETE",
         "duration" : {
-          "startDesiredAvg" : 8000,
-          "endDesiredAvg" : 4000,
+          "startDesiredAvg" : "PT8S",
+          "endDesiredAvg" : "PT8S",
           "minMaxPercent" : 20,
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000

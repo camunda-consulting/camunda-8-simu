@@ -71,7 +71,7 @@ public class ExecPlanController {
       plan.setDefinition(operateService.getProcessDefinition(bpmnProcessId, version));
       plan.setXml(operateService.getProcessDefinitionXmlByKey(plan.getDefinition().getKey()));
       plan.setXmlDependencies(operateService.getDependencies(plan.getXml()));
-      Scenario s = ScenarioUtils.generateScenario(plan.getXml());
+      Scenario s = ScenarioUtils.generateScenario(plan.getXml(), plan);
       s.setName("Scenario 1");
       plan.getScenarii().add(s);
       execPlanService.save(plan);
@@ -97,7 +97,7 @@ public class ExecPlanController {
       @RequestBody ExecutionPlan plan)
       throws OperateException, IOException {
     ExecutionPlan originalPlan = execPlanService.find(bpmnProcessId, version);
-    Scenario s = ScenarioUtils.generateScenario(originalPlan.getXml());
+    Scenario s = ScenarioUtils.generateScenario(originalPlan.getXml(), originalPlan);
     s.setName("Scenario " + (plan.getScenarii().size() + 1));
     plan.getScenarii().add(s);
     return plan;
@@ -152,7 +152,7 @@ public class ExecPlanController {
     ExecutionPlan plan = new ExecutionPlan();
     plan.setDefinition(def);
     plan.setXml(xml);
-    Scenario s = ScenarioUtils.generateScenario(xml);
+    Scenario s = ScenarioUtils.generateScenario(xml, plan);
     s.setName("Scenario 1");
     plan.getScenarii().add(s);
     return execPlanService.save(plan);

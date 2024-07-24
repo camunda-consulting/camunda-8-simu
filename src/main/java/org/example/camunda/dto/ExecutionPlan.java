@@ -14,6 +14,7 @@ public class ExecutionPlan {
   private Integer idleTimeBeforeClockMove = 300;
   private ChronoUnit instanceDistribution = ChronoUnit.DAYS;
   private TimePrecisionEnum timePrecision = TimePrecisionEnum.HUNDRED_MILLIS;
+  private String durationsType = "FEEL";
   private List<Scenario> scenarii = new ArrayList<>();
 
   public ProcessDefinition getDefinition() {
@@ -70,6 +71,14 @@ public class ExecutionPlan {
 
   public void setTimePrecision(TimePrecisionEnum timePrecision) {
     this.timePrecision = timePrecision;
+  }
+
+  public String getDurationsType() {
+    return durationsType;
+  }
+
+  public void setDurationsType(String durationsType) {
+    this.durationsType = durationsType;
   }
 
   public List<Scenario> getScenarii() {
