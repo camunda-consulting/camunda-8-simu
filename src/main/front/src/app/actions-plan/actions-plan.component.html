@@ -19,11 +19,11 @@
 <div *ngIf="state=='general'" class="tab-pane scrollable">
   <div class="input-group mb-3">
     <span class="input-group-text" id="basic-addon1">Milliseconds Idle time before next clock move</span>
-    <input type="number" class="form-control" [ngModel]="execPlanService.executionPlan!.idleTimeBeforeClockMove">
+    <input type="number" class="form-control" [(ngModel)]="execPlanService.executionPlan!.idleTimeBeforeClockMove">
   </div>
   <div class="input-group mb-3">
     <span class="input-group-text" id="basic-addon1">Time precision</span>
-    <select class="form-select" [ngModel]="execPlanService.executionPlan!.timePrecision">
+    <select class="form-select" [(ngModel)]="execPlanService.executionPlan!.timePrecision">
       <option selected>Choose...</option>
       <option value="SECOND">SECOND</option>
       <option value="HUNDRED_MILLIS">HUNDRED_MILLIS</option>
@@ -33,7 +33,7 @@
   </div>
   <div class="input-group mb-3">
     <span class="input-group-text" id="basic-addon1">Instance distribution</span>
-    <select class="form-select" [ngModel]="execPlanService.executionPlan!.instanceDistribution">
+    <select class="form-select" [(ngModel)]="execPlanService.executionPlan!.instanceDistribution">
       <option selected>Choose...</option>
       <option value="DAYS">DAYS</option>
       <option value="HALF_DAYS">HALF_DAYS</option>
@@ -43,11 +43,20 @@
   </div>
   <div class="input-group mb-3">
     <span class="input-group-text" id="basic-addon1">Duration expression type</span>
-    <select class="form-select" [ngModel]="execPlanService.executionPlan!.durationsType">
+    <select class="form-select" [(ngModel)]="execPlanService.executionPlan!.durationsType">
       <option selected>Choose...</option>
       <option value="FEEL">FEEL</option>
       <option value="SECONDS">SECONDS</option>
       <option value="MILLIS">MILLIS</option>
+    </select>
+  </div>
+  <div class="input-group mb-3">
+    <span class="input-group-text" id="basic-addon1">Steps label</span>
+    <select class="form-select" [(ngModel)]="execPlanService.executionPlan!.stepLabel">
+      <option selected>Choose...</option>
+      <option value="id">id</option>
+      <option value="name">name</option>
+      <option value="idName">id and name</option>
     </select>
   </div>
   <div class="alert alert-info">
@@ -60,7 +69,7 @@
     <div class="d-flex align-items-start">
       <div class="nav flex-column nav-pills me-3" role="tablist">
         <button [ngClass]="execPlanService.currentActivity == 'startInstances' ? 'nav-link active' : 'nav-link'" (click)="execPlanService.selectActivity('startInstances')">Scenario settings</button>
-        <button *ngFor="let step of scenario.steps | keyvalue" [ngClass]="execPlanService.currentActivity == step.key ? 'nav-link active' : 'nav-link'" role="tab" (click)="execPlanService.selectActivity($any(step.key))">{{step.key}}</button>
+        <button *ngFor="let step of scenario.steps | keyvalue" [ngClass]="execPlanService.currentActivity == step.key ? 'nav-link active' : 'nav-link'" role="tab" (click)="execPlanService.selectActivity($any(step.key))"> {{execPlanService.stepLabel(step.key)}}</button>
         <button class="btn btn-outline-warning" (click)="openAddStepModal()"><i class="bi bi-plus-circle"></i> Add step</button>
         <hr />
         <button class="btn btn-danger" (click)="deleteScenario(i)"><i class="bi bi-trash"></i> Delete scenario</button>

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
+import NavigatedViewer from 'camunda-bpmn-js/lib/camunda-cloud/NavigatedViewer';
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +17,11 @@ export class ExecPlanService {
   activitySubject = new BehaviorSubject<string>('');
   activities: any = {};
 
+  managedActivities = ["bpmn:ServiceTask", "bpmn:UserTask", "bpmn:SendTask", "bpmn:IntermediateCatchEvent", "bpmn:BoundaryEvent"];
+
+  isManagedActivity(type: string): boolean {
+    return this.managedActivities.indexOf(type) >= 0;
+  }
   list(): Observable<string[]> {
     return this.http.get<string[]>(environment.backend + "/api/plan");
   }
@@ -27,9 +33,41 @@ export class ExecPlanService {
     return this.activities[id];
   }
 
+  loadXmlActivities(xml: string) {
+    let viewer = new NavigatedViewer();
+    viewer.importXML(xml).then((result: any) => {
+      const eltRegistry: any = viewer!.get('elementRegistry');
+      eltRegistry.forEach((elt: any) => {
+        if (this.isManagedActivity(elt.type)) {
+          this.mapActivityName(elt.di.bpmnElement.id, elt.di.bpmnElement.name);
+        }
+      });
+    });
+  }
+
+  loadActivities() {
+    this.loadXmlActivities(this.executionPlan.xml);
+   
+    if (this.executionPlan.xmlDependencies) {
+      for (const dep in this.executionPlan.xmlDependencies) {
+        this.loadXmlActivities(this.executionPlan.xmlDependencies[dep]);
+      }
+    }
+  }
+
+  stepLabel(id: any): string {
+    if (this.executionPlan.stepLabel == 'id') {
+      return id;
+    } else if (this.executionPlan.stepLabel == 'name') {
+      return this.getActivityName(id);
+    }
+    return this.getActivityName(id) + ' ('+ id + ')';
+  }
+
   createExecutionPlan(xml: string): void {
     this.http.post<any>(environment.backend + "/api/plan", xml).subscribe((response: any) => {
       this.executionPlan = response;
+      this.loadActivities();
       this.selectScenario(response.scenarii[0]);
     });
   }
@@ -37,6 +75,7 @@ export class ExecPlanService {
   openExecutionPlan(definition: any): void {
     this.http.get<any>(environment.backend + "/api/plan/" + definition.bpmnProcessId + "/" + definition.version).subscribe((response: any) => {
       this.executionPlan = response;
+      this.loadActivities();
       this.selectScenario(response.scenarii[0]);
     });
   }

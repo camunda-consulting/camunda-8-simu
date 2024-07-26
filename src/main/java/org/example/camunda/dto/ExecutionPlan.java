@@ -16,6 +16,7 @@ public class ExecutionPlan {
   private TimePrecisionEnum timePrecision = TimePrecisionEnum.HUNDRED_MILLIS;
   private String durationsType = "FEEL";
   private List<Scenario> scenarii = new ArrayList<>();
+  private String stepLabel = "id";
 
   public ProcessDefinition getDefinition() {
     return definition;
@@ -87,5 +88,13 @@ public class ExecutionPlan {
 
   public void setScenarii(List<Scenario> scenarii) {
     this.scenarii = scenarii;
+  }
+
+  public String getStepLabel() {
+    return stepLabel;
+  }
+
+  public void setStepLabel(String stepLabel) {
+    this.stepLabel = stepLabel;
   }
 }

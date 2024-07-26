@@ -9,8 +9,7 @@ import { ExecPlanService } from '../services/exec-plan.service';
   styleUrls: ['./viewer.component.css']
 })
 export class ViewerComponent implements AfterViewInit, OnInit {
-  managedActivities = ["bpmn:ServiceTask", "bpmn:UserTask", "bpmn:SendTask", "bpmn:IntermediateCatchEvent", "bpmn:BoundaryEvent"];
-
+ 
   @ViewChild('viewer') viewerElt: ElementRef | undefined;
   viewer: NavigatedViewer | undefined;
   previousActivity?: string;
@@ -37,9 +36,9 @@ export class ViewerComponent implements AfterViewInit, OnInit {
         }
         const eltRegistry: any = this.viewer!.get('elementRegistry');
         eltRegistry.forEach((elt: any) => {
-          if (this.managedActivities.indexOf(elt.type) >= 0) {
+          if (this.execPlanService.isManagedActivity(elt.type)) {
             console.log(elt.di.bpmnElement.name);
-            this.execPlanService.mapActivityName(elt.di.bpmnElement.id, elt.di.bpmnElement.name);
+
             if (stepScenar.indexOf(elt.id) < 0) {
               this.colorActivity(elt.id, "#000000");
             }
@@ -88,7 +87,7 @@ export class ViewerComponent implements AfterViewInit, OnInit {
 
   selectActivity = (event: any) => {
     this.selectedElt = event.element;
-    if (this.managedActivities.indexOf(this.selectedElt.type) >= 0 && !this.execPlanService.scenario.steps[event.element.id]) {
+    if (this.execPlanService.isManagedActivity(this.selectedElt.type) && !this.execPlanService.scenario.steps[event.element.id]) {
       this.opennewstepModal();
     } else {
       this.execPlanService.selectActivity(this.selectedElt.id);

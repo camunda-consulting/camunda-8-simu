@@ -288,7 +288,12 @@
         "postSteps" : null,
         "preSteps" : [ {
           "type" : "CLOCK",
-          "delay" : "P2D"
+          "delay" : "P2D",
+          "signal" : "Signal",
+          "msg" : "MSG",
+          "correlationKey" : null,
+          "jsonTemplate" : null,
+          "errorCode" : null
         } ],
         "incident" : null
       },
@@ -369,5 +374,6 @@
       "template" : "{\n  \"applicationNumber\": templateUtils.generateUUID(\"A-\"),\n  \"applicant\": {\n    \"name\": templateUtils.getFrom(\"firstname\"),\n    \"email\": templateUtils.getFrom(\"firstname\", null, \"@gmail.com\"),\n    \"birthday\": \"1984-11-24 13:12:00.000+00:00\",\n    \"age\": 38\n  },\n  \"employment\": \"Freelancer\",\n  \"category\": \"Basic Package\"\n}",
       "exampleContext" : { }
     }
-  } ]
+  } ],
+  "stepLabel" : "name"
 }

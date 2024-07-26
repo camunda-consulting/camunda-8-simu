@@ -306,5 +306,6 @@
       "template" : "{\n  \"input\": \"automatic\",\n  \"businessKey\": templateUtils.generateUUID(\"A-\")\n}",
       "exampleContext" : { }
     }
-  } ]
+  } ],
+  "stepLabel" : "name"
 }
