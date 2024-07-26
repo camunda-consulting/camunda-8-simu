@@ -208,16 +208,16 @@ export class ViewerComponent implements AfterViewInit, OnInit {
   addDep(): void {
     let xml = this.newDepXml!;
     this.viewer!.importXML(xml).then((result: any) => {
-      const eltRegistry: any = this.viewer!.get('elementRegistry');
-      eltRegistry.forEach((elt: any) => {
-        if (elt.type == "bpmn:Process") {
-          if (!this.execPlanService.executionPlan.xmlDependencies || this.execPlanService.executionPlan.xmlDependencies==null) {
+      let roots: any[] = this.viewer?.getDefinitions().rootElements;
+      for (let elt of roots) {
+        if (elt.$type == "bpmn:Process") {
+          if (!this.execPlanService.executionPlan.xmlDependencies || this.execPlanService.executionPlan.xmlDependencies == null) {
             this.execPlanService.executionPlan.xmlDependencies = {};
           }
           this.execPlanService.executionPlan.xmlDependencies[elt.id] = xml;
           this.xmlDeps.push(elt.id);
         }
-      });
+      }
     });
 
     this.toggleAddDep();
