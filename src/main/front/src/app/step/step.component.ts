@@ -34,15 +34,15 @@ export class StepComponent implements AfterViewInit, OnInit {
 
   displayAdditionalStep(step: any): string {
     if (step.type == 'CLOCK') {
-      return 'CLOCK at ' + step.feelDelay;
+      return 'CLOCK at ' + step.delay;
     }
     if (step.type == 'MSG') {
-      return 'Publish ' + step.msg + ' after ' + step.msgDelay + 'ms';
+      return 'Publish ' + step.msg + ' after ' + step.delay + '(' + this.execPlanService.executionPlan!.durationsType + ')';
     }
     if (step.type == 'SIGNAL') {
-      return 'Broadcast ' + step.signal + ' after ' + step.msgDelay + 'ms';
+      return 'Broadcast ' + step.signal + ' after ' + step.delay + '(' + this.execPlanService.executionPlan!.durationsType + ')';
     }
-    return 'Error ' + step.errorCode + ' after ' + step.errorDelay + 'ms';
+    return 'Error ' + step.errorCode + ' after ' + step.delay + '(' + this.execPlanService.executionPlan!.durationsType + ')';
   }
 
   updatePreStep = EditorView.updateListener.of((v) => {
@@ -76,7 +76,7 @@ export class StepComponent implements AfterViewInit, OnInit {
   }
 
   addPreStep() {
-    this.prestep = { "type": "CLOCK", "feelDelay": "PT5M", "jsonTemplate": {"template": "", "exampleContext": {}}};
+    this.prestep = { "type": "CLOCK", "feelDelay": "PT5M", "jsonTemplate": { "template": "", "exampleContext": {} } };
     if (!this.step.preSteps) {
       this.step.preSteps = [];
     }

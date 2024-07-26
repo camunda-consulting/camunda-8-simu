@@ -147,10 +147,10 @@ export class ViewerComponent implements AfterViewInit, OnInit {
         this.execPlanService.createPreStepInScenario(parentStep, 'CLOCK', null, timer);
       } else if (type == 'bpmn:ErrorEventDefinition') {
         let errorRef = this.selectedElt.businessObject.eventDefinitions[0].errorRef;
-        this.execPlanService.createPreStepInScenario(parentStep, 'BPMN_ERROR', errorRef, 1000);
+        this.execPlanService.createPreStepInScenario(parentStep, 'BPMN_ERROR', errorRef, 1);
       } else if (type == 'bpmn:SignalEventDefinition') {
         let signalRef = this.selectedElt.businessObject.eventDefinitions[0].signalRef;
-        this.execPlanService.createPreStepInScenario(parentStep, 'SIGNAL', signalRef, 1000);
+        this.execPlanService.createPreStepInScenario(parentStep, 'SIGNAL', signalRef, 1);
       }
       else {
         alert('Implementation for the type ' + type + ' is missing.');
@@ -166,10 +166,10 @@ export class ViewerComponent implements AfterViewInit, OnInit {
         this.execPlanService.createPostStepInScenario(this.intermediateCatchEventSource, 'CLOCK', null, timer);
       } else if (type == 'bpmn:ErrorEventDefinition') {
         let errorRef = this.selectedElt.businessObject.eventDefinitions[0].errorRef;
-        this.execPlanService.createPostStepInScenario(this.intermediateCatchEventSource, 'BPMN_ERROR', errorRef, 1000);
+        this.execPlanService.createPostStepInScenario(this.intermediateCatchEventSource, 'BPMN_ERROR', errorRef, 1);
       } else if (type == 'bpmn:SignalEventDefinition') {
         let signalRef = this.selectedElt.businessObject.eventDefinitions[0].signalRef;
-        this.execPlanService.createPostStepInScenario(this.intermediateCatchEventSource, 'SIGNAL', signalRef, 1000);
+        this.execPlanService.createPostStepInScenario(this.intermediateCatchEventSource, 'SIGNAL', signalRef, 1);
       }
       else {
         alert('Implementation for the type ' + type + ' is missing.');

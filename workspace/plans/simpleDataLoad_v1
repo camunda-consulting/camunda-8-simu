@@ -22,35 +22,40 @@
     "dayTimeEnd" : 18,
     "firstDayFeelExpression" : "now() - duration(\"P1M\")",
     "lastDayFeelExpression" : "now()",
+    "evolution" : {
+      "type" : "linear",
+      "min" : 2,
+      "max" : 20,
+      "decreasing" : false
+    },
     "startType" : "MSG",
     "startMsgName" : "MSG_START",
-    "evolution" : {
-    "type": "linear",
-    "min": 2,
-    "max": 20,
-    "decreasing": false
-    },
     "steps" : {
       "Activity_00mbrcd" : {
         "elementId" : "Activity_00mbrcd",
         "action" : "COMPLETE",
         "duration" : {
-          "startDesiredAvg" : 7200000,
-          "endDesiredAvg" : 3600000,
+          "startDesiredAvg" : "7200000",
+          "endDesiredAvg" : "3600000",
           "minMaxPercent" : 20,
           "avgProgression" : "LINEAR_SALTED",
           "progressionSalt" : 1000
         },
-        "jsonTemplate" : {"exampleContext":{}, "template" : "{}"},
+        "jsonTemplate" : {
+          "template" : "{}",
+          "exampleContext" : { }
+        },
         "postSteps" : [ {
           "type" : "MSG",
-          "feelDelay" : "PT5M",
+          "delay" : "PT1H",
+          "signal" : "Signal",
           "msg" : "MSG_WAIT",
-          "msgDelay" : 360000,
           "correlationKey" : "businessKey",
-          "jsonTemplate" : {"exampleContext":{}, "template" : "{}"},
-          "errorCode" : null,
-          "errorDelay" : 1000
+          "jsonTemplate" : {
+            "template" : "{}",
+            "exampleContext" : { }
+          },
+          "errorCode" : null
         } ],
         "preSteps" : null,
         "incident" : null
@@ -59,13 +64,16 @@
         "elementId" : "Activity_18tntd1",
         "action" : "COMPLETE",
         "duration" : {
-          "startDesiredAvg" : 8000,
-          "endDesiredAvg" : 4000,
+          "startDesiredAvg" : "8000",
+          "endDesiredAvg" : "4000",
           "minMaxPercent" : 0,
           "avgProgression" : "LINEAR",
           "progressionSalt" : 0
         },
-        "jsonTemplate" : {"exampleContext":{}, "template" : "{}"},
+        "jsonTemplate" : {
+          "template" : "{}",
+          "exampleContext" : { }
+        },
         "postSteps" : null,
         "preSteps" : null,
         "incident" : null
@@ -74,13 +82,16 @@
         "elementId" : "Activity_0io9qnw",
         "action" : "COMPLETE",
         "duration" : {
-          "startDesiredAvg" : 8000,
-          "endDesiredAvg" : 4000,
+          "startDesiredAvg" : "8000",
+          "endDesiredAvg" : "4000",
           "minMaxPercent" : 0,
           "avgProgression" : "LINEAR",
           "progressionSalt" : 0
         },
-        "jsonTemplate" : {"exampleContext":{}, "template" : "{}"},
+        "jsonTemplate" : {
+          "template" : "{}",
+          "exampleContext" : { }
+        },
         "postSteps" : null,
         "preSteps" : null,
         "incident" : null
@@ -89,13 +100,16 @@
         "elementId" : "Activity_13vp1p6",
         "action" : "COMPLETE",
         "duration" : {
-          "startDesiredAvg" : 8000,
-          "endDesiredAvg" : 4000,
+          "startDesiredAvg" : "8000",
+          "endDesiredAvg" : "4000",
           "minMaxPercent" : 0,
           "avgProgression" : "LINEAR",
           "progressionSalt" : 0
         },
-        "jsonTemplate" : {"exampleContext":{}, "template" : "{}"},
+        "jsonTemplate" : {
+          "template" : "{}",
+          "exampleContext" : { }
+        },
         "postSteps" : null,
         "preSteps" : null,
         "incident" : null
@@ -104,54 +118,62 @@
         "elementId" : "Activity_15z22gq",
         "action" : "COMPLETE",
         "duration" : {
-          "startDesiredAvg" : 8000,
-          "endDesiredAvg" : 4000,
+          "startDesiredAvg" : "8000",
+          "endDesiredAvg" : "4000",
           "minMaxPercent" : 0,
           "avgProgression" : "LINEAR",
           "progressionSalt" : 0
         },
-        "jsonTemplate" : {"exampleContext":{}, "template" : "{}"},
+        "jsonTemplate" : {
+          "template" : "{}",
+          "exampleContext" : { }
+        },
         "postSteps" : null,
         "preSteps" : null,
         "incident" : null
       }
     },
-    "jsonTemplate" : {"exampleContext":{}, "template" : "{\n  \"input\": \"manual\",\n  \"businessKey\": templateUtils.generateUUID(\"A-\")\n}"}
+    "jsonTemplate" : {
+      "template" : "{\n  \"input\": \"manual\",\n  \"businessKey\": templateUtils.generateUUID(\"A-\")\n}",
+      "exampleContext" : { }
+    }
   }, {
     "name" : "High branch",
     "dayTimeStart" : 9,
     "dayTimeEnd" : 18,
     "firstDayFeelExpression" : "now() - duration(\"P1M\")",
     "lastDayFeelExpression" : "now() - duration(\"P2D\")",
+    "evolution" : {
+      "type" : "linear",
+      "min" : 4,
+      "max" : 20,
+      "decreasing" : false
+    },
     "startType" : "START",
     "startMsgName" : null,
-    "evolution" : {
-    "type": "linear",
-    "min": 4,
-    "max": 20,
-    "decreasing": false
-    },
     "steps" : {
       "Activity_0rb9s4p" : {
         "elementId" : "Activity_0rb9s4p",
         "action" : "COMPLETE",
         "duration" : {
-          "startDesiredAvg" : 8000,
-          "endDesiredAvg" : 4000,
+          "startDesiredAvg" : "PT8S",
+          "endDesiredAvg" : "PT4S",
           "minMaxPercent" : 20,
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000
         },
-        "jsonTemplate" : {"exampleContext":{}, "template" : "{}"},
+        "jsonTemplate" : {
+          "template" : "{}",
+          "exampleContext" : { }
+        },
         "postSteps" : [ {
           "type" : "CLOCK",
-          "feelDelay" : "P1D",
+          "delay" : "P1D",
+          "signal" : "Signal",
           "msg" : "MSG",
-          "msgDelay" : 1000,
           "correlationKey" : null,
-          "jsonTemplate" : {"exampleContext":{}, "template" : "{}"},
-          "errorCode" : null,
-          "errorDelay" : 1000
+          "jsonTemplate" : null,
+          "errorCode" : null
         } ],
         "preSteps" : null,
         "incident" : null
@@ -160,86 +182,103 @@
         "elementId" : "Activity_0dpkze6",
         "action" : "COMPLETE",
         "duration" : {
-          "startDesiredAvg" : 8000,
-          "endDesiredAvg" : 4000,
+          "startDesiredAvg" : "PT8S",
+          "endDesiredAvg" : "PT4S",
           "minMaxPercent" : 20,
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000
         },
-        "jsonTemplate" : {"exampleContext":{}, "template" : "{}"},
+        "jsonTemplate" : {
+          "template" : "{}",
+          "exampleContext" : { }
+        },
         "postSteps" : null,
         "preSteps" : null,
         "incident" : null
       }
     },
-    "jsonTemplate" : {"exampleContext":{}, "template" : "{\n  \"input\": \"automatic\",\n  \"businessKey\": templateUtils.generateUUID(\"A-\")\n}"}
+    "jsonTemplate" : {
+      "template" : "{\n  \"input\": \"automatic\",\n  \"businessKey\": templateUtils.generateUUID(\"A-\")\n}",
+      "exampleContext" : { }
+    }
   }, {
     "name" : "Error scenario",
     "dayTimeStart" : 9,
     "dayTimeEnd" : 18,
     "firstDayFeelExpression" : "now() - duration(\"P15D\")",
     "lastDayFeelExpression" : "now()",
+    "evolution" : {
+      "type" : "linear",
+      "min" : 2,
+      "max" : 2,
+      "decreasing" : false
+    },
     "startType" : "START",
     "startMsgName" : null,
-    "evolution" : {
-    "type": "linear",
-    "min": 2,
-    "max": 2,
-    "decreasing": false
-    },
     "steps" : {
       "Activity_0rb9s4p" : {
         "elementId" : "Activity_0rb9s4p",
         "action" : "DO_NOTHING",
         "duration" : {
-          "startDesiredAvg" : 8000,
-          "endDesiredAvg" : 4000,
+          "startDesiredAvg" : "8000",
+          "endDesiredAvg" : "4000",
           "minMaxPercent" : 20,
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000
         },
-        "jsonTemplate" : {"exampleContext":{}, "template" : "{}"},
+        "jsonTemplate" : {
+          "template" : "{}",
+          "exampleContext" : { }
+        },
         "postSteps" : null,
         "preSteps" : [ {
           "type" : "BPMN_ERROR",
-          "feelDelay" : "PT5M",
+          "delay" : "PT1S",
+          "signal" : "Signal",
           "msg" : "MSG",
-          "msgDelay" : 1000,
           "correlationKey" : null,
-          "jsonTemplate" : {"exampleContext":{}, "template" : "{}"},
-          "errorCode" : "404",
-          "errorDelay" : 1000
+          "jsonTemplate" : {
+            "template" : "{}",
+            "exampleContext" : { }
+          },
+          "errorCode" : "404"
         } ],
         "incident" : null
       }
     },
-    "jsonTemplate" : {"exampleContext":{}, "template" : "{\n  \"input\": \"automatic\",\n  \"businessKey\": templateUtils.generateUUID(\"A-\")\n}"}
+    "jsonTemplate" : {
+      "template" : "{\n  \"input\": \"automatic\",\n  \"businessKey\": templateUtils.generateUUID(\"A-\")\n}",
+      "exampleContext" : { }
+    }
   }, {
     "name" : "Incident",
     "dayTimeStart" : 9,
     "dayTimeEnd" : 18,
     "firstDayFeelExpression" : "now() - duration(\"P1M\")",
     "lastDayFeelExpression" : "now()- duration(\"P10D\")",
+    "evolution" : {
+      "type" : "linear",
+      "min" : 10,
+      "max" : 1,
+      "decreasing" : true
+    },
     "startType" : "START",
     "startMsgName" : null,
-    "evolution" : {
-    "type": "linear",
-    "min": 10,
-    "max": 1,
-    "decreasing": true
-    },
     "steps" : {
       "Activity_0rb9s4p" : {
         "elementId" : "Activity_0rb9s4p",
         "action" : "COMPLETE",
         "duration" : {
-          "startDesiredAvg" : 8000,
-          "endDesiredAvg" : 4000,
+          "startDesiredAvg" : "PT8S",
+          "endDesiredAvg" : "PT5S",
           "minMaxPercent" : 20,
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000
         },
-        "jsonTemplate" : {"exampleContext":{}, "template" : "{}"},
+        "jsonTemplate" : {
+          "template" : "{}",
+          "exampleContext" : { }
+        },
         "postSteps" : null,
         "preSteps" : null,
         "incident" : null
@@ -248,18 +287,24 @@
         "elementId" : "Activity_0dpkze6",
         "action" : "INCIDENT",
         "duration" : {
-          "startDesiredAvg" : 1000,
-          "endDesiredAvg" : 1000,
+          "startDesiredAvg" : "PT1S",
+          "endDesiredAvg" : "PT1S",
           "minMaxPercent" : 20,
           "avgProgression" : "LINEAR",
           "progressionSalt" : 1000
         },
-        "jsonTemplate" : {"exampleContext":{}, "template" : "{}"},
+        "jsonTemplate" : {
+          "template" : "{}",
+          "exampleContext" : { }
+        },
         "postSteps" : null,
         "preSteps" : null,
         "incident" : "OUT_OF_BOUND"
       }
     },
-    "jsonTemplate" : {"exampleContext":{}, "template" : "{\n  \"input\": \"automatic\",\n  \"businessKey\": templateUtils.generateUUID(\"A-\")\n}"}
+    "jsonTemplate" : {
+      "template" : "{\n  \"input\": \"automatic\",\n  \"businessKey\": templateUtils.generateUUID(\"A-\")\n}",
+      "exampleContext" : { }
+    }
   } ]
 }

@@ -5,6 +5,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.camunda.feel.FeelEngine;
 import org.camunda.feel.FeelEngineClock;
 import org.camunda.feel.impl.SpiServiceLoader;
@@ -54,11 +55,14 @@ public class FeelUtils {
     return (T) evaluate(expression, context);
   }
 
-  public static ValDayTimeDuration feelDuration(String duration) {
-    // TODO Auto-generated method stub
+  public static Long feelDurationToMillis(String duration) {
+    if (NumberUtils.isCreatable(duration)) {
+      // expression is in millis
+      return Long.valueOf(duration);
+    }
     if (duration.startsWith("P")) {
       duration = "duration(\"" + duration + "\")";
     }
-    return evaluate(duration, ValDayTimeDuration.class);
+    return evaluate(duration, ValDayTimeDuration.class).value().toMillis();
   }
 }

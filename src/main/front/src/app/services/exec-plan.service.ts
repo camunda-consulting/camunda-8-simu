@@ -100,13 +100,23 @@ export class ExecPlanService {
     this.scenario = scenario;
     this.selectActivity('startInstances');
   }
+
+  createDuration(seconds: number) {
+    if (this.executionPlan.durationsType == 'FEEL') {
+      return "PT" + seconds+ "S";
+    } else if (this.executionPlan.durationsType == 'MILLIS') {
+      return seconds*1000;
+    }
+    return seconds;
+  }
+
   createStepInScenario(elementId: string): void {
     this.scenario.steps[elementId] = {
       "elementId": elementId,
       "action": "COMPLETE",
       "duration": {
-        "startDesiredAvg": 8000,
-        "endDesiredAvg": 4000,
+        "startDesiredAvg": this.createDuration(8),
+        "endDesiredAvg": this.createDuration(4),
         "minMaxPercent": 0,
         "avgProgression": "LINEAR",
         "progressionSalt": 0
@@ -117,15 +127,20 @@ export class ExecPlanService {
     };
     this.selectActivity(elementId);
   }
-
-  createPreStepInScenario(parentStep: string, type: string, elementRef: any, time: number): void {
+  isNumber(value: any) {
+  return typeof value === 'number';
+}
+  createPreStepInScenario(parentStep: string, type: string, elementRef: any, time: any): void {
+    if (this.isNumber(time)) {
+      time = this.createDuration(time);
+    }
     if (!this.scenario.steps[parentStep]) {
       this.scenario.steps[parentStep] = {
         "elementId": parentStep,
         "action": "DO_NOTHING",
         "duration": {
-          "startDesiredAvg": 1000,
-          "endDesiredAvg": 1000,
+          "startDesiredAvg": this.createDuration(1),
+          "endDesiredAvg": this.createDuration(1),
           "minMaxPercent": 0,
           "avgProgression": "LINEAR",
           "progressionSalt": 0
@@ -141,7 +156,7 @@ export class ExecPlanService {
     if (type == 'MSG') {
       this.scenario.steps[parentStep].preSteps.push({
         "type": type,
-        "msgDelay": time,
+        "delay": time,
         "msg": elementRef.name,
         "correlationKey": elementRef.extensionElements.valueOf("correlationKey").values[0].correlationKey.replace("=", "").trim(),
         "jsonTemplate": {
@@ -151,13 +166,13 @@ export class ExecPlanService {
     } else if (type == 'CLOCK') {
       this.scenario.steps[parentStep].preSteps.push({
         "type": type,
-        "feelDelay": time
+        "delay": time
       });
     } else if (type == 'BPMN_ERROR') {
       this.scenario.steps[parentStep].preSteps.push({
         "type": type,
         "errorCode": elementRef.errorCode,
-        "errorDelay": time,
+        "delay": time,
         "jsonTemplate": {
           template: "{}", exampleContext: {}
         }
@@ -166,7 +181,7 @@ export class ExecPlanService {
       this.scenario.steps[parentStep].preSteps.push({
         "type": type,
         "signal": elementRef.name,
-        "msgDelay": time,
+        "delay": time,
         "jsonTemplate": {
           template: "{}", exampleContext: {}
         }
@@ -175,7 +190,10 @@ export class ExecPlanService {
     this.selectActivity(parentStep);
   }
 
-  createPostStepInScenario(parentStep: string, type: string, elementRef: any, time: number): void {
+  createPostStepInScenario(parentStep: string, type: string, elementRef: any, time: any): void {
+    if (this.isNumber(time)) {
+      time = this.createDuration(time);
+    }
     if (!this.scenario.steps[parentStep]) {
       this.scenario.steps[parentStep] = {
         "elementId": parentStep,
@@ -198,7 +216,7 @@ export class ExecPlanService {
     if (type == 'MSG') {
       this.scenario.steps[parentStep].postSteps.push({
         "type": type,
-        "msgDelay": time,
+        "delay": time,
         "msg": elementRef.name,
         "correlationKey": elementRef.extensionElements.valueOf("correlationKey").values[0].correlationKey.replace("=", "").trim(),
         "jsonTemplate": {
@@ -208,13 +226,13 @@ export class ExecPlanService {
     } else if (type == 'CLOCK') {
       this.scenario.steps[parentStep].postSteps.push({
         "type": type,
-        "feelDelay": time
+        "delay": time
       });
     } else if (type == 'BPMN_ERROR') {
       this.scenario.steps[parentStep].postSteps.push({
         "type": type,
         "errorCode": elementRef.errorCode,
-        "errorDelay": time,
+        "delay": time,
         "jsonTemplate": {
           template: "{}", exampleContext: {}
         }
@@ -223,7 +241,7 @@ export class ExecPlanService {
       this.scenario.steps[parentStep].postSteps.push({
         "type": type,
         "signal": elementRef.name,
-        "msgDelay": time,
+        "delay": time,
         "jsonTemplate": {
           template: "{}", exampleContext: {}
         }

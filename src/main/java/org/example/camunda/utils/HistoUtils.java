@@ -113,7 +113,8 @@ public class HistoUtils {
         int indexSep = after.indexOf("_");
         Integer doc = Integer.valueOf(after.substring(0, indexSep));
         Float score = Float.valueOf(after.substring(indexSep + 1));
-        topDocs = searcher.searchAfter(new ScoreDoc(doc, score), luceneQuery, pageSize);
+        topDocs =
+            searcher.searchAfter(new ScoreDoc(doc, score.floatValue()), luceneQuery, pageSize);
       } else {
         topDocs = searcher.search(luceneQuery, pageSize);
       }

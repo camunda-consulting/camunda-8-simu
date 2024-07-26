@@ -126,23 +126,22 @@ public class ScenarioUtils {
     return evol.getMin() + Math.round(difference * x) + salt * multiplier;
   }
 
+  public static long durationToMillis(String duration) {
+    String durationType = ContextUtils.getPlan().getDurationsType();
+    if (duration.startsWith("P") || durationType.equals("FEEL")) {
+      return FeelUtils.feelDurationToMillis(duration);
+    } else if (durationType.equals("SECONDS")) {
+      return Long.valueOf(duration) * 1000;
+    }
+    return Long.valueOf(duration);
+  }
+
   public static long calculateTaskDuration(StepExecPlan step, String processUniqueId) {
     InstanceContext context = ContextUtils.getContext(processUniqueId);
-    String durationType = ContextUtils.getPlan().getDurationsType();
     StepDuration duration = step.getDuration();
-    long startAvg = 0;
-    long endAvg = 0;
 
-    if (durationType.equals("FEEL")) {
-      startAvg = FeelUtils.feelDuration(duration.getStartDesiredAvg()).value().toMillis();
-      endAvg = FeelUtils.feelDuration(duration.getEndDesiredAvg()).value().toMillis();
-    } else if (durationType.equals("SECONDS")) {
-      startAvg = Long.valueOf(duration.getStartDesiredAvg()) * 1000;
-      endAvg = Long.valueOf(duration.getEndDesiredAvg()) * 1000;
-    } else {
-      startAvg = Long.valueOf(duration.getStartDesiredAvg());
-      endAvg = Long.valueOf(duration.getEndDesiredAvg());
-    }
+    long startAvg = durationToMillis(duration.getStartDesiredAvg());
+    long endAvg = durationToMillis(duration.getEndDesiredAvg());
 
     long desiredAvg = startAvg + Math.round((endAvg - startAvg) * context.getProgress());
     if (duration.getAvgProgression() == ProgressionEnum.LINEAR_SALTED) {

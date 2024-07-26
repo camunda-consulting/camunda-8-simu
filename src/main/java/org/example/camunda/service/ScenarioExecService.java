@@ -137,11 +137,12 @@ public class ScenarioExecService {
   public void addAdditionalStep(
       Long baseDate, ActivatedJob job, StepAdditionalAction step, InstanceContext context) {
     Map<String, Object> variables = job.getVariablesAsMap();
+    Long dateTarget = baseDate + ScenarioUtils.durationToMillis(step.getDelay());
     if (step.getType() == StepActionEnum.CLOCK) {
-      ContextUtils.buildEntry(ScenarioUtils.getEstimatedTime(baseDate, step.getFeelDelay()));
+      ContextUtils.buildEntry(dateTarget);
     } else if (step.getType() == StepActionEnum.MSG) {
       ContextUtils.addAction(
-          baseDate + step.getMsgDelay(),
+          dateTarget,
           new MessageAction(
               step.getMsg(),
               (String) variables.get(step.getCorrelationKey()),
@@ -150,7 +151,7 @@ public class ScenarioExecService {
               zeebeService));
     } else if (step.getType() == StepActionEnum.SIGNAL) {
       ContextUtils.addAction(
-          baseDate + step.getMsgDelay(),
+          dateTarget,
           new SignalAction(
               step.getSignal(),
               step.getJsonTemplate().getTemplate(),
@@ -158,7 +159,7 @@ public class ScenarioExecService {
               zeebeService));
     } else if (step.getType() == StepActionEnum.BPMN_ERROR) {
       ContextUtils.addAction(
-          baseDate + step.getErrorDelay(),
+          dateTarget,
           new BpmnErrorAction(
               step.getErrorCode(),
               job.getKey(),

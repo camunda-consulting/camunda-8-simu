@@ -288,14 +288,7 @@
         "postSteps" : null,
         "preSteps" : [ {
           "type" : "CLOCK",
-          "feelDelay" : "P2D",
-          "signal" : "Signal",
-          "msg" : "MSG",
-          "msgDelay" : 1000,
-          "correlationKey" : null,
-          "jsonTemplate" : null,
-          "errorCode" : null,
-          "errorDelay" : 1000
+          "delay" : "P2D"
         } ],
         "incident" : null
       },
