@@ -52,7 +52,7 @@ public class ScenarioExecService {
       deploy(plan.getDefinition().getName() + ".bpmn", plan.getXml());
       if (plan.getXmlDependencies() != null) {
         for (String dep : plan.getXmlDependencies().keySet()) {
-          deploy(dep, plan.getXmlDependencies().get(dep));
+          deploy(dep + ".bpmn", plan.getXmlDependencies().get(dep));
         }
       }
     }
