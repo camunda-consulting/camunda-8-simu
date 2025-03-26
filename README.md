@@ -40,16 +40,3 @@ make buildall
 ```
 make runjava
 ```
-Just pay attention to the configurations to connect to Operate and Zeebe in the [application.yaml](src/main/resources/application.yaml) file.
-
-You can connect it to any Self-Managed cluster. Just pay attention to :
-- add the configuration ZEEBE_CLOCK_CONTROLLED=true in Zeebe
-- Create the client/secret that allows the Simulation application to speak with Operate (from Identity UI or from configs):
-```
-KEYCLOAK_CLIENTS_1_NAME: dataloader
-KEYCLOAK_CLIENTS_1_ID: dataloader
-KEYCLOAK_CLIENTS_1_SECRET: Tcx9kFqVwxlnWMZOhjYCemnLvBr1Gvs3
-KEYCLOAK_CLIENTS_1_TYPE: M2M
-KEYCLOAK_CLIENTS_1_PERMISSIONS_0_RESOURCE_SERVER_ID: operate-api
-KEYCLOAK_CLIENTS_1_PERMISSIONS_0_DEFINITION: read:*
-```
