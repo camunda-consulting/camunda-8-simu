@@ -7,7 +7,9 @@
 
 This project is made to populate data into a C8 installation to provide meaningfull data in Optimize, Operate and Tasklist.
 
-:information_source: This is a draft project. It's **not production ready** and you should not use it in production.
+:information_source: This is a draft project. It's **not production ready** and you use it at your own risks.
+
+:information_source: Elasticsearch indexes are created with the events dates but the ILM is cleaning data based on real index creation date. If you create instances older than a month, it will lead to a number of shards exceeding the default 1000 shards limits in ES. And you data will not be loaded in Optimize, Operate or Tasklist.
 
 ## Repository content
 
