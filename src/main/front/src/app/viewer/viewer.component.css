@@ -2,3 +2,56 @@
   position:absolute;
   bottom:0px;
 }
+
+.hidden {
+  display:none;
+}
+
+.dmn {
+  display: flex;
+  flex: 1 1 0%;
+  overflow-x: hidden;
+}
+
+  .dmn .renderer {
+    display: flex;
+    flex: 1 1 0%;
+    position: relative;
+    background-color: white;
+    flex-wrap: wrap;
+  }
+
+  .dmn .prop {
+    width: 400px;
+  }
+
+  button.saveDmn {
+display: block;
+position: absolute;
+right: 5px;
+top: 5px;
+z-index: 10;
+}
+
+.modelermain {
+  display: flex;
+  flex: 1 1 0%;
+  overflow-x: hidden;
+}
+  .modelermain.hidden {
+    display: none;
+  }
+.modeler {
+  display: flex;
+  flex: 1 1 0%;
+  position: relative;
+  background-color: white;
+  outline: none;
+}
+
+.properties-panel {
+  width: 400px;
+  max-height: calc(-48px + 100vh);
+  position: relative;
+  margin-top: -1px;
+}

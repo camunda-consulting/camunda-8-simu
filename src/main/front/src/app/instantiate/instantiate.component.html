@@ -21,6 +21,10 @@
     </div>
   </div>
 </div>
+<div class="alert alert-info">
+  If you start your instances too far in the past, you're likely to increment number of shards used in ElasticSearch and SaaS clusters have a default limit to 1000 shards. Therefore, it's recommended not to go further than 40 days ago.
+</div>
+@if (execPlanService.executionPlan!.instanceDistribution=='HOURS') {
 <div class="row">
   <div class="col-6">
     <div class="input-group mb-3">
@@ -30,11 +34,12 @@
   </div>
   <div class="col-6">
     <div class="input-group mb-3">
-      <span class="input-group-text">Day end time (our)</span>
+      <span class="input-group-text">Day end time (hour)</span>
       <input type="number" class="form-control" [(ngModel)]="execPlanService.scenario!.dayTimeEnd" min="0" max="23">
     </div>
   </div>
 </div>
+}
 <hr />
 <div class="row">
   <div class="col-12">
@@ -55,10 +60,12 @@
     </div>
   </div>
   <div class="col-8">
-    <div class="input-group mb-3" *ngIf="execPlanService.scenario.startType=='MSG'">
+    @if (execPlanService.scenario.startType=='MSG') {
+    <div class="input-group mb-3">
       <span class="input-group-text">Message name</span>
       <input type="text" class="form-control" [(ngModel)]="execPlanService.scenario.startMsgName">
     </div>
+	}
   </div>
 </div>
   <div class="row">
@@ -93,30 +100,36 @@
             <span class="input-group-text">Maximum instances</span>
             <input type="number" class="form-control" min=0 [(ngModel)]="execPlanService.scenario.evolution.max">
           </div>
-          <div class="form-check form-switch mb-3" *ngIf="execPlanService.scenario!.evolution.type!='normal'">
+		  @if(execPlanService.scenario!.evolution.type!='normal') {
+          <div class="form-check form-switch mb-3">
             <input class="form-check-input" type="checkbox" role="switch" [(ngModel)]="execPlanService.scenario.evolution.decreasing">
             <label class="form-check-label" for="flexSwitchCheckDefault">Decreasing evolution</label>
           </div>
-          <div class="input-group mb-3 " *ngIf="execPlanService.scenario!.evolution.type=='saltedlinear'">
+		  }
+		  @if(execPlanService.scenario!.evolution.type=='saltedlinear') {
+          <div class="input-group mb-3 ">
             <span class="input-group-text">Salt (min)</span>
             <input type="number" class="form-control" min=0 [(ngModel)]="execPlanService.scenario.evolution.saltMin">
           </div>
-          <div class="input-group mb-3 " *ngIf="execPlanService.scenario!.evolution.type=='saltedlinear'">
+          <div class="input-group mb-3 ">
             <span class="input-group-text">Salt (max)</span>
             <input type="number" class="form-control" min=0 [(ngModel)]="execPlanService.scenario.evolution.saltMax">
           </div>
-          <div class="input-group mb-3 " *ngIf="execPlanService.scenario!.evolution.type=='exponential'">
+		  } @else if(execPlanService.scenario!.evolution.type=='exponential') {
+          <div class="input-group mb-3 ">
             <span class="input-group-text">Exponent</span>
             <input type="number" class="form-control" min=0 [(ngModel)]="execPlanService.scenario.evolution.exponent">
           </div>
-          <div class="input-group mb-3 " *ngIf="execPlanService.scenario!.evolution.type=='normal'">
+		  } @else if(execPlanService.scenario!.evolution.type=='normal') {
+          <div class="input-group mb-3 ">
             <span class="input-group-text">Mean</span>
             <input type="number" class="form-control" min=0 step=0.01 max=1 [(ngModel)]="execPlanService.scenario.evolution.mean">
           </div>
-          <div class="input-group mb-3 " *ngIf="execPlanService.scenario!.evolution.type=='normal'">
+          <div class="input-group mb-3 ">
             <span class="input-group-text">Standard derivation</span>
             <input type="number" class="form-control" min=0 step=0.01 max=1 [(ngModel)]="execPlanService.scenario.evolution.derivation">
           </div>
+		  }
           <button class="btn btn-primary" (click)="previewEvol()"><i class="bi bi-eye"></i> Preview</button><br/>
           <canvas #preview></canvas>
         </div>

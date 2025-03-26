@@ -2,9 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { TemplatingService } from '../services/templating.service';
 
 @Component({
-  selector: 'app-dataset',
-  templateUrl: './dataset.component.html',
-  styleUrls: ['./dataset.component.css']
+    selector: 'app-dataset',
+    templateUrl: './dataset.component.html',
+    styleUrls: ['./dataset.component.css'],
+    standalone: false
 })
 export class DatasetComponent implements OnInit {
   category: string = 'en';

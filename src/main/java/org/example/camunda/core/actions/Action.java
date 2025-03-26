@@ -1,5 +1,6 @@
 package org.example.camunda.core.actions;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.Map;
 import org.example.camunda.core.PayloadGenerator;
@@ -20,4 +21,6 @@ public abstract class Action implements Runnable {
   public static ObjectNode getVariables(String payloadTemplate, Map<String, Object> variables) {
     return JsonUtils.toJsonNode(PayloadGenerator.generatePayload(payloadTemplate, variables));
   }
+
+  public abstract String getType();
 }

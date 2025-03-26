@@ -19,30 +19,35 @@
     </div>
   </div>
 </div>
-<div class="row" *ngIf="step.action=='COMPLETE' || step.action=='INCIDENT'">
-  <div class="col">
-    <div class="input-group mb-3 ">
-      <span class="input-group-text">Completion time ({{execPlanService.executionPlan!.durationsType}})</span>
-      <button class="btn btn-outline-primary" (click)="openDurationModal()"><i class="bi bi-pencil"></i> Avg from {{step.duration.startDesiredAvg}} to {{step.duration.endDesiredAvg}} (variation {{step.duration.minMaxPercent}}%). Progression {{step.duration.avgProgression}}</button>
-    </div>
-  </div>
-</div>
-<div class="row" *ngIf="step.action=='COMPLETE'">
-  <app-json-editor label="JSON template" classnames="mb-3" [(template)]="this.step.jsonTemplate"></app-json-editor>
-</div>
-<div class="row" *ngIf="step.action=='INCIDENT'">
-  <div class="input-group mb-3 ">
-    <span class="input-group-text">Incident</span>
-    <select class="form-select" [(ngModel)]="step.incident">
-      <option selected>Choose...</option>
-      <option value="NULLPOINTER">NULLPOINTER</option>
-      <option value="ARITHMETIC">ARITHMETIC</option>
-      <option value="OUT_OF_BOUND">OUT_OF_BOUND</option>
-      <option value="OUT_OF_BOUND">ILLEGAL_ARGUMENT</option>
-      <option value="OUT_OF_BOUND">TIME_OUT</option>
-    </select>
-  </div>
-</div>
+@if (step.action=='COMPLETE' || step.action=='INCIDENT') {
+	<div class="row">
+	  <div class="col">
+		<div class="input-group mb-3 ">
+		  <span class="input-group-text">Completion time ({{execPlanService.executionPlan!.durationsType}})</span>
+		  <button class="btn btn-outline-primary" (click)="openDurationModal()"><i class="bi bi-pencil"></i> Avg from {{step.duration.startDesiredAvg}} to {{step.duration.endDesiredAvg}} (variation {{step.duration.minMaxPercent}}%). Progression {{step.duration.avgProgression}}</button>
+		</div>
+	  </div>
+	</div>
+	@if (step.action=='COMPLETE') {
+	<div class="row">
+	  <app-json-editor label="JSON template" classnames="mb-3" [(template)]="this.step.jsonTemplate"></app-json-editor>
+	</div>
+	} @else {
+	<div class="row">
+	  <div class="input-group mb-3 ">
+		<span class="input-group-text">Incident</span>
+		<select class="form-select" [(ngModel)]="step.incident">
+		  <option selected>Choose...</option>
+		  <option value="NULLPOINTER">NULLPOINTER</option>
+		  <option value="ARITHMETIC">ARITHMETIC</option>
+		  <option value="OUT_OF_BOUND">OUT_OF_BOUND</option>
+		  <option value="OUT_OF_BOUND">ILLEGAL_ARGUMENT</option>
+		  <option value="OUT_OF_BOUND">TIME_OUT</option>
+		</select>
+	  </div>
+	</div>
+	}
+}
 <div class="row">
   <div class="col-6">
     <h4>
@@ -75,8 +80,8 @@
 
 </div>
 
-
-<div class="modal fade" id="{{step.elementId}}-durationModal" tabindex="-1" role="dialog" aria-hidden="true" *ngIf="step.action=='COMPLETE' || step.action=='INCIDENT'">
+@if(step.action=='COMPLETE' || step.action=='INCIDENT') {
+<div class="modal fade" id="{{step.elementId}}-durationModal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -86,13 +91,19 @@
       <div class="modal-body">
         <div class="input-group mb-3 ">
           <span class="input-group-text">Duration avg at start ({{execPlanService.executionPlan!.durationsType}})</span>
-          <input type="number" class="form-control" min=0 [(ngModel)]="step.duration.startDesiredAvg" *ngIf="execPlanService.executionPlan!.durationsType!='FEEL'">
-          <input type="text" class="form-control" [(ngModel)]="step.duration.startDesiredAvg" *ngIf="execPlanService.executionPlan!.durationsType==='FEEL'">
+		  @if(execPlanService.executionPlan!.durationsType!='FEEL') {
+          <input type="number" class="form-control" min=0 [(ngModel)]="step.duration.startDesiredAvg">
+		  } @else {
+          <input type="text" class="form-control" [(ngModel)]="step.duration.startDesiredAvg">
+		  }
         </div>
         <div class="input-group mb-3 ">
           <span class="input-group-text">Duration avg at end ({{execPlanService.executionPlan!.durationsType}})</span>
-          <input type="number" class="form-control" min=0 [(ngModel)]="step.duration.endDesiredAvg" *ngIf="execPlanService.executionPlan!.durationsType!='FEEL'">
-          <input type="text" class="form-control" [(ngModel)]="step.duration.endDesiredAvg" *ngIf="execPlanService.executionPlan!.durationsType==='FEEL'">
+		  @if(execPlanService.executionPlan!.durationsType!='FEEL') {
+          <input type="number" class="form-control" min=0 [(ngModel)]="step.duration.endDesiredAvg">
+		  } @else {
+          <input type="text" class="form-control" [(ngModel)]="step.duration.endDesiredAvg">
+		  }
         </div>
         <div class="input-group mb-3 ">
           <span class="input-group-text">Percentage variations</span>
@@ -106,10 +117,12 @@
             <option value="LINEAR_SALTED">LINEAR_SALTED</option>
           </select>
         </div>
-        <div class="input-group mb-3" *ngIf="step.duration.avgProgression=='LINEAR_SALTED'">
+		@if (step.duration.avgProgression=='LINEAR_SALTED') {
+        <div class="input-group mb-3">
           <span class="input-group-text">progression salt (MS)</span>
           <input type="number" class="form-control" min=0 [(ngModel)]="step.duration.progressionSalt">
         </div>
+		}
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="closeDurationModal()">Close</button>
@@ -117,16 +130,17 @@
     </div>
   </div>
 </div>
-
+}
 
 <div class="modal fade" id="{{step.elementId}}-prestep" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
+	  @if (prestep) {
       <div class="modal-header">
-        <h5 class="modal-title" *ngIf="prestep">Pre step  (executed {{prestep.delay}}({{execPlanService.executionPlan!.durationsType}}) after creation time)</h5>
+        <h5 class="modal-title">Pre step  (executed {{prestep.delay}}({{execPlanService.executionPlan!.durationsType}}) after creation time)</h5>
         <button type="button" class="btn-close" (click)="closePreStepModal()"></button>
       </div>
-      <div class="modal-body" *ngIf="prestep">
+      <div class="modal-body">
         <div class="input-group mb-3 ">
           <span class="input-group-text">Type</span>
           <select class="form-select" [(ngModel)]="prestep.type">
@@ -139,28 +153,38 @@
         </div>
         <div class="input-group mb-3 ">
           <span class="input-group-text">Delay ({{execPlanService.executionPlan!.durationsType}})</span>
-          <input type="number" class="form-control" min=0 [(ngModel)]="prestep.delay" *ngIf="execPlanService.executionPlan!.durationsType!='FEEL'">
-          <input type="text" class="form-control" [(ngModel)]="prestep.delay" *ngIf="execPlanService.executionPlan!.durationsType==='FEEL'">
+		  @if(execPlanService.executionPlan!.durationsType!='FEEL') {
+          <input type="number" class="form-control" min=0 [(ngModel)]="prestep.delay">
+		  } @else {
+          <input type="text" class="form-control" [(ngModel)]="prestep.delay">
+		  }
         </div>
-        <div class="input-group mb-3 " *ngIf="prestep.type=='MSG'">
+		@if(prestep.type=='MSG') {
+        <div class="input-group mb-3 ">
           <span class="input-group-text">Message</span>
           <input type="text" class="form-control" [(ngModel)]="prestep.msg">
         </div>
-        <div class="input-group mb-3 " *ngIf="prestep.type=='SIGNAL'">
-          <span class="input-group-text">Signal</span>
-          <input type="text" class="form-control" [(ngModel)]="prestep.signal">
-        </div>
-        <div class="input-group mb-3 " *ngIf="prestep.type=='MSG'">
+		
+        <div class="input-group mb-3 ">
           <span class="input-group-text">Correlation Key</span>
           <input type="text" class="form-control" [(ngModel)]="prestep.correlationKey">
         </div>
-        <div class="input-group mb-3 " *ngIf="prestep.type=='BPMN_ERROR'">
+		} @else if(prestep.type=='SIGNAL') {
+        <div class="input-group mb-3 ">
+          <span class="input-group-text">Signal</span>
+          <input type="text" class="form-control" [(ngModel)]="prestep.signal">
+        </div>
+		} @else if(prestep.type=='BPMN_ERROR') {
+        <div class="input-group mb-3 ">
           <span class="input-group-text">Error Code</span>
           <input type="text" class="form-control" [(ngModel)]="prestep.errorCode">
         </div>
-
-        <app-json-editor *ngIf="prestep.type!='CLOCK'" label="JSON template" classnames="mb-3" [(template)]="prestep.jsonTemplate"></app-json-editor>
+		} 
+		@if(prestep.type!='CLOCK') {
+        <app-json-editor label="JSON template" classnames="mb-3" [(template)]="prestep.jsonTemplate"></app-json-editor>
+		}
       </div>
+	  }
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="closePreStepModal()">Close</button>
       </div>
@@ -171,11 +195,12 @@
 <div class="modal fade" id="{{step.elementId}}-poststep" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
+	@if (poststep) {
       <div class="modal-header">
-        <h5 class="modal-title" *ngIf="poststep">Post step (executed {{poststep.delay}} ({{execPlanService.executionPlan!.durationsType}}) after completion time)</h5>
+        <h5 class="modal-title">Post step (executed {{poststep.delay}} ({{execPlanService.executionPlan!.durationsType}}) after completion time)</h5>
         <button type="button" class="btn-close" (click)="closePostStepModal()"></button>
       </div>
-      <div class="modal-body" *ngIf="poststep">
+      <div class="modal-body">
         <div class="input-group mb-3 ">
           <span class="input-group-text">Type</span>
           <select class="form-select" [(ngModel)]="poststep.type">
@@ -188,27 +213,37 @@
         </div>
         <div class="input-group mb-3">
           <span class="input-group-text">Delay ({{execPlanService.executionPlan!.durationsType}})</span>
+		  @if(execPlanService.executionPlan!.durationsType!='FEEL') {
           <input type="number" class="form-control" min=0 [(ngModel)]="poststep.delay" *ngIf="execPlanService.executionPlan!.durationsType!='FEEL'">
+		  } @else {
           <input type="text" class="form-control" [(ngModel)]="poststep.delay" *ngIf="execPlanService.executionPlan!.durationsType==='FEEL'">
+		  }
         </div>
-        <div class="input-group mb-3 " *ngIf="poststep.type=='MSG'">
+		@if(poststep.type=='MSG') {
+        <div class="input-group mb-3 ">
           <span class="input-group-text">Message</span>
           <input type="text" class="form-control" [(ngModel)]="poststep.msg">
         </div>
-        <div class="input-group mb-3 " *ngIf="poststep.type=='SIGNAL'">
-          <span class="input-group-text">Signal</span>
-          <input type="text" class="form-control" [(ngModel)]="poststep.signal">
-        </div>
-        <div class="input-group mb-3 " *ngIf="poststep.type=='MSG'">
+        <div class="input-group mb-3 ">
           <span class="input-group-text">Correlation Key</span>
           <input type="text" class="form-control" [(ngModel)]="poststep.correlationKey">
         </div>
+		} @else if(poststep.type=='SIGNAL') {
+        <div class="input-group mb-3 ">
+          <span class="input-group-text">Signal</span>
+          <input type="text" class="form-control" [(ngModel)]="poststep.signal">
+        </div>
+		} @else if(poststep.type=='BPMN_ERROR') {
         <div class="input-group mb-3 " *ngIf="poststep.type=='BPMN_ERROR'">
           <span class="input-group-text">Error Code</span>
           <input type="text" class="form-control" [(ngModel)]="poststep.errorCode">
         </div>
-        <app-json-editor *ngIf="poststep.type!='CLOCK'" label="JSON template" classnames="mb-3" [(template)]="poststep.jsonTemplate"></app-json-editor>
+		}
+		@if(poststep.type!='CLOCK') {
+        <app-json-editor label="JSON template" classnames="mb-3" [(template)]="poststep.jsonTemplate"></app-json-editor>
+		}
       </div>
+	  }
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="closePostStepModal()">Close</button>
       </div>

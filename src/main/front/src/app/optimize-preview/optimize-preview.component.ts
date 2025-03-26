@@ -4,9 +4,10 @@ import { Colors } from 'chart.js';
 import { ExecPlanService } from '../services/exec-plan.service';
 
 @Component({
-  selector: 'app-optimize-preview',
-  templateUrl: './optimize-preview.component.html',
-  styleUrls: ['./optimize-preview.component.css']
+    selector: 'app-optimize-preview',
+    templateUrl: './optimize-preview.component.html',
+    styleUrls: ['./optimize-preview.component.css'],
+    standalone: false
 })
 export class OptimizePreviewComponent implements AfterViewInit {
 

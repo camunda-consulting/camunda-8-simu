@@ -3,6 +3,7 @@ package org.example.camunda.utils;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,10 +12,17 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+import org.example.camunda.exception.TechnicalException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -238,6 +246,33 @@ public class BpmnUtils {
       return builder.parse(new ByteArrayInputStream(xml.getBytes(Charset.forName("UTF-8"))));
     } catch (SAXException | IOException | ParserConfigurationException e) {
       return null;
+    }
+  }
+
+  public static String getAttribute(Node node, String attribute) {
+    try {
+      return node.getAttributes().getNamedItem(attribute).getTextContent();
+    } catch (NullPointerException e) {
+      return null;
+    }
+  }
+
+  public static String getXmlContent(Document doc) {
+    try {
+      TransformerFactory transfac = TransformerFactory.newInstance();
+      Transformer trans = transfac.newTransformer();
+      trans.setOutputProperty(OutputKeys.METHOD, "xml");
+      trans.setOutputProperty(OutputKeys.INDENT, "yes");
+      trans.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", Integer.toString(2));
+
+      StringWriter sw = new StringWriter();
+      StreamResult result = new StreamResult(sw);
+      DOMSource source = new DOMSource(doc.getDocumentElement());
+
+      trans.transform(source, result);
+      return sw.toString();
+    } catch (TransformerException e) {
+      throw new TechnicalException("Error getting xml from doc", e);
     }
   }
 }

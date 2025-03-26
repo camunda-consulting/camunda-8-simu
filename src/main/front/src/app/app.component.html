@@ -1,3 +1,9 @@
-<app-home *ngIf="!execPlanService.executionPlan && !templatingService.dataset"></app-home>
-<app-executionplan *ngIf="execPlanService.executionPlan"></app-executionplan>
-<app-dataset *ngIf="templatingService.dataset"></app-dataset>
+@if (!execPlanService.executionPlan && !templatingService.dataset && !templatingService.jsondataset) {
+<app-home></app-home>
+} @else if(execPlanService.executionPlan) {
+<app-executionplan></app-executionplan>
+} @else if(templatingService.dataset) {
+<app-dataset></app-dataset>
+} @else if(templatingService.jsondataset) {
+<app-jsondataset></app-jsondataset>
+}

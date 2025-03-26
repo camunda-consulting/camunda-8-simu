@@ -55,7 +55,12 @@ public class FeelUtils {
     return (T) evaluate(expression, context);
   }
 
+  private static final Map<String, Long> calculatedDurations = new HashMap<>();
+
   public static Long feelDurationToMillis(String duration) {
+    if (calculatedDurations.containsKey(duration)) {
+      return calculatedDurations.get(duration);
+    }
     if (NumberUtils.isCreatable(duration)) {
       // expression is in millis
       return Long.valueOf(duration);
@@ -63,6 +68,8 @@ public class FeelUtils {
     if (duration.startsWith("P")) {
       duration = "duration(\"" + duration + "\")";
     }
-    return evaluate(duration, ValDayTimeDuration.class).value().toMillis();
+    Long result = evaluate(duration, ValDayTimeDuration.class).value().toMillis();
+    calculatedDurations.put(duration, result);
+    return result;
   }
 }

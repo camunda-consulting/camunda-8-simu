@@ -20,8 +20,8 @@ public class ExecutionPlanService {
   @Value("${workspace:workspace}")
   private String workspace;
 
-  public Path resolve(String bpmnProcessId, Long version) {
-    return Path.of(workspace).resolve(REPO).resolve(bpmnProcessId + "_v" + version);
+  public Path resolve(String bpmnProcessId) {
+    return Path.of(workspace).resolve(REPO).resolve(bpmnProcessId);
   }
 
   public List<String> list() {
@@ -30,8 +30,8 @@ public class ExecutionPlanService {
         .collect(Collectors.toList());
   }
 
-  public ExecutionPlan find(String bpmnProcessId, Long version) throws IOException {
-    Path planPath = resolve(bpmnProcessId, version);
+  public ExecutionPlan find(String bpmnProcessId) throws IOException {
+    Path planPath = resolve(bpmnProcessId);
     if (!planPath.toFile().exists()) {
       return null;
     }
@@ -40,11 +40,11 @@ public class ExecutionPlanService {
 
   public ExecutionPlan save(ExecutionPlan plan) throws IOException {
     JsonUtils.toJsonFile(
-        resolve(plan.getDefinition().getBpmnProcessId(), plan.getDefinition().getVersion()), plan);
+        resolve(plan.getDefinition().getBpmnProcessId()), plan);
     return plan;
   }
 
-  public void delete(String bpmnProcessId, Long version) throws IOException {
-    Files.delete(resolve(bpmnProcessId, version));
+  public void delete(String bpmnProcessId) throws IOException {
+    Files.delete(resolve(bpmnProcessId));
   }
 }

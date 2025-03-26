@@ -1,6 +1,24 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import '~camunda-bpmn-js/dist/assets/camunda-cloud-modeler.css';
+@import '~camunda-dmn-js/dist/assets/diagram-js.css';
+@import '~camunda-dmn-js/dist/assets/dmn-js-boxed-expression.css';
+@import '~camunda-dmn-js/dist/assets/dmn-js-boxed-expression-controls.css';
+@import '~camunda-dmn-js/dist/assets/dmn-js-decision-table.css';
+@import '~camunda-dmn-js/dist/assets/dmn-js-decision-table-controls.css';
+@import '~camunda-dmn-js/dist/assets/dmn-js-drd.css';
+@import '~camunda-dmn-js/dist/assets/dmn-js-literal-expression.css';
+@import '~camunda-dmn-js/dist/assets/dmn-js-shared.css';
+@import '~camunda-dmn-js/dist/assets/dmn-font/css/dmn.css';
+
+/* custom */
+.djs-container.with-palette .dmn-definitions {
+  display: none;
+}
+
+.djs-palette.two-column.open {
+  width: 50px;
+}
 
 .btn.btn-tooltip, .btn.btn-icon {
   border-radius: 15px;
@@ -11,4 +29,21 @@
 
 .hidden {
   display: none;
+}
+
+.modal-xxl {
+  --bs-modal-width: calc(100vw - 100px);
+  max-height: calc(100vh - 100px);
+}
+.modal-xxl {
+  --bs-modal-width: calc(100vw - 100px);
+  max-height: calc(100vh - 60px);
+}
+  .modal-xxl .modal-body {
+    max-height: calc(100vh - 265px);
+    overflow-y: auto;
+  }
+
+.modelermain .djs-palette.two-column.open {
+  width: 100px;
 }

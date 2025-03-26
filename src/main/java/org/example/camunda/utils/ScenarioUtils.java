@@ -1,6 +1,7 @@
 package org.example.camunda.utils;
 
-import java.time.Instant;
+import static javax.naming.Context.*;
+
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
@@ -21,9 +22,12 @@ import org.example.camunda.dto.progression.LinearEvolution;
 import org.example.camunda.dto.progression.NormalEvolution;
 import org.example.camunda.dto.progression.SaltedLinearEvolution;
 import org.example.camunda.dto.templating.JsonTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 public class ScenarioUtils {
+  private static final Logger LOG = LoggerFactory.getLogger(ScenarioUtils.class);
 
   public static Scenario generateScenario(String xml, ExecutionPlan plan) {
     Document doc = BpmnUtils.getXmlDocument(xml);
@@ -32,7 +36,7 @@ public class ScenarioUtils {
 
     Scenario result = new Scenario();
     result.setJsonTemplate(new JsonTemplate());
-    result.setFirstDayFeelExpression("now() - duration(\"P3M\")");
+    result.setFirstDayFeelExpression("now() - duration(\"P1M\")");
     result.setLastDayFeelExpression("now()");
     LinearEvolution evol = new LinearEvolution();
     evol.setMax(100);
@@ -99,9 +103,8 @@ public class ScenarioUtils {
     if (evol.isDecreasing()) {
       x = 1 - x;
     }
-    final int result =
-        evol.getMin() + (int) (Math.pow(x, evol.getExponent()) * (evol.getMax() - evol.getMin()));
-    return result;
+    return evol.getMin()
+        + (int) (Math.pow(x, evol.getExponent()) * (evol.getMax() - evol.getMin()));
   }
 
   private static long linearEvol(LinearEvolution evol, double progress) {
@@ -127,17 +130,45 @@ public class ScenarioUtils {
   }
 
   public static long durationToMillis(String duration) {
-    String durationType = ContextUtils.getPlan().getDurationsType();
+    return durationToMillis(ContextUtils.getPlan(), duration);
+  }
+
+  public static long durationToMillis(ExecutionPlan plan, String duration) {
+    String durationType = plan.getDurationsType();
     if (duration.startsWith("P") || durationType.equals("FEEL")) {
       return FeelUtils.feelDurationToMillis(duration);
     } else if (durationType.equals("SECONDS")) {
-      return Long.valueOf(duration) * 1000;
+      return Long.parseLong(duration) * 1000;
     }
-    return Long.valueOf(duration);
+    return Long.parseLong(duration);
   }
 
-  public static long calculateTaskDuration(StepExecPlan step, String processUniqueId) {
-    InstanceContext context = ContextUtils.getContext(processUniqueId);
+  public static synchronized long getTaskDuration(StepExecPlan step, InstanceContext context) {
+    Long calculated =
+        ContextUtils.getTaskDuration(context.getProcessUniqueId(), step.getElementId());
+    if (calculated != null) {
+      return calculated;
+    }
+    long result = getStepDuration(step, context);
+    ContextUtils.addTaskDuration(context.getProcessUniqueId(), step.getElementId(), result);
+    return result;
+  }
+
+  private static synchronized long getStepDuration(StepExecPlan step, InstanceContext context) {
+
+    Long duration =
+        ContextUtils.getAvgStepDuration(
+            step.getElementId(), context.getScenario().getName(), context.getProgress());
+    if (duration == null) {
+      duration = calculateTaskDuration(step, context);
+      ContextUtils.addAvgStepDuration(
+          step.getElementId(), context.getScenario().getName(), context.getProgress(), duration);
+    }
+    return duration;
+  }
+
+  private static long calculateTaskDuration(StepExecPlan step, InstanceContext context) {
+    LOG.warn("Computing task duration for " + step.getElementId() + " at " + context.getProgress());
     StepDuration duration = step.getDuration();
 
     long startAvg = durationToMillis(duration.getStartDesiredAvg());
@@ -152,12 +183,6 @@ public class ScenarioUtils {
     if (ContextUtils.getInstanceDistribution() == ChronoUnit.DAYS
         || ContextUtils.getInstanceDistribution() == ChronoUnit.HALF_DAYS
         || ContextUtils.getInstanceDistribution() == ChronoUnit.HOURS) {
-      if (ContextUtils.shouldComputeMin(processUniqueId)) {
-        return desiredAvg - duration.getMinMaxPercent() * desiredAvg / 100;
-      }
-      if (ContextUtils.shouldComputeMax(processUniqueId)) {
-        return desiredAvg + duration.getMinMaxPercent() * desiredAvg / 100;
-      }
 
       return desiredAvg;
     }
@@ -169,46 +194,11 @@ public class ScenarioUtils {
     return desiredAvg + salt;
   }
 
-  public static Long getTimerCatchEventTime(String flowNodeId, long creationTime) {
-    if (ContextUtils.isDateTimer(flowNodeId)) {
-      String date = ContextUtils.getDateTimer(flowNodeId);
-      if (date.startsWith("=")) {
-        return getMillis(FeelUtils.evaluate(date.substring(1), new HashMap<>(), ValDateTime.class));
-      }
-      return Instant.parse(date.substring(1)).toEpochMilli();
-    } else if (ContextUtils.isDurationTimer(flowNodeId)) {
-      String duration = ContextUtils.getDurationTimer(flowNodeId);
-      String creationDate = Instant.ofEpochMilli(creationTime).toString();
-      return getMillis(
-          FeelUtils.evaluate(
-              "date and time(\"" + creationDate + "\") + duration(\"" + duration + "\")",
-              new HashMap<>(),
-              ValDateTime.class));
-    }
-    return null;
-  }
-
-  public static Long getEstimatedTime(long date, String feelDuration) {
-    return getMillis(
-        FeelUtils.evaluate(
-            "date and time(\""
-                + Instant.ofEpochMilli(date).toString()
-                + "\") + duration(\""
-                + feelDuration
-                + "\")",
-            new HashMap<>(),
-            ValDateTime.class));
-  }
-
-  public static Long getMillis(ValDateTime valDate) {
-    return Instant.parse(valDate.toString()).toEpochMilli();
-  }
-
   public static ZonedDateTime getZonedDateDay(String feelExpression) {
     return FeelUtils.evaluate(feelExpression, ValDateTime.class).value();
   }
 
-  private static Map<String, NormalDistribution> normalDistributionRegistry = new HashMap<>();
+  private static final Map<String, NormalDistribution> normalDistributionRegistry = new HashMap<>();
 
   private static NormalDistribution getNormalDistribution(double mean, double standardDeviation) {
     String name = mean + "_" + standardDeviation;
@@ -218,5 +208,15 @@ public class ScenarioUtils {
       normalDistributionRegistry.put(name, normalDistribution);
     }
     return normalDistribution;
+  }
+
+  public static String getCorrelationKeyValue(
+      Map<String, Object> variables, String correlationKey) {
+    int dotIndex = correlationKey.indexOf(".");
+    if (dotIndex > 0) {
+      Map<String, Object> subMap = (Map) variables.get(correlationKey.substring(0, dotIndex));
+      return getCorrelationKeyValue(subMap, correlationKey.substring(dotIndex + 1));
+    }
+    return (String) variables.get(correlationKey);
   }
 }
