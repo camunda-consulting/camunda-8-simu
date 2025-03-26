@@ -29,7 +29,7 @@ make
 
 To do so, you need a proper JDK, Make, docker-compose.
 
-If you don't change any configuration, you should be able to access the Simulator UI at [http://localhost:8080/](http://localhost:8080/).
+If you don't change any configuration, you should be able to access the Simulator UI at [http://localhost:8082/](http://localhost:8082/).
 
 To start populating your application, you should execute a plan.
 
