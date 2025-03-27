@@ -7,7 +7,9 @@
 
 This project is made to populate data into a C8 installation to provide meaningfull data in Optimize, Operate and Tasklist.
 
-:information_source: This is a draft project. It's **not production ready** and you should not use it in production.
+:information_source: This is a draft project. It's **not production ready** and youuse it at your own risks
+
+:information_source: Elasticsearch indexes are created with the events dates but the ILM is cleaning data based on real index creation date. If you create instances older than a month, it will lead to a number of shards exceeding the default 1000 shards limits in ES. And you data will not be loaded in Optimize, Operate or Tasklist.
 
 ## Repository content
 
@@ -39,17 +41,4 @@ make buildall
 
 ```
 make runjava
-```
-Just pay attention to the configurations to connect to Operate and Zeebe in the [application.yaml](src/main/resources/application.yaml) file.
-
-You can connect it to any Self-Managed cluster. Just pay attention to :
-- add the configuration ZEEBE_CLOCK_CONTROLLED=true in Zeebe
-- Create the client/secret that allows the Simulation application to speak with Operate (from Identity UI or from configs):
-```
-KEYCLOAK_CLIENTS_1_NAME: dataloader
-KEYCLOAK_CLIENTS_1_ID: dataloader
-KEYCLOAK_CLIENTS_1_SECRET: Tcx9kFqVwxlnWMZOhjYCemnLvBr1Gvs3
-KEYCLOAK_CLIENTS_1_TYPE: M2M
-KEYCLOAK_CLIENTS_1_PERMISSIONS_0_RESOURCE_SERVER_ID: operate-api
-KEYCLOAK_CLIENTS_1_PERMISSIONS_0_DEFINITION: read:*
 ```

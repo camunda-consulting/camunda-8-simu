@@ -29,7 +29,8 @@
     </li>
   </ul>
   <div *ngFor="let cat of templatingService.dataset!.categorizedData | keyvalue">
-    <div class="tab-pane" *ngIf="category==cat.key">
+    @if (category==cat.key) {
+    <div class="tab-pane">
       <div class="alert alert-info">You can add values for the dataset <b>{{templatingService.dataset.name}}</b> in the <b>{{cat.key}}</b> category. If you want to remove this category, just press the following button <button class="btn btn-danger" (click)="deleteCategory(cat.key)"><i class="bi bi-trash"></i></button></div>
 
       <button class="btn btn-success" (click)="addValue()"><i class="bi bi-plus"></i></button> Values
@@ -43,5 +44,6 @@
       </div>
       
     </div>
+	}
   </div>
 </div>

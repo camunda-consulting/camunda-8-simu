@@ -1,26 +1,14 @@
 # https://github.com/camunda-community-hub/spring-zeebe#configuring-camunda-platform-8-saas-connection
 # https://github.com/camunda-community-hub/spring-zeebe#additional-configuration-options
 
-zeebe.client:
-  broker.gatewayAddress: 127.0.0.1:26500
-  security.plaintext: true 
-#zeebe.client:
-#  cloud:
-#    region: bru-2
-#    clusterId: XXX
-#    clientId: XXX
-#    clientSecret: XXX
-      
-gateway.actuator: http://127.0.0.1:9600/actuator
-operate:
-  selfmanaged:
-    url: http://localhost:8081
-    clientId: dataloader
-    clientSecret: Tcx9kFqVwxlnWMZOhjYCemnLvBr1Gvs3
-    keycloakUrl: http://localhost:18080
+client:
+  region: ${CLIENT_CLOUD_REGION}
+  clusterId: ${CLIENT_CLOUD_CLUSTER_ID}
+  clientId: ${CLIENT_CLOUD_CLIENT_ID}
+  clientSecret: ${CLIENT_CLOUD_CLIENT_SECRET}
 
 server:
-  port: 8080
+  port: 8082
   error:
     whitelabel:
       enabled: false

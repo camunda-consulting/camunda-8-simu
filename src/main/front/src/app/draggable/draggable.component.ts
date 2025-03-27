@@ -4,9 +4,10 @@ import {
 import { fromEvent, map, Observable, Subject, switchMap, takeUntil, tap } from 'rxjs';
 
 @Component({
-  selector: 'app-draggable',
-  templateUrl: './draggable.component.html',
-  styleUrls: ['./draggable.component.css']
+    selector: 'app-draggable',
+    templateUrl: './draggable.component.html',
+    styleUrls: ['./draggable.component.css'],
+    standalone: false
 })
 export class DraggableComponent implements AfterViewInit, OnDestroy {
 
@@ -50,14 +51,18 @@ export class DraggableComponent implements AfterViewInit, OnDestroy {
         ),
         tap(({ startEvent, moveEvent }) => {
           //const x = moveEvent.x - startEvent.offsetX;
-          const y = moveEvent.y - startEvent.offsetY - 40;
+          const y = moveEvent.y - startEvent.offsetY - 56;
           // update position
           //nativeElement.parent.style.left = x + 'px';
           nativeElement.offsetParent.style.top = y + 'px';
           //app-actions-plan
-          nativeElement.offsetParent.style.height = 'calc(100vh - ' + (y + 40) + 'px)';
+          nativeElement.offsetParent.style.height = 'calc(100vh - ' + (y + 56) + 'px)';
           //viewer
           nativeElement.offsetParent.offsetParent.firstChild.firstChild.firstChild.firstChild.style.height = y + 'px';
+          //dmn viewer
+          if (nativeElement.offsetParent.offsetParent.firstChild.firstChild.children[1].firstChild.firstChild) {
+            nativeElement.offsetParent.offsetParent.firstChild.firstChild.children[1].firstChild.firstChild.style.height = y + 'px';
+          }
         }),
         takeUntil(this.destroy$$)
       );

@@ -1,17 +1,17 @@
 import { Component, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import BpmnModeler from 'camunda-bpmn-js/lib/camunda-cloud/Modeler';
 import ElementTemplatesIconsRenderer from '@bpmn-io/element-template-icon-renderer';
-import { ProcessService } from '../services/process.service';
 import { ExecPlanService } from '../services/exec-plan.service';
 
 @Component({
-  selector: 'app-modeler',
-  templateUrl: './modeler.component.html',
-  styleUrls: ['./modeler.component.css']
+    selector: 'app-modeler',
+    templateUrl: './modeler.component.html',
+    styleUrls: ['./modeler.component.css'],
+    standalone: false
 })
 export class ModelerComponent implements AfterViewInit {
 
-  constructor(private processService: ProcessService, private execPlanService: ExecPlanService) { }
+  constructor(private execPlanService: ExecPlanService) { }
 
   @ViewChild('modeler') modelerElt: ElementRef | undefined;
   @ViewChild('properties') properties: ElementRef | undefined;

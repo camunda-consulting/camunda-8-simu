@@ -2,9 +2,9 @@ nav {
   z-index: 2;
 }
 .mainContent {
-  height: calc(100vh - 40px);
+  height: calc(100vh - 56px);
   position: absolute;
-  top:40px;
+  top:56px;
   width:100vw;
   overflow: hidden;
 }

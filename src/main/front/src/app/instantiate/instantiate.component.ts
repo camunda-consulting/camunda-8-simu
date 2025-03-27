@@ -1,18 +1,18 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
 import Chart from 'chart.js/auto';
-import { ProcessService } from '../services/process.service';
 import { ExecPlanService } from '../services/exec-plan.service';
 
 @Component({
-  selector: 'app-instantiate',
-  templateUrl: './instantiate.component.html',
-  styleUrls: ['./instantiate.component.css']
+    selector: 'app-instantiate',
+    templateUrl: './instantiate.component.html',
+    styleUrls: ['./instantiate.component.css'],
+    standalone: false
 })
 export class InstantiateComponent {
 
   @ViewChild('preview') preview: ElementRef | undefined;
   private chart?: Chart;
-  constructor(private processService: ProcessService, public execPlanService: ExecPlanService) { }
+  constructor(public execPlanService: ExecPlanService) { }
 
   openStartPlanModal() {
     (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById('startPlanModal')).show();

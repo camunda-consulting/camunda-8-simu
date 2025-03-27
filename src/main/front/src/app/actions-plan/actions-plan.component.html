@@ -9,18 +9,14 @@
   <li class="nav-item">
     <a class="nav-link text-warning" (click)="addScenario()"><i class="bi bi-plus-circle"></i> Add scenario</a>
   </li>
-  <li class="nav-item">
-    <a class="nav-link text-light" (click)="save()"><i class="bi bi-floppy"></i> Save</a>
-  </li>
-  <li class="nav-item" *ngIf="!running">
-    <a class="nav-link text-light text-bold" (click)="execute()"><i class="bi bi-send"></i> Execute plan</a>
-  </li>
 </ul>
 <div *ngIf="state=='general'" class="tab-pane scrollable">
+<!--
   <div class="input-group mb-3">
     <span class="input-group-text" id="basic-addon1">Milliseconds Idle time before next clock move</span>
     <input type="number" class="form-control" [(ngModel)]="execPlanService.executionPlan!.idleTimeBeforeClockMove">
   </div>
+  -->
   <div class="input-group mb-3">
     <span class="input-group-text" id="basic-addon1">Time precision</span>
     <select class="form-select" [(ngModel)]="execPlanService.executionPlan!.timePrecision">
@@ -38,7 +34,9 @@
       <option value="DAYS">DAYS</option>
       <option value="HALF_DAYS">HALF_DAYS</option>
       <option value="HOURS">HOURS</option>
+	  <!--
       <option value="MINUTES">MINUTES</option>
+	  -->
     </select>
   </div>
   <div class="input-group mb-3">
@@ -64,45 +62,45 @@
   </div>
 </div>
 
-<div *ngFor="let scenario of execPlanService.executionPlan!.scenarii; let i=index" [ngClass]="state==''+i ? 'scrollable' : ''">
-  <div class="tab-pane" *ngIf="state==''+i">
-    <div class="d-flex align-items-start">
-      <div class="nav flex-column nav-pills me-3" role="tablist">
-        <button [ngClass]="execPlanService.currentActivity == 'startInstances' ? 'nav-link active' : 'nav-link'" (click)="execPlanService.selectActivity('startInstances')">Scenario settings</button>
-        <button *ngFor="let step of scenario.steps | keyvalue" [ngClass]="execPlanService.currentActivity == step.key ? 'nav-link active' : 'nav-link'" role="tab" (click)="execPlanService.selectActivity($any(step.key))"> {{execPlanService.stepLabel(step.key)}}</button>
-        <button class="btn btn-outline-warning" (click)="openAddStepModal()"><i class="bi bi-plus-circle"></i> Add step</button>
-        <hr />
-        <button class="btn btn-danger" (click)="deleteScenario(i)"><i class="bi bi-trash"></i> Delete scenario</button>
-      </div>
-      <div class="tab-content" id="v-pills-tabContent">
-        <div [ngClass]="execPlanService.currentActivity == 'startInstances' ? 'tab-pane fade show active' : 'tab-pane fade'">
-          <app-instantiate></app-instantiate>
+  <div *ngFor="let scenario of execPlanService.executionPlan!.scenarii; let i=index" [ngClass]="state==''+i ? 'scrollable' : ''">
+    <div class="tab-pane" *ngIf="state==''+i">
+      <div class="d-flex align-items-start">
+        <div class="nav flex-column nav-pills me-3" role="tablist">
+          <button [ngClass]="execPlanService.currentActivity == 'startInstances' ? 'nav-link active' : 'nav-link'" (click)="execPlanService.selectActivity('startInstances')">Scenario settings</button>
+          <button *ngFor="let step of scenario.steps | keyvalue" [ngClass]="execPlanService.currentActivity == step.key ? 'nav-link active' : 'nav-link'" role="tab" (click)="execPlanService.selectActivity($any(step.key))"> {{execPlanService.stepLabel(step.key)}}</button>
+          <button class="btn btn-outline-warning" (click)="openAddStepModal()"><i class="bi bi-plus-circle"></i> Add step</button>
+          <hr />
+          <button class="btn btn-danger" (click)="deleteScenario(i)"><i class="bi bi-trash"></i> Delete scenario</button>
         </div>
-        <div *ngFor="let step of scenario.steps | keyvalue" [ngClass]="execPlanService.currentActivity == step.key ? 'tab-pane fade show active' : 'tab-pane fade'"><app-step [step]="step.value"></app-step></div>
+        <div class="tab-content" id="v-pills-tabContent">
+          <div [ngClass]="execPlanService.currentActivity == 'startInstances' ? 'tab-pane fade show active' : 'tab-pane fade'">
+            <app-instantiate></app-instantiate>
+          </div>
+          <div *ngFor="let step of scenario.steps | keyvalue" [ngClass]="execPlanService.currentActivity == step.key ? 'tab-pane fade show active' : 'tab-pane fade'"><app-step [step]="step.value"></app-step></div>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<div class="modal fade" id="addnewstep" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Create new step</h5>
-        <button type="button" class="btn-close" (click)="closeAddStepModal()"></button>
-      </div>
-      <div class="modal-body">
-        Please provide the elementId that you want to add as a step
-
-        <div class="input-group mb-3 ">
-          <span class="input-group-text">Element Id</span>
-          <input type="text" class="form-control" [(ngModel)]="newStepElementId">
+  <div class="modal fade" id="addnewstep" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Create new step</h5>
+          <button type="button" class="btn-close" (click)="closeAddStepModal()"></button>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-warning" (click)="createStep()"><i class="bi bi-plus-circle"></i> Add step</button>
-        <button type="button" class="btn btn-secondary" (click)="closeAddStepModal()">Close</button>
+        <div class="modal-body">
+          Please provide the elementId that you want to add as a step
+
+          <div class="input-group mb-3 ">
+            <span class="input-group-text">Element Id</span>
+            <input type="text" class="form-control" [(ngModel)]="newStepElementId">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-warning" (click)="createStep()"><i class="bi bi-plus-circle"></i> Add step</button>
+          <button type="button" class="btn btn-secondary" (click)="closeAddStepModal()">Close</button>
+        </div>
       </div>
     </div>
   </div>
-</div>

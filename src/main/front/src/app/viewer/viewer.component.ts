@@ -1,26 +1,47 @@
 import { Component, AfterViewInit, ViewChild, ElementRef, OnInit } from '@angular/core';
 import NavigatedViewer from 'camunda-bpmn-js/lib/camunda-cloud/NavigatedViewer';
-import { ProcessService } from '../services/process.service';
+import BpmnModeler from 'camunda-bpmn-js/lib/camunda-cloud/Modeler';
+import ElementTemplatesIconsRenderer from '@bpmn-io/element-template-icon-renderer';
+import { CamundaCloudModeler as DmnModeler } from 'camunda-dmn-js';
+import { basicSetup, EditorView } from 'codemirror';
+import { xml } from '@codemirror/lang-xml';
+
 import { ExecPlanService } from '../services/exec-plan.service';
 
 @Component({
-  selector: 'app-viewer',
-  templateUrl: './viewer.component.html',
-  styleUrls: ['./viewer.component.css']
+    selector: 'app-viewer',
+    templateUrl: './viewer.component.html',
+    styleUrls: ['./viewer.component.css'],
+    standalone: false
 })
 export class ViewerComponent implements AfterViewInit, OnInit {
- 
+
   @ViewChild('viewer') viewerElt: ElementRef | undefined;
+  @ViewChild('dmn') dmnElt: ElementRef | undefined;
+  @ViewChild('dmnProperties') dmnPropElt: ElementRef | undefined;
+  @ViewChild('jsonDepDefinition') jsonDepDefinition!: ElementRef
+  @ViewChild('modelerDepDefinition') modelerDepDefinition!: ElementRef;
+  @ViewChild('modelerProperties') modelerProperties!: ElementRef;
+
   viewer: NavigatedViewer | undefined;
+  editDepModeler: BpmnModeler | undefined;
+  editDepJson: EditorView | undefined;
+  dmnEditor: any | undefined;
   previousActivity?: string;
+  showDmn = false;
   xmlDeps = ["Main definition"];
+  dmnDeps: string[] = [];
+  currentDmn: string = '';
+  currentDep: string = 'Main definition';
   selectedElt: any = null;
   origins: any[] = [];
   addDepModal = false;
+  editDepModal = false;
   newDepXml?: string;
   intermediateCatchEventSource?: any;
+  editDepType = 'modeler';
 
-  constructor(private processService: ProcessService, public execPlanService: ExecPlanService) {
+  constructor(public execPlanService: ExecPlanService) {
     this.execPlanService.activitySubject.subscribe((activity: string) => {
       this.colorSelectedActivity(activity);
     });
@@ -37,8 +58,6 @@ export class ViewerComponent implements AfterViewInit, OnInit {
         const eltRegistry: any = this.viewer!.get('elementRegistry');
         eltRegistry.forEach((elt: any) => {
           if (this.execPlanService.isManagedActivity(elt.type)) {
-            console.log(elt.di.bpmnElement.name);
-
             if (stepScenar.indexOf(elt.id) < 0) {
               this.colorActivity(elt.id, "#000000");
             }
@@ -49,19 +68,25 @@ export class ViewerComponent implements AfterViewInit, OnInit {
       }
     }
   }
+
   ngOnInit(): void {
     if (this.execPlanService.executionPlan.xmlDependencies) {
       for (let prop in this.execPlanService.executionPlan.xmlDependencies) {
         this.xmlDeps.push(prop);
       }
     }
+    if (this.execPlanService.executionPlan.dmnDependencies) {
+      for (let prop in this.execPlanService.executionPlan.dmnDependencies) {
+        this.dmnDeps.push(prop);
+      }
+    }
   }
 
   ngAfterViewInit(): void {
-
     this.viewer = new NavigatedViewer({
       container: this.viewerElt!.nativeElement,
-      height: 400
+      height: 400,
+      additionalModules: [ElementTemplatesIconsRenderer]
     });
     this.viewer.importXML(this.execPlanService.executionPlan.xml).then((result: any) => {
       this.colorSelectedActivity('blop');
@@ -74,6 +99,8 @@ export class ViewerComponent implements AfterViewInit, OnInit {
   }
 
   openDef(dep: string): void {
+    this.showDmn = false;
+    this.currentDep = dep;
     if (dep == "Main definition") {
       this.viewer!.importXML(this.execPlanService.executionPlan.xml).then((result: any) => {
         this.colorSelectedActivity('blop');
@@ -84,6 +111,39 @@ export class ViewerComponent implements AfterViewInit, OnInit {
       });
     }
   }
+
+  buildDmnEditor(): void {
+    this.showDmn = true;
+    if (!this.dmnEditor) {
+      this.dmnEditor = new DmnModeler({
+        container: this.dmnElt!.nativeElement,
+        drd: {
+          propertiesPanel: {
+            parent: this.dmnPropElt!.nativeElement
+          }
+        },
+        height: 400,
+        width: '100%',
+        keyboard: {
+          bindTo: window
+        }
+      });
+    }
+
+  }
+
+  openDmn(dep: string): void {
+    this.buildDmnEditor();
+    this.currentDmn = dep;
+    let editor = this.dmnEditor;
+    this.dmnEditor.importXML(this.execPlanService.executionPlan.dmnDependencies[dep], function (err: any) {
+      var activeView = editor.getActiveView();
+      if (activeView.type === 'drd') {
+        var activeEditor = editor.getActiveViewer();
+      }
+    });
+  }
+
 
   selectActivity = (event: any) => {
     this.selectedElt = event.element;
@@ -142,7 +202,13 @@ export class ViewerComponent implements AfterViewInit, OnInit {
         let messageRef = this.selectedElt.businessObject.eventDefinitions[0].messageRef;
         this.execPlanService.createPreStepInScenario(parentStep, 'MSG', messageRef, 3600);
       } else if (type == 'bpmn:TimerEventDefinition') {
-        let timer = this.selectedElt.businessObject.eventDefinitions[0].timeDuration.body;
+        let moddleElt = this.selectedElt.businessObject.eventDefinitions[0];
+        let timer = 'PT10M';
+        if (moddleElt.timeCycle) {
+          timer = moddleElt.timeCycle.body.substring(2);
+        } else if (moddleElt.timeDuration) {
+          timer = moddleElt.timeDuration.body;
+        }
         this.execPlanService.createPreStepInScenario(parentStep, 'CLOCK', null, timer);
       } else if (type == 'bpmn:ErrorEventDefinition') {
         let errorRef = this.selectedElt.businessObject.eventDefinitions[0].errorRef;
@@ -174,7 +240,7 @@ export class ViewerComponent implements AfterViewInit, OnInit {
         alert('Implementation for the type ' + type + ' is missing.');
       }
 
-    }  else {
+    } else {
       this.execPlanService.createStepInScenario(this.selectedElt.id);
     }
     this.closenewstepModal();
@@ -218,8 +284,131 @@ export class ViewerComponent implements AfterViewInit, OnInit {
           this.xmlDeps.push(elt.id);
         }
       }
+    }).catch(() => {
+      if (xml.indexOf("decision") > 0) {
+        this.buildDmnEditor();
+        this.dmnEditor.importXML(xml).then((err: any) => {
+          let name = this.dmnEditor._definitions.name;
+          if (!this.execPlanService.executionPlan.dmnDependencies || this.execPlanService.executionPlan.dmnDependencies == null) {
+            this.execPlanService.executionPlan.dmnDependencies = {};
+          }
+          this.execPlanService.executionPlan.dmnDependencies[name] = xml;
+          this.dmnDeps.push(name);
+          this.currentDmn = name;
+        });
+      }
     });
 
     this.toggleAddDep();
   }
+
+  saveDmn(): void {
+
+    this.dmnEditor!.saveXML().then((result: any) => {
+      this.execPlanService.executionPlan.dmnDependencies[this.currentDmn] = result.xml;
+    });
+  }
+
+  toggleEditDep(dep: string): void {
+    if (dep != '') {
+      this.currentDep = dep;
+    }
+    this.editDepModal = !this.editDepModal;
+    if (this.editDepModal) {
+      (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById('editDepModal')).show();
+    let content = '';
+    if (this.currentDep == "Main definition") {
+      content = this.execPlanService.executionPlan.xml;
+    } else {
+      content = this.execPlanService.executionPlan.xmlDependencies[this.currentDep];
+    }
+      this.prepareDefinitionEdition(content);
+    } else {
+      this.newDepXml = undefined;
+      (window as any).bootstrap.Modal.getInstance(document.getElementById('editDepModal')).hide();
+    }
+  }
+
+  setEditDepType(type: string) {
+    this.editDepType = type;
+	if (this.editDepType=='XML') {
+	  this.editDepModeler!.saveXML({format: true}).then((result: any) => {
+	    this.prepareDefinitionEdition(result.xml);
+	  });
+	} else {
+	  this.prepareDefinitionEdition(this.editDepJson!.state.doc.toString());
+	}
+  }
+
+  prepareDefinitionEdition(content: string): void {
+
+    if (this.editDepType == 'XML') {
+      if (!this.editDepJson) {
+        this.editDepJson = new EditorView({
+          doc: content,
+          extensions: [
+            basicSetup,
+            xml()/*,
+            this.updateTemplate*/
+          ],
+          parent: this.jsonDepDefinition.nativeElement,
+        });
+      } else {
+	    this.editDepJson.dispatch({changes: {
+		  from: 0,
+		  to: this.editDepJson.state.doc.length,
+		  insert: content
+		}})
+	  }
+
+    } else {
+      if (!this.editDepModeler) {
+        this.editDepModeler = new BpmnModeler({
+          container: this.modelerDepDefinition!.nativeElement,
+          propertiesPanel: {
+            parent: this.modelerProperties!.nativeElement
+          },
+          height: 600,
+          additionalModules: [ElementTemplatesIconsRenderer]
+        });
+      }
+      this.editDepModeler!.importXML(content).then((result: any) => { });
+    }
+
+  }
+
+  applyDepModif(): void {
+    if (this.editDepType == 'XML') {
+      this.execPlanService.updateDep(this.currentDep, this.editDepJson!.state.doc.toString());
+      this.toggleEditDep('');
+    } else {
+
+      this.editDepModeler!.saveXML({format: true}).then((result: any) => {
+        this.execPlanService.updateDep(this.currentDep, result.xml);
+        this.toggleEditDep('');
+      });
+    }
+  }
+
+  prettifyXml(sourceXml: string): string {
+    var xmlDoc = new DOMParser().parseFromString(sourceXml, 'application/xml');
+    var xsltDoc = new DOMParser().parseFromString([
+      `<xsl:stylesheet version="1.0"
+ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+ <xsl:output method="xml" omit-xml-declaration="yes" indent="yes"/>
+
+ <xsl:template match="node()|@*">
+  <xsl:copy>
+   <xsl:apply-templates select="node()|@*"/>
+  </xsl:copy>
+ </xsl:template>
+</xsl:stylesheet>`,
+    ].join('\n'), 'application/xml');
+
+    var xsltProcessor = new XSLTProcessor();
+    xsltProcessor.importStylesheet(xsltDoc);
+    var resultDoc = xsltProcessor.transformToDocument(xmlDoc);
+    var resultXml = new XMLSerializer().serializeToString(resultDoc);
+    return resultXml;
+  };
 }
