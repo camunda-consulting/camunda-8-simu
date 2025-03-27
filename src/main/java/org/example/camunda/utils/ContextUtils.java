@@ -2,51 +2,57 @@ package org.example.camunda.utils;
 
 import io.camunda.zeebe.client.api.worker.JobWorker;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import org.example.camunda.core.actions.Action;
+import org.example.camunda.core.actions.ClockAction;
 import org.example.camunda.dto.ExecutionPlan;
 import org.example.camunda.dto.InstanceContext;
+import org.example.camunda.dto.InstancesToStart;
 import org.example.camunda.dto.Scenario;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ContextUtils {
 
-  private static long estimateEngineTime;
-  private static ExecutionPlan currentPlan = null;
-  private static Map<String, String> dateTimers = new HashMap<>();
-  private static Map<String, String> durationTimers = new HashMap<>();
-  private static SortedMap<Long, List<Action>> timedActions = new TreeMap<>();
-  private static Map<String, InstanceContext> processInstanceScenarioMap = new HashMap<>();
-  private static Set<String> minHandledMap = new HashSet<>();
-  private static Set<String> maxHandledMap = new HashSet<>();
-  private static Set<String> minProcessInstances = new HashSet<>();
-  private static Set<String> maxProcessInstances = new HashSet<>();
-  private static List<JobWorker> activeWorkers = new ArrayList<>();
+  private static final Logger LOG = LoggerFactory.getLogger(ContextUtils.class);
 
-  public static void addInstance(String uniqueId, Scenario scenario, Double progress) {
-    processInstanceScenarioMap.put(uniqueId, new InstanceContext(scenario, progress));
-    prepareMinMax(uniqueId, scenario, progress);
+  private static long estimateEngineTime;
+  private static boolean executing = true;
+  private static ExecutionPlan currentPlan = null;
+  private static final SortedMap<Long, Map<String, InstancesToStart>> timedScenarioInstance =
+      new TreeMap<>();
+  private static final SortedMap<Long, Map<String, List<Action>>> timedActions = new TreeMap<>();
+  private static final Map<String, InstanceContext> processInstanceScenarioMap = new HashMap<>();
+  private static final Map<String, Long> uniqueKeyToInstanceKey = new HashMap<>();
+  private static final List<JobWorker> activeWorkers = new ArrayList<>();
+
+  public static void addInstancesToStart(
+      long time, Scenario scenario, Long nbInstances, double progress) {
+    if (!timedScenarioInstance.containsKey(time)) {
+      timedScenarioInstance.put(time, new HashMap<>());
+    }
+    timedScenarioInstance
+        .get(time)
+        .put(scenario.getName(), new InstancesToStart(time, scenario, progress, nbInstances));
   }
 
-  private static synchronized void prepareMinMax(
-      String processUniqueId, Scenario scenario, Double progress) {
-    if (!minHandledMap.contains(scenario.getName() + progress)) {
-      minHandledMap.add(scenario.getName() + progress);
-      minProcessInstances.add(processUniqueId);
-    } else if (!maxHandledMap.contains(scenario.getName() + progress)) {
-      maxHandledMap.add(scenario.getName() + progress);
-      maxProcessInstances.add(processUniqueId);
+  public static InstancesToStart getInstancesToStart() {
+    if (timedScenarioInstance.isEmpty()) {
+      return null;
+    }
+    return timedScenarioInstance.firstEntry().getValue().values().iterator().next();
+  }
+
+  public static void started(long time, String scenario) {
+    timedScenarioInstance.get(time).remove(scenario);
+    if (timedScenarioInstance.get(time).isEmpty()) {
+      timedScenarioInstance.remove(time);
     }
   }
 
-  public static Double getProgress(String processUniqueId) {
-    return getContext(processUniqueId).getProgress();
+  public static synchronized void addInstance(String uniqueId, Scenario scenario, Double progress) {
+    processInstanceScenarioMap.put(uniqueId, new InstanceContext(scenario, uniqueId, progress));
   }
 
   public static InstanceContext getContext(String processUniqueId) {
@@ -57,29 +63,51 @@ public class ContextUtils {
     activeWorkers.add(worker);
   }
 
-  public static long addAction(long time, Action action) {
-    if (time < System.currentTimeMillis()) {
-      long realTime = buildEntry(ContextUtils.getPlan().getTimePrecision().round(time));
-      timedActions.get(realTime).add(action);
-      return realTime;
+  public static void addTime(long time, String uniqueId) {
+    List<Action> existing = getActionsAt(time, "Clock");
+    if (existing != null && !existing.isEmpty()) {
+      ((ClockAction) (existing.get(0))).addUniqueId(uniqueId);
     } else {
-      return -1;
+      addAction(time, new ClockAction(uniqueId, time));
     }
   }
 
-  public static long buildEntry(long time) {
-    if (time < System.currentTimeMillis() && !timedActions.containsKey(time)) {
-      timedActions.put(time, new ArrayList<>());
+  public static synchronized long addAction(long realTime, Action action) {
+    if (!timedActions.containsKey(realTime)) {
+      timedActions.put(realTime, new HashMap<>());
     }
-    return time;
+    if (action != null) {
+      if (!timedActions.get(realTime).containsKey(action.getType())) {
+        timedActions.get(realTime).put(action.getType(), new ArrayList<>());
+      }
+      timedActions.get(realTime).get(action.getType()).add(action);
+    }
+    return realTime;
+  }
+
+  public static List<Action> getActionsAt(long time, String type) {
+    if (timedActions.containsKey(time)) {
+      return timedActions.get(time).get(type);
+    } else {
+      return null;
+    }
   }
 
   public static long nextTimeEntry() {
     return timedActions.firstKey();
   }
 
-  public static List<Action> getActionsAt(long time) {
-    return timedActions.get(time);
+  public static boolean isEmptyTime(long time) {
+    try {
+      for (List<Action> actions : timedActions.get(time).values()) {
+        if (!actions.isEmpty()) {
+          return false;
+        }
+      }
+    } catch (NullPointerException e) {
+
+    }
+    return true;
   }
 
   public static void removeTimeEntry(long time) {
@@ -90,70 +118,33 @@ public class ContextUtils {
     return !timedActions.isEmpty();
   }
 
-  public static int nbEntries() {
-    return timedActions.size();
-  }
-
-  public static void endPlan() {
-    HistoUtils.endPlan();
-    currentPlan = null;
-    timedActions.clear();
-    durationTimers.clear();
-    dateTimers.clear();
-    processInstanceScenarioMap.clear();
-    minHandledMap.clear();
-    maxHandledMap.clear();
-    minProcessInstances.clear();
-    maxProcessInstances.clear();
+  public static void stopWorkers() {
     for (JobWorker worker : activeWorkers) {
       worker.close();
     }
     activeWorkers.clear();
+  }
+
+  public static void endPlan() {
+    stopWorkers();
+    // HistoUtils.endPlan();
+    executing = false;
+    timedActions.clear();
     estimateEngineTime = 0;
-  }
-
-  public static boolean shouldComputeMin(String processUniqueId) {
-    return minProcessInstances.contains(processUniqueId);
-  }
-
-  public static boolean shouldComputeMax(String processUniqueId) {
-    return maxProcessInstances.contains(processUniqueId);
-  }
-
-  public static void addDateTimer(String flowNodeId, String date) {
-    dateTimers.put(flowNodeId, date);
-  }
-
-  public static void addDurationTimer(String flowNodeId, String durationFeelExpression) {
-    durationTimers.put(flowNodeId, durationFeelExpression);
-  }
-
-  public static boolean isDateTimer(String flowNodeId) {
-    return dateTimers.containsKey(flowNodeId);
-  }
-
-  public static boolean isDurationTimer(String flowNodeId) {
-    return durationTimers.containsKey(flowNodeId);
-  }
-
-  public static String getDateTimer(String flowNodeId) {
-    return dateTimers.get(flowNodeId);
-  }
-
-  public static String getDurationTimer(String flowNodeId) {
-    return durationTimers.get(flowNodeId);
-  }
-
-  public static int getIdleTimeBeforeClockMove() {
-    return currentPlan.getIdleTimeBeforeClockMove();
+    cleanPendingInstances();
   }
 
   public static void setPlan(ExecutionPlan plan) {
     currentPlan = plan;
+    executing = true;
   }
 
   public static ExecutionPlan getPlan() {
     return currentPlan;
+  }
+
+  public static boolean isExecuting() {
+    return executing;
   }
 
   public static long getEngineTime() {
@@ -161,10 +152,96 @@ public class ContextUtils {
   }
 
   public static void setEngineTime(long estimateEngineTime) {
+
     ContextUtils.estimateEngineTime = estimateEngineTime;
   }
 
   public static ChronoUnit getInstanceDistribution() {
     return currentPlan.getInstanceDistribution();
+  }
+
+  private static AtomicLong nbInstances = new AtomicLong(0);
+
+  public static synchronized void setNbInstances(long newInstances) {
+    nbInstances = new AtomicLong(newInstances);
+  }
+
+  public static Long getNbInstances() {
+    return nbInstances.get();
+  }
+
+  public static void instanceCompleted(String processUniqueId) {
+    processInstanceScenarioMap.remove(processUniqueId);
+    mapTaskDuration.remove(processUniqueId);
+    processInstanceTime.remove(processUniqueId);
+    uniqueKeyToInstanceKey.remove(processUniqueId);
+    nbInstances.decrementAndGet();
+    HistoUtils.completeInstances(1);
+  }
+
+  private static final Map<String, Map<String, Long>> mapTaskDuration = new HashMap<>();
+
+  public static void addTaskDuration(String processUniqueId, String stepId, Long duration) {
+    if (!mapTaskDuration.containsKey(processUniqueId)) {
+      mapTaskDuration.put(processUniqueId, new HashMap<>());
+    }
+    mapTaskDuration.get(processUniqueId).put(stepId, duration);
+  }
+
+  public static Long getTaskDuration(String processUniqueId, String stepId) {
+    if (!mapTaskDuration.containsKey(processUniqueId)) {
+      return null;
+    }
+    return mapTaskDuration.get(processUniqueId).get(stepId);
+  }
+
+  public static final Map<String, Long> processInstanceTime = new HashMap<>();
+
+  public static void setProcessInstanceTime(String processUniqueId, long time) {
+    if (!processInstanceTime.containsKey(processUniqueId)
+        || processInstanceTime.get(processUniqueId) < time) {
+      processInstanceTime.put(processUniqueId, time);
+    }
+  }
+
+  public static Long getProcessInstanceTime(String processUniqueId) {
+    return processInstanceTime.get(processUniqueId);
+  }
+
+  public static void addInstanceKey(String processUniqueId, long processInstanceKey) {
+    uniqueKeyToInstanceKey.put(processUniqueId, processInstanceKey);
+  }
+
+  public static Collection<Long> getPendingInstanceKeys() {
+    return uniqueKeyToInstanceKey.values();
+  }
+
+  public static void cleanPendingInstances() {
+    processInstanceScenarioMap.clear();
+    mapTaskDuration.clear();
+    processInstanceTime.clear();
+    nbInstances.set(0);
+    uniqueKeyToInstanceKey.clear();
+    jobKeysReceived.clear();
+  }
+
+  private static final Set<Long> jobKeysReceived = new HashSet<>();
+
+  public static synchronized boolean checkAlreadyReceived(Long key) {
+    boolean already = jobKeysReceived.contains(key);
+    if (already) return true;
+    jobKeysReceived.add(key);
+    return false;
+  }
+
+  private static final Map<String, Long> avgStepDuration = new HashMap<>();
+
+  public static void addAvgStepDuration(
+      String step, String scenario, Double progress, Long duration) {
+    avgStepDuration.put(step + scenario + progress, duration);
+  }
+
+  public static Long getAvgStepDuration(String step, String scenario, Double progress) {
+    return avgStepDuration.get(step + scenario + progress);
   }
 }

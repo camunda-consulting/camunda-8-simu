@@ -1,7 +1,5 @@
 package org.example.camunda.facade;
 
-import io.camunda.operate.exception.OperateException;
-import io.camunda.operate.model.ProcessDefinition;
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -10,25 +8,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.example.camunda.dto.ExecutionPlan;
+import org.example.camunda.dto.HistoPlan;
 import org.example.camunda.dto.Scenario;
+import org.example.camunda.dto.operate.ProcessDefinition;
 import org.example.camunda.dto.progression.Evolution;
 import org.example.camunda.service.ExecutionPlanService;
-import org.example.camunda.service.OperateService;
 import org.example.camunda.service.ScenarioExecService;
-import org.example.camunda.utils.BpmnUtils;
-import org.example.camunda.utils.ContextUtils;
-import org.example.camunda.utils.ScenarioUtils;
+import org.example.camunda.test.TestAction;
+import org.example.camunda.test.ZeebeTestUtils;
+import org.example.camunda.utils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin
 @RestController
@@ -36,22 +27,21 @@ import org.springframework.web.bind.annotation.RestController;
 public class ExecPlanController {
 
   private static final Logger LOG = LoggerFactory.getLogger(ExecPlanController.class);
-  private final OperateService operateService;
   private final ExecutionPlanService execPlanService;
   private final ScenarioExecService scenarioExecService;
 
   public ExecPlanController(
-      OperateService operateService,
-      ExecutionPlanService execPlanService,
-      ScenarioExecService scenarioExecService) {
-    this.operateService = operateService;
+      ExecutionPlanService execPlanService, ScenarioExecService scenarioExecService) {
     this.execPlanService = execPlanService;
     this.scenarioExecService = scenarioExecService;
   }
 
   @GetMapping("/running")
   public ExecutionPlan runningPlan() {
-    return ContextUtils.getPlan();
+    if (ContextUtils.isExecuting()) {
+      return ContextUtils.getPlan();
+    }
+    return null;
   }
 
   @GetMapping("/stop")
@@ -61,66 +51,42 @@ public class ExecPlanController {
     }
   }
 
-  @GetMapping("/{bpmnProcessId}/{version}")
-  public ExecutionPlan definitions(@PathVariable String bpmnProcessId, @PathVariable Long version)
-      throws OperateException, IOException {
-    ExecutionPlan plan = execPlanService.find(bpmnProcessId, version);
-    if (plan == null) {
-      plan = new ExecutionPlan();
-
-      plan.setDefinition(operateService.getProcessDefinition(bpmnProcessId, version));
-      plan.setXml(operateService.getProcessDefinitionXmlByKey(plan.getDefinition().getKey()));
-      plan.setXmlDependencies(operateService.getDependencies(plan.getXml()));
-      Scenario s = ScenarioUtils.generateScenario(plan.getXml(), plan);
-      s.setName("Scenario 1");
-      plan.getScenarii().add(s);
-      execPlanService.save(plan);
-    }
-    return plan;
+  @GetMapping("/{name}")
+  public ExecutionPlan getPlan(@PathVariable String name)
+      throws IOException {
+    return execPlanService.find(name);
   }
 
-  @PostMapping("/{bpmnProcessId}/{version}/xml")
-  public ExecutionPlan definitions(
-      @PathVariable String bpmnProcessId, @PathVariable Long version, @RequestBody String xml)
-      throws OperateException, IOException {
-    ExecutionPlan plan = execPlanService.find(bpmnProcessId, version);
+  @PostMapping("/{bpmnProcessId}/xml")
+  public ExecutionPlan updateXml(@PathVariable String bpmnProcessId, @RequestBody String xml)
+      throws IOException {
+    ExecutionPlan plan = execPlanService.find(bpmnProcessId);
     plan.setXml(xml);
     plan.setXmlModified(true);
     execPlanService.save(plan);
     return plan;
   }
 
-  @PutMapping("/{bpmnProcessId}/{version}/newScenario")
-  public ExecutionPlan newScenario(
-      @PathVariable String bpmnProcessId,
-      @PathVariable Long version,
-      @RequestBody ExecutionPlan plan)
-      throws OperateException, IOException {
-    ExecutionPlan originalPlan = execPlanService.find(bpmnProcessId, version);
-    Scenario s = ScenarioUtils.generateScenario(originalPlan.getXml(), originalPlan);
+  @PutMapping("/newScenario")
+  public ExecutionPlan newScenario(@RequestBody ExecutionPlan plan) {
+    // ExecutionPlan originalPlan = execPlanService.find(bpmnProcessId);
+    Scenario s = ScenarioUtils.generateScenario(plan.getXml(), plan);
     s.setName("Scenario " + (plan.getScenarii().size() + 1));
     plan.getScenarii().add(s);
     return plan;
   }
 
-  @PutMapping("/{bpmnProcessId}/{version}")
-  public ExecutionPlan definitions(
-      @PathVariable String bpmnProcessId,
-      @PathVariable Long version,
-      @RequestBody ExecutionPlan plan)
-      throws OperateException, IOException {
+  @PutMapping
+  public ExecutionPlan save(@RequestBody ExecutionPlan plan) throws IOException {
     return execPlanService.save(plan);
   }
 
-  @GetMapping("/{bpmnProcessId}/{version}/start")
-  public boolean startPlan(@PathVariable String bpmnProcessId, @PathVariable Long version)
-      throws OperateException, IOException {
-    ExecutionPlan plan = execPlanService.find(bpmnProcessId, version);
+  @GetMapping("/{name}/start")
+  public boolean startPlan(@PathVariable String name)
+      throws IOException {
+    ExecutionPlan plan = execPlanService.find(name);
     if (plan == null) {
       return false;
-    }
-    if (plan.getXmlModified()) {
-      this.scenarioExecService.deploy(plan.getDefinition().getName(), plan.getXml());
     }
     this.scenarioExecService.start(plan);
     return true;
@@ -130,7 +96,7 @@ public class ExecPlanController {
   public boolean startPlan(
       @RequestBody ExecutionPlan plan,
       @RequestParam(value = "scenario", required = false) String scenario)
-      throws OperateException, IOException {
+      throws IOException {
     if (plan == null) {
       return false;
     }
@@ -142,6 +108,24 @@ public class ExecPlanController {
     return true;
   }
 
+  @PostMapping("/test")
+  public Map<String, List<TestAction>> testPlan(@RequestBody ExecutionPlan plan)
+      throws NoSuchFieldException, IllegalAccessException {
+    if (plan == null) {
+      return null;
+    }
+    return ZeebeTestUtils.test(plan);
+  }
+
+  @GetMapping("/status/{name}")
+  public Map<String, String> getSatus(@PathVariable String name) {
+    HistoPlan plan = HistoUtils.getPlan(name);
+    if (plan == null) {
+      return Map.of("status", "not started");
+    }
+    return Map.of("status", plan.isRunning() ? "running" : "completed");
+  }
+
   @PostMapping
   public ExecutionPlan createPlanFromXml(@RequestBody String xml) throws IOException {
     ProcessDefinition def = new ProcessDefinition();
@@ -150,6 +134,7 @@ public class ExecPlanController {
     def.setVersion(-1L);
     def.setName(procIdName.values().iterator().next());
     ExecutionPlan plan = new ExecutionPlan();
+    plan.setName(def.getBpmnProcessId());
     plan.setDefinition(def);
     plan.setXml(xml);
     Scenario s = ScenarioUtils.generateScenario(xml, plan);
@@ -271,5 +256,11 @@ public class ExecPlanController {
             "tension",
             0.3));
     return Map.of("labels", labels, "datasets", datasets);
+  }
+
+  @DeleteMapping("/{name}")
+  public Map<String, Boolean> delete(@PathVariable String name) throws IOException {
+    execPlanService.delete(name);
+    return Map.of("status", true);
   }
 }

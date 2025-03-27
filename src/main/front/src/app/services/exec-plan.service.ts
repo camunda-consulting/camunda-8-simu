@@ -72,16 +72,19 @@ export class ExecPlanService {
     });
   }
 
-  openExecutionPlan(definition: any): void {
-    this.http.get<any>(environment.backend + "/api/plan/" + definition.bpmnProcessId + "/" + definition.version).subscribe((response: any) => {
+  openExecutionPlan(plan: any): void {
+    this.http.get<any>(environment.backend + "/api/plan/" + plan.bpmnProcessId).subscribe((response: any) => {
       this.executionPlan = response;
       this.loadActivities();
       this.selectScenario(response.scenarii[0]);
     });
   }
+  delete(plan: any): Observable<any> {
+    return this.http.delete<any>(environment.backend + "/api/plan/" + plan.bpmnProcessId);
+  }
 
   executePlan(definition: any): Observable<any> {
-    return this.http.get<any>(environment.backend + "/api/plan/" + definition.bpmnProcessId + "/" + definition.version + "/start");
+    return this.http.get<any>(environment.backend + "/api/plan/" + definition.bpmnProcessId + "/start");
   }
 
   executeCurrentPlan(): void {
@@ -90,24 +93,35 @@ export class ExecPlanService {
     });
   }
 
+  testPlan(): Observable<any> {
+    return this.http.post<any>(environment.backend + "/api/plan/test", this.executionPlan);
+  }
+
   executeCurrentScenario(): void {
     this.http.post<any>(environment.backend + "/api/plan/start?scenario=" + this.scenario!.name, this.executionPlan).subscribe((response: any) => {
       console.log("status " + response);
     });
   }
+  updateDep(dep: string, xml: string): void {
 
+    if (dep == "Main definition") {
+      this.executionPlan.xml = xml;
+    } else {
+      this.executionPlan.xmlDependencies[dep] = xml;
+    }
+  }
   updateDef(xml: string): void {
-    this.http.post<any>(environment.backend + "/api/plan/" + this.executionPlan.definition.bpmnProcessId + "/" + this.executionPlan.definition.version + '/xml', xml).subscribe((response: any) => {
+    this.http.post<any>(environment.backend + "/api/plan/" + this.executionPlan.definition.bpmnProcessId + '/xml', xml).subscribe((response: any) => {
       this.executionPlan = response;
     });
   }
   updatePlan(): void {
-    this.http.put<any>(environment.backend + "/api/plan/" + this.executionPlan.definition.bpmnProcessId + "/" + this.executionPlan.definition.version, this.executionPlan).subscribe((response: any) => {
+    this.http.put<any>(environment.backend + "/api/plan", this.executionPlan).subscribe((response: any) => {
       this.executionPlan = response;
     });
   }
   addScenario(): void {
-    this.http.put<any>(environment.backend + "/api/plan/" + this.executionPlan.definition.bpmnProcessId + "/" + this.executionPlan.definition.version + "/newScenario", this.executionPlan).subscribe((response: any) => {
+    this.http.put<any>(environment.backend + "/api/plan/newScenario", this.executionPlan).subscribe((response: any) => {
       this.executionPlan = response;
     });
   }

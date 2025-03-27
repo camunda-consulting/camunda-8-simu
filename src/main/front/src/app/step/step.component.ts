@@ -1,12 +1,13 @@
-import { Component, AfterViewInit, ViewChild, ElementRef, Input, OnInit } from '@angular/core';
+import { Component, AfterViewInit, Input, OnInit } from '@angular/core';
 import { basicSetup, EditorView } from 'codemirror';
 import { json } from '@codemirror/lang-json';
-import { ProcessService } from '../services/process.service';
 import { ExecPlanService } from '../services/exec-plan.service';
+
 @Component({
-  selector: 'app-step',
-  templateUrl: './step.component.html',
-  styleUrls: ['./step.component.css']
+    selector: 'app-step',
+    templateUrl: './step.component.html',
+    styleUrls: ['./step.component.css'],
+    standalone: false
 })
 export class StepComponent implements AfterViewInit, OnInit {
 
@@ -14,7 +15,7 @@ export class StepComponent implements AfterViewInit, OnInit {
   prestep: any;
   poststep: any;
 
-  constructor(private processService: ProcessService, public execPlanService: ExecPlanService) { }
+  constructor(public execPlanService: ExecPlanService) { }
   ngOnInit(): void {
     if (this.step.preSteps && this.step.preSteps.length > 0) {
       this.prestep = this.step.preSteps[0];
@@ -45,13 +46,13 @@ export class StepComponent implements AfterViewInit, OnInit {
     return 'Error ' + step.errorCode + ' after ' + step.delay + '(' + this.execPlanService.executionPlan!.durationsType + ')';
   }
 
-  updatePreStep = EditorView.updateListener.of((v) => {
+  /*updatePreStep = EditorView.updateListener.of((v) => {
     this.prestep.jsonTemplate.template = v.state.doc.toString();
   });
 
   updatePostStep = EditorView.updateListener.of((v) => {
     this.poststep.jsonTemplate.template = v.state.doc.toString();
-  });
+  });*/
 
   openDurationModal() {
     (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById(this.step.elementId + '-durationModal')).show();
@@ -76,7 +77,7 @@ export class StepComponent implements AfterViewInit, OnInit {
   }
 
   addPreStep() {
-    this.prestep = { "type": "CLOCK", "feelDelay": "PT5M", "jsonTemplate": { "template": "", "exampleContext": {} } };
+    this.prestep = { "type": "CLOCK", "feelDelay": "PT5M", "jsonTemplate": { "template": "{}", "exampleContext": {} } };
     if (!this.step.preSteps) {
       this.step.preSteps = [];
     }
@@ -84,7 +85,7 @@ export class StepComponent implements AfterViewInit, OnInit {
     this.openPreStepModal(this.step.preSteps.length - 1);
   }
   addPostStep() {
-    this.poststep = { "type": "CLOCK", "feelDelay": "PT5M", "jsonTemplate": { "template": "", "exampleContext": {} } };
+    this.poststep = { "type": "CLOCK", "feelDelay": "PT5M", "jsonTemplate": { "template": "{}", "exampleContext": {} } };
     if (!this.step.postSteps) {
       this.step.postSteps = [];
     }

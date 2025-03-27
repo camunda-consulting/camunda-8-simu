@@ -1,15 +1,17 @@
 package org.example.camunda.dto;
 
-import io.camunda.operate.model.ProcessDefinition;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.example.camunda.dto.operate.ProcessDefinition;
 
 public class ExecutionPlan {
+  private String name;
   private ProcessDefinition definition;
   private String xml;
   private Map<String, String> xmlDependencies;
+  private Map<String, String> dmnDependencies;
   private Boolean xmlModified = false;
   private Integer idleTimeBeforeClockMove = 300;
   private ChronoUnit instanceDistribution = ChronoUnit.DAYS;
@@ -17,6 +19,16 @@ public class ExecutionPlan {
   private String durationsType = "FEEL";
   private List<Scenario> scenarii = new ArrayList<>();
   private String stepLabel = "id";
+
+  public String getName() {
+    if (name != null) {
+      return name;
+    } else return getDefinition().getBpmnProcessId();
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
 
   public ProcessDefinition getDefinition() {
     return definition;
@@ -40,6 +52,14 @@ public class ExecutionPlan {
 
   public void setXmlDependencies(Map<String, String> xmlDependencies) {
     this.xmlDependencies = xmlDependencies;
+  }
+
+  public Map<String, String> getDmnDependencies() {
+    return dmnDependencies;
+  }
+
+  public void setDmnDependencies(Map<String, String> dmnDependencies) {
+    this.dmnDependencies = dmnDependencies;
   }
 
   public Boolean getXmlModified() {

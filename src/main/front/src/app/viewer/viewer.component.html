@@ -1,7 +1,17 @@
 
-<div #viewer></div>
+<div #viewer [ngClass]="showDmn ? 'hidden' : ''"></div>
+<div [ngClass]="showDmn ? 'dmn' : 'hidden'">
+  <div class="renderer" #dmn></div>
+  <div class="prop" #dmnProperties></div>
+  <button class="btn btn-primary saveDmn" (click)="saveDmn()"><i class="bi bi-floppy"></i> Save modifications</button>
+</div>
 <div class="mt-3 bottom">
-  <button class="btn btn-outline-primary m-1" *ngFor="let dep of xmlDeps; let i=index" (click)="openDef(dep)">{{dep}}</button>
+  <div class="btn-group m-1" role="group" aria-label="Basic example" *ngFor="let dep of xmlDeps; let i=index">
+    <button class="btn btn-outline-primary" (click)="openDef(dep)">{{dep}}</button>
+    <button type="button" class="btn btn-primary " (click)="toggleEditDep(dep)"><i class="bi bi-pencil"></i></button>
+  </div>
+
+  <button class="btn btn-outline-primary m-1" *ngFor="let dep of dmnDeps; let i=index" (click)="openDmn(dep)">{{dep}}</button>
   <button class="btn btn-primary" (click)="toggleAddDep()"><i class="bi bi-plus"></i></button>
 </div>
 <div class="modal fade" id="newstep" tabindex="-1" role="dialog" aria-hidden="true">
@@ -11,10 +21,12 @@
         <h5 class="modal-title">Prepare step</h5>
         <button type="button" class="btn-close" (click)="closenewstepModal()"></button>
       </div>
-      <div class="modal-body" *ngIf="selectedElt && selectedElt.type!=='bpmn:IntermediateCatchEvent' &&  selectedElt.type!=='bpmn:BoundaryEvent'">
+	  @if(selectedElt && selectedElt.type!=='bpmn:IntermediateCatchEvent' &&  selectedElt.type!=='bpmn:BoundaryEvent') {
+      <div class="modal-body">
         Do you want to add a step for {{selectedElt.id}} into the current scenario ?
       </div>
-      <div class="modal-body" *ngIf="selectedElt && selectedElt.type=='bpmn:IntermediateCatchEvent'">
+	  } @else if(selectedElt && selectedElt.type=='bpmn:IntermediateCatchEvent') {
+      <div class="modal-body">
         To manage Intermediate catch event, you should add a Post Step activity in the previous task. Please select the activity that will "host" this post step :
         <div class="input-group mb-3">
           <span class="input-group-text">Hosting activity</span>
@@ -23,11 +35,15 @@
           </select>
         </div>
       </div>
-      <div class="modal-body" *ngIf="selectedElt && selectedElt.type=='bpmn:BoundaryEvent'">
+	  } @else if(selectedElt && selectedElt.type=='bpmn:BoundaryEvent') {
+      <div class="modal-body">
         To manage a boundary event, you should add a Pre Step activity in the parent task. Do you want to create that Pre Step ?
       </div>
+	  }
       <div class="modal-footer">
-        <button type="button" class="btn btn-warning" (click)="createStep()" *ngIf="selectedElt"><i class="bi bi-plus-circle"></i> Create</button>
+	    @if(selectedElt) {
+        <button type="button" class="btn btn-primary" (click)="createStep()"><i class="bi bi-plus-circle"></i> Create</button>
+		}
         <button type="button" class="btn btn-secondary" (click)="closenewstepModal()">Close</button>
       </div>
     </div>
@@ -47,8 +63,34 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="addDep()" [disabled]="!newDepXml">Create</button>
+        <button type="button" class="btn btn-primary" (click)="addDep()" [disabled]="!newDepXml">Create</button>
         <button type="button" class="btn btn-secondary" (click)="toggleAddDep()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade modal-xxl" id="editDepModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          Edit a BPMN definition <div class="btn-group btn-group-toggle" data-toggle="buttons">
+            <buttun [ngClass]="editDepType == 'modeler' ? 'btn btn-primary active' : 'btn btn-outline-primary'" (click)="setEditDepType('modeler')"> Modeler </buttun>
+            <buttun [ngClass]="editDepType != 'modeler' ? 'btn btn-primary active' : 'btn btn-outline-primary'" (click)="setEditDepType('XML')"> XML </buttun>
+          </div>
+        </h5>
+        <button type="button" class="btn-close" (click)="toggleEditDep('')"></button>
+      </div>
+      <div class="modal-body">
+        <div [ngClass]="editDepType == 'modeler' ? 'modelermain' : 'modelermain hidden'">
+          <div #modelerDepDefinition class="modeler"></div>
+          <div #modelerProperties class="properties-panel"></div>
+        </div>
+        <div  [ngClass]="editDepType == 'modeler' ? 'hidden' : ''" #jsonDepDefinition></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="applyDepModif()">Apply</button>
+        <button type="button" class="btn btn-secondary" (click)="toggleEditDep('')">Close</button>
       </div>
     </div>
   </div>

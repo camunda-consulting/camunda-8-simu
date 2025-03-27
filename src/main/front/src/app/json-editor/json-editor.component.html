@@ -3,15 +3,20 @@
     <span class="input-group-text">{{label}} <i class="bi bi-question-circle text-info" (click)="help()"></i><i class="bi bi-check2-circle text-success" (click)="toggleCheck()"></i></span>
     <div class="form-control" #jsonTemplate></div>
   </div>
-  <div class="alert alert-info" *ngIf="displayHelp">
+  @if (displayHelp) {
+  <div class="alert alert-info">
     List of available methods (click on its name to have an example) :<br /><span *ngFor="let method of templatingMethods; let i=index"><a (click)="showExample(i)"><b>{{method.name}}</b> <span *ngIf="method.showExample">(e.g. <i *ngFor="let m of method.methods">{{m.example}}. </i>)</span></a>, </span>
-
+    <br />
+    <b>Note :</b> to pass an aray parameter, use the following syntax : &#123;"string1", "string2", "string3"&#125;<br />
     <button type="button" class="btn-close" aria-label="Close" (click)="closeHelp()"></button>
   </div>
+  }
   <div class="input-group" [ngClass]="displayCheck ? '' : 'hidden'">
     <span class="input-group-text">Test context</span>
     <div class="form-control" #contextTemplate></div>
     <button type="button" class="btn btn-outline-primary" (click)="checkTemplate()"><i class="bi bi-check2-circle"></i> Check template</button>
   </div>
-  <div class="alert alert-success" *ngIf="checkResult"><pre>{{checkResult}}</pre></div>
+  @if(checkResult) {
+  <div class="alert alert-success"><pre>{{checkResult}}</pre></div>
+  }
 </div>

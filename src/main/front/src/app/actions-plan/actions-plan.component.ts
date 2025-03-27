@@ -1,41 +1,27 @@
 import { Component, OnInit } from '@angular/core';
 import { ExecPlanService } from '../services/exec-plan.service';
-import { ProcessService } from '../services/process.service';
 
 @Component({
-  selector: 'app-actions-plan',
-  templateUrl: './actions-plan.component.html',
-  styleUrls: ['./actions-plan.component.css']
+    selector: 'app-actions-plan',
+    templateUrl: './actions-plan.component.html',
+    styleUrls: ['./actions-plan.component.css'],
+    standalone: false
 })
 export class ActionsPlanComponent implements OnInit {
 
   state: string = 'general';
   newStepElementId: string = '';
-  running = false;
-  constructor(public execPlanService: ExecPlanService, public processService: ProcessService) { }
+  constructor(public execPlanService: ExecPlanService) { }
 
   ngOnInit(): void {
-    this.execPlanService.currentlyRunning().subscribe((response: any) => {
-      if (response) {
-        this.running = true;
-      }
-    });
+
     this.selectScenario(0);
     }
 
-  
 
 
   addScenario(): void {
     this.execPlanService.addScenario();
-  }
-
-  save(): void {
-    this.execPlanService.updatePlan();
-  }
-
-  execute(): void {
-    this.execPlanService.executeCurrentPlan();
   }
 
   selectScenario(i: number): void {
