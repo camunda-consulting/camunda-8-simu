@@ -3,6 +3,9 @@
 [![](https://img.shields.io/badge/Lifecycle-Incubating-blue)](https://github.com/Camunda-Community-Hub/community/blob/main/extension-lifecycle.md#incubating-)
 
 
+# ARCHIVED REPO
+:information_source: This project is replaced by https://github.com/camunda-consulting/camunda-8-dataloader
+
 # Camunda Platform 8 data simulator
 
 This project is made to populate data into a C8 installation to provide meaningfull data in Optimize, Operate and Tasklist.
