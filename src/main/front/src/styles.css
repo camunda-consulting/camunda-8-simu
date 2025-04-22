@@ -12,6 +12,9 @@
 @import '~camunda-dmn-js/dist/assets/dmn-font/css/dmn.css';
 
 /* custom */
+.overflow {
+	overflow: auto !important;
+}
 .djs-container.with-palette .dmn-definitions {
   display: none;
 }

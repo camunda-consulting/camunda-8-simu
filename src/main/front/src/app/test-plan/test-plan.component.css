@@ -8,4 +8,5 @@
 .tab-content {
   width: 100%;
   padding: 0px 20px;
+  height: calc(100vh - 50px);
 }

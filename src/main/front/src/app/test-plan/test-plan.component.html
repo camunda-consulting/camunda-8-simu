@@ -11,8 +11,8 @@
 	}
     <button [ngClass]="currentTab == 'rawResult' ? 'nav-link active' : 'nav-link' " role="tab" (click)="selectTab('rawResult')"><i class="bi bi-filetype-json"></i>Raw result</button>
   </div>
-  <div class="tab-content">
-    <div [ngClass]="currentTab == 'rawResult' ? 'tab-pane fade show active' : 'tab-pane fade' ">
+  <div class="tab-content overflow">
+    <div [ngClass]="currentTab == 'rawResult' ? 'tab-pane fade show active ' : 'tab-pane fade' ">
       <div class="form-control" #jsonResult></div>
     </div>
     <div [ngClass]="currentTab != 'rawResult' ? 'tab-pane fade show active' : 'tab-pane fade'">
