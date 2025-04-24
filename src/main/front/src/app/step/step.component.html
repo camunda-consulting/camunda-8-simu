@@ -1,3 +1,28 @@
+@if (step.action=="DO_NOTHING" && step.preSteps.length==1 && step.duration.startDesiredAvg=='CLOCK') {
+<div class="row">
+  <div class="col-6">
+    <div class="input-group mb-3 ">
+      <span class="input-group-text">Element Id</span>
+      <input type="text" class="form-control" value="{{step.elementId}}" readonly disabled>
+
+      <button class="btn btn-danger" (click)="execPlanService.deleteCurrentStep()"><i class="bi bi-trash"></i></button>
+    </div>
+  </div>
+  
+  @for(prestep of step.preSteps; track prestep) {
+    <div class="col-6">
+	  <div class="input-group mb-3 ">
+          <span class="input-group-text">Wait ({{execPlanService.executionPlan!.durationsType}})</span>
+		  @if(execPlanService.executionPlan!.durationsType!='FEEL') {
+          <input type="number" class="form-control" min=0 [(ngModel)]="prestep.delay">
+		  } @else {
+          <input type="text" class="form-control" [(ngModel)]="prestep.delay">
+		  }
+      </div>
+    </div>
+  }
+</div>
+} @else {
 <div class="row">
   <div class="col-8">
     <div class="input-group mb-3 ">
@@ -250,3 +275,4 @@
     </div>
   </div>
 </div>
+}

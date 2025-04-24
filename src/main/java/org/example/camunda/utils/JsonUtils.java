@@ -29,6 +29,10 @@ public class JsonUtils {
     return getObjectMapper().readTree(is);
   }
 
+  public static ObjectNode getEmptyNode() {
+    return getObjectMapper().createObjectNode();
+  }
+
   public static ObjectNode toJsonNode(String json) {
     try {
       return (ObjectNode) getObjectMapper().readTree(json);

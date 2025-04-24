@@ -168,7 +168,6 @@ public class ScenarioUtils {
   }
 
   private static long calculateTaskDuration(StepExecPlan step, InstanceContext context) {
-    LOG.warn("Computing task duration for " + step.getElementId() + " at " + context.getProgress());
     StepDuration duration = step.getDuration();
 
     long startAvg = durationToMillis(duration.getStartDesiredAvg());

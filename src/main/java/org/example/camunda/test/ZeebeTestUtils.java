@@ -286,6 +286,30 @@ public class ZeebeTestUtils {
                   }
                 })
             .open());
+
+    workers.add(
+        client
+            .newWorker()
+            .jobType("moveClock")
+            .handler(
+                new JobHandler() {
+                  @Override
+                  public void handle(JobClient client, ActivatedJob job) throws Exception {
+                    Map<String, Object> variables = job.getVariablesAsMap();
+                    String processUniqueId = (String) variables.get(Constants.UNIQUE_ID_KEY);
+                    Long processInstanceTime = ContextUtils.getProcessInstanceTime(processUniqueId);
+                    InstanceContext context = ContextUtils.getContext(processUniqueId);
+                    StepExecPlan step = context.getScenario().getSteps().get(job.getElementId());
+                    if (step != null && step.getPreSteps() != null) {
+                      for (StepAdditionalAction preStep : step.getPreSteps()) {
+                        addAdditionalStep(
+                            clock.getCurrentTime().toEpochMilli(), job, preStep, context);
+                      }
+                    }
+                    client.newCompleteCommand(job.getKey()).send();
+                  }
+                })
+            .open());
     for (String jobType : jobTypes) {
       workers.add(
           client

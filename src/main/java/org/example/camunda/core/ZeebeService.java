@@ -68,14 +68,20 @@ public class ZeebeService {
   }
 
   public void setClock(long time) {
-    try {
-      zeebeClient().newClockPinCommand().time(time).send().join();
-    } catch (CompletionException | ClientException e) {
-      zeebeClient(true).newClockPinCommand().time(time).send();
-    }
-    FeelUtils.setClock(time);
-    ContextUtils.setEngineTime(time);
+    setClock(time, false);
   }
+
+  private void setClock(long time, boolean recreateClient) {
+    try {
+      ContextUtils.setEngineTime(time);
+      FeelUtils.setClock(time);
+      zeebeClient(recreateClient).newClockPinCommand().time(time).send().join();
+    } catch (CompletionException | ClientException e) {
+      setClock(time, true);
+    }
+  }
+
+
 
   public void stop() {
     zeebeClient().newClockResetCommand().send().join();
@@ -234,7 +240,6 @@ public class ZeebeService {
 
   public void incidentJob(Long jobKey, IncidentTypeEnum incident, int retryCount) {
     try {
-
       this.zeebeClient()
           .newFailCommand(jobKey)
           .retries(0)
@@ -260,25 +265,17 @@ public class ZeebeService {
   }
 
   public JobWorker createStreamingWorker(String jobType, JobHandler jobHandler) {
-    // this.zeebeClient().newProcessInstanceQuery().filter(f ->
-    // f.active(true)).send().join()FlownodeInstanceQuery()
-    //                  .filter(f -> f.state("Activated")).send()*/
-    JobWorker worker =
-        this.zeebeClient()
+    return this.zeebeClient()
             .newWorker()
             .jobType(jobType)
             .handler(jobHandler)
             .name(jobType)
-            .maxJobsActive(30)
-            // .timeout(1000)
+            .timeout(Duration.ofDays(30))//avoid requesting multiple time the same task
             // .requestTimeout(Duration.ofMillis(500))
             // .streamTimeout()
             .streamEnabled(true)
             // .streamTimeout(Duration.ofMinutes())
-
             .open();
-
-    return worker;
   }
 
   @PostConstruct

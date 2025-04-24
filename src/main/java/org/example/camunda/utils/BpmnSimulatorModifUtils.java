@@ -1,5 +1,7 @@
 package org.example.camunda.utils;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import org.example.camunda.Constants;
@@ -11,7 +13,9 @@ import org.w3c.dom.NodeList;
 
 public class BpmnSimulatorModifUtils {
 
-  private static Map<String, Map<String, String>> planXmls = new HashMap<>();
+  private static final Map<String, Map<String, String>> originalBpmnContents = new HashMap<>();
+
+  private static SimpleDateFormat sdf = new SimpleDateFormat("DDHHmm");
 
   public static void prepareSimulation(ExecutionPlan plan) {
     keepOriginals(plan);
@@ -19,6 +23,7 @@ public class BpmnSimulatorModifUtils {
     propagateUniqueIdIfNecessary(plan);
     removeLinkedForms(plan);
     addProcessEndListener(plan);
+    addTimerIntermediateCatchListener(plan);
   }
 
   private static void addProcessEndListener(ExecutionPlan plan) {
@@ -28,7 +33,7 @@ public class BpmnSimulatorModifUtils {
     for (int i = 0; i < processes.getLength(); i++) {
       Node process = processes.item(i);
       String id = BpmnUtils.getAttribute(process, "id");
-      if (plan.getName().startsWith(id)) {
+      if (plan.getName().startsWith(id) || processes.getLength()==1) {
         NodeList extensionElements =
             ((Element) process).getElementsByTagName("bpmn:extensionElements");
         Element extension = null;
@@ -54,13 +59,11 @@ public class BpmnSimulatorModifUtils {
         }
         Element startEventListener = doc.createElement("zeebe:executionListener");
         startEventListener.setAttribute("eventType", "start");
-        startEventListener.setAttribute("retries", "3");
         startEventListener.setAttribute("type", "startEventListener");
         execListener.appendChild(startEventListener);
 
         Element processTerminatedListener = doc.createElement("zeebe:executionListener");
         processTerminatedListener.setAttribute("eventType", "end");
-        processTerminatedListener.setAttribute("retries", "3");
         processTerminatedListener.setAttribute("type", "processTerminated");
         execListener.appendChild(processTerminatedListener);
       }
@@ -68,14 +71,64 @@ public class BpmnSimulatorModifUtils {
     plan.setXml(BpmnUtils.getXmlContent(doc));
   }
 
-  public static void keepOriginals(ExecutionPlan plan) {
-    if (!planXmls.containsKey(plan.getDefinition().getBpmnProcessId())) {
-      planXmls.put(plan.getDefinition().getBpmnProcessId(), new HashMap<>());
-    }
-    planXmls.get(plan.getDefinition().getBpmnProcessId()).put("0", plan.getXml());
+  public static void addTimerIntermediateCatchListener(ExecutionPlan plan) {
+    plan.setXml(addTimerIntermediateCatchListener(plan.getXml()));
     if (plan.getXmlDependencies() != null) {
       for (String dep : plan.getXmlDependencies().keySet()) {
-        planXmls
+        plan.getXmlDependencies()
+                .put(dep, addTimerIntermediateCatchListener(plan.getXmlDependencies().get(dep)));
+      }
+    }
+  }
+  public static String addTimerIntermediateCatchListener(String xmlContent) {
+    Document doc = BpmnUtils.getXmlDocument(xmlContent);
+    NodeList intermediateCatchEvents = doc.getElementsByTagName("bpmn:intermediateCatchEvent");
+    for (int i = 0; i < intermediateCatchEvents.getLength(); i++) {
+      Node catchEvent = intermediateCatchEvents.item(i);
+      NodeList timerEventDefinitions = ((Element) catchEvent).getElementsByTagName("bpmn:timerEventDefinition");
+      if (timerEventDefinitions.getLength()>0) {
+        //we have a timer
+
+        NodeList extensionElements =
+                ((Element) catchEvent).getElementsByTagName("bpmn:extensionElements");
+        Element extension = null;
+        for (int u = 0; u < extensionElements.getLength(); u++) {
+          Node extensionElement = extensionElements.item(u);
+          if (extensionElement.getParentNode().equals(catchEvent)) {
+            extension = (Element) extensionElement;
+          }
+        }
+        if (extension == null) {
+          extension = doc.createElement("bpmn:extensionElements");
+          Element proc = (Element) catchEvent;
+          Node firstChild = proc.getFirstChild();
+          proc.insertBefore(extension, firstChild);
+        }
+        NodeList executionListeners = extension.getElementsByTagName("bpmn:executionListeners");
+        Element execListener = null;
+        if (executionListeners.getLength() == 0) {
+          execListener = doc.createElement("zeebe:executionListeners");
+          extension.appendChild(execListener);
+        } else {
+          execListener = (Element) executionListeners.item(0);
+        }
+        Element startEventListener = doc.createElement("zeebe:executionListener");
+        startEventListener.setAttribute("eventType", "start");
+        startEventListener.setAttribute("type", "moveClock");
+        execListener.appendChild(startEventListener);
+      }
+    }
+    return BpmnUtils.getXmlContent(doc);
+  }
+
+  public static void keepOriginals(ExecutionPlan plan) {
+    if (!originalBpmnContents.containsKey(plan.getDefinition().getBpmnProcessId())) {
+      originalBpmnContents.put(plan.getDefinition().getBpmnProcessId(), new HashMap<>());
+    }
+    originalBpmnContents.get(plan.getDefinition().getBpmnProcessId()).put("0", plan.getXml());
+    if (plan.getXmlDependencies() != null) {
+      for (String dep : plan.getXmlDependencies().keySet()) {
+        originalBpmnContents
             .get(plan.getDefinition().getBpmnProcessId())
             .put(dep, plan.getXmlDependencies().get(dep));
       }
@@ -83,17 +136,18 @@ public class BpmnSimulatorModifUtils {
   }
 
   public static void revertToInitial(ExecutionPlan plan) {
-    plan.setXml(planXmls.get(plan.getDefinition().getBpmnProcessId()).get("0"));
+    plan.setXml(originalBpmnContents.get(plan.getDefinition().getBpmnProcessId()).get("0"));
     if (plan.getXmlDependencies() != null) {
       for (String dep : plan.getXmlDependencies().keySet()) {
         plan.getXmlDependencies()
-            .put(dep, planXmls.get(plan.getDefinition().getBpmnProcessId()).get(dep));
+            .put(dep, originalBpmnContents.get(plan.getDefinition().getBpmnProcessId()).get(dep));
       }
     }
   }
 
   public static String fakeConnectorsAndWorkers(String xml) {
-    return xml.replaceAll("taskDefinition type=\"", "taskDefinition type=\"datasimulator.");
+    String dynamicId = sdf.format(new Date());
+    return xml.replaceAll("taskDefinition type=\"", "taskDefinition type=\"datasimulator"+dynamicId+".");
   }
 
   public static void fakeConnectorsAndWorkers(ExecutionPlan plan) {

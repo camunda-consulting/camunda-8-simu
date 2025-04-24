@@ -170,19 +170,28 @@ export class ViewerComponent implements AfterViewInit, OnInit {
 
   findOrigins(intermediateCatchEvent: any): string[] {
     let result: string[] = [];
-    for (let incoming of intermediateCatchEvent.incoming) {
-      if (incoming.sourceRef.$type == 'bpmn:ServiceTask' || incoming.sourceRef.$type == 'bpmn:UserTask') {
-        result.push(incoming.sourceRef);
-      } else {
-        result = result.concat(this.findOrigins(incoming.sourceRef));
+	if (intermediateCatchEvent.incoming) {
+      for (let incoming of intermediateCatchEvent.incoming) {
+	    if (this.loopControl.indexOf(incoming.sourceRef.id)<0) {
+	      console.log(incoming.sourceRef);
+	      this.loopControl.push(incoming.sourceRef.id);
+          if (incoming.sourceRef.$type == 'bpmn:ServiceTask' || incoming.sourceRef.$type == 'bpmn:UserTask') {
+            result.push(incoming.sourceRef);
+          } else {
+            result = result.concat(this.findOrigins(incoming.sourceRef));
+          }
+	    }
       }
-    }
+	}
     return result;
   }
 
+  loopControl:string[]=[];
   opennewstepModal() {
-    this.origins = []
+    this.origins = [];
+    this.loopControl=[this.selectedElt.id];
     if (this.selectedElt.type == 'bpmn:IntermediateCatchEvent') {
+	  console.log(this.selectedElt);
       this.origins = this.findOrigins(this.selectedElt.businessObject);
       if (this.origins && this.origins.length > 0) {
         this.intermediateCatchEventSource = this.origins[0].id;
@@ -220,16 +229,20 @@ export class ViewerComponent implements AfterViewInit, OnInit {
       else {
         alert('Implementation for the type ' + type + ' is missing.');
       }
-    } else if (this.selectedElt.type == 'bpmn:IntermediateCatchEvent') {
+    } else if (this.selectedElt.type == 'bpmn:IntermediateCatchEvent' && this.selectedElt.businessObject.eventDefinitions[0].$type == 'bpmn:TimerEventDefinition') {
+	  //manage clock intermediate catch event with a specific step.
+	  let timer = this.selectedElt.businessObject.eventDefinitions[0].timeDuration.body;
+      this.execPlanService.createClockStepInScenario(this.selectedElt.id, timer);
+	} else if (this.selectedElt.type == 'bpmn:IntermediateCatchEvent') {
       let type = this.selectedElt.businessObject.eventDefinitions[0].$type;
 
       if (type == 'bpmn:MessageEventDefinition') {
         let messageRef = this.selectedElt.businessObject.eventDefinitions[0].messageRef;
         this.execPlanService.createPostStepInScenario(this.intermediateCatchEventSource, 'MSG', messageRef, 3600);
-      } else if (type == 'bpmn:TimerEventDefinition') {
+      } /*else if (type == 'bpmn:TimerEventDefinition') {
         let timer = this.selectedElt.businessObject.eventDefinitions[0].timeDuration.body;
         this.execPlanService.createPostStepInScenario(this.intermediateCatchEventSource, 'CLOCK', null, timer);
-      } else if (type == 'bpmn:ErrorEventDefinition') {
+      }*/ else if (type == 'bpmn:ErrorEventDefinition') {
         let errorRef = this.selectedElt.businessObject.eventDefinitions[0].errorRef;
         this.execPlanService.createPostStepInScenario(this.intermediateCatchEventSource, 'BPMN_ERROR', errorRef, 1);
       } else if (type == 'bpmn:SignalEventDefinition') {
@@ -389,26 +402,4 @@ export class ViewerComponent implements AfterViewInit, OnInit {
       });
     }
   }
-
-  prettifyXml(sourceXml: string): string {
-    var xmlDoc = new DOMParser().parseFromString(sourceXml, 'application/xml');
-    var xsltDoc = new DOMParser().parseFromString([
-      `<xsl:stylesheet version="1.0"
- xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
- <xsl:output method="xml" omit-xml-declaration="yes" indent="yes"/>
-
- <xsl:template match="node()|@*">
-  <xsl:copy>
-   <xsl:apply-templates select="node()|@*"/>
-  </xsl:copy>
- </xsl:template>
-</xsl:stylesheet>`,
-    ].join('\n'), 'application/xml');
-
-    var xsltProcessor = new XSLTProcessor();
-    xsltProcessor.importStylesheet(xsltDoc);
-    var resultDoc = xsltProcessor.transformToDocument(xmlDoc);
-    var resultXml = new XMLSerializer().serializeToString(resultDoc);
-    return resultXml;
-  };
 }
