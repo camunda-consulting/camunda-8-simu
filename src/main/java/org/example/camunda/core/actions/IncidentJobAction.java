@@ -29,8 +29,10 @@ public class IncidentJobAction extends Action {
 
   @Override
   public void run() {
-    ContextUtils.setProcessInstanceTime((String) variables.get(Constants.UNIQUE_ID_KEY), time);
+    String uniqueId = (String) variables.get(Constants.UNIQUE_ID_KEY);
+    ContextUtils.setProcessInstanceTime(uniqueId, time);
     this.getZeebeService().incidentJob(this.jobKey, incident);
+    ContextUtils.instanceResolved(uniqueId, true);//TODO: we should be able to define a resolution procedure in the scenario
   }
 
   @Override

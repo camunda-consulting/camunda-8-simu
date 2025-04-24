@@ -180,9 +180,35 @@ export class ExecPlanService {
     };
     this.selectActivity(elementId);
   }
+  
+  
+  createClockStepInScenario(elementId: string, time: string): void {
+    this.scenario.steps[elementId] = {
+      "elementId": elementId,
+      "action": "DO_NOTHING",
+      "duration": {
+        "startDesiredAvg": "CLOCK",
+        "endDesiredAvg": "CLOCK",
+        "minMaxPercent": 0,
+        "avgProgression": "LINEAR",
+        "progressionSalt": 0
+      },
+      "jsonTemplate": {
+        template: "{}", exampleContext: {}
+      },
+	  "preSteps": []
+    };
+    this.scenario.steps[elementId].preSteps.push({
+        "type": "CLOCK",
+        "delay": time
+    });
+    this.selectActivity(elementId);
+  }
+  
   isNumber(value: any) {
-  return typeof value === 'number';
-}
+    return typeof value === 'number';
+  }
+  
   createPreStepInScenario(parentStep: string, type: string, elementRef: any, time: any): void {
     if (this.isNumber(time)) {
       time = this.createDuration(time);

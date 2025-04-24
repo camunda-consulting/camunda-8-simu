@@ -21,7 +21,7 @@
         <h5 class="modal-title">Prepare step</h5>
         <button type="button" class="btn-close" (click)="closenewstepModal()"></button>
       </div>
-	  @if(selectedElt && selectedElt.type!=='bpmn:IntermediateCatchEvent' &&  selectedElt.type!=='bpmn:BoundaryEvent') {
+	  @if(selectedElt && (selectedElt.type!=='bpmn:IntermediateCatchEvent' || selectedElt.businessObject.eventDefinitions[0].$type=='bpmn:TimerEventDefinition') &&  selectedElt.type!=='bpmn:BoundaryEvent') {
       <div class="modal-body">
         Do you want to add a step for {{selectedElt.id}} into the current scenario ?
       </div>
