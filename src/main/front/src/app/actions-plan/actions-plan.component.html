@@ -11,36 +11,26 @@
   </li>
 </ul>
 <div *ngIf="state=='general'" class="tab-pane scrollable">
-<!--
   <div class="input-group mb-3">
-    <span class="input-group-text" id="basic-addon1">Milliseconds Idle time before next clock move</span>
-    <input type="number" class="form-control" [(ngModel)]="execPlanService.executionPlan!.idleTimeBeforeClockMove">
-  </div>
-  -->
-  <div class="input-group mb-3">
-    <span class="input-group-text" id="basic-addon1">Time precision</span>
-    <select class="form-select" [(ngModel)]="execPlanService.executionPlan!.timePrecision">
-      <option selected>Choose...</option>
-      <option value="SECOND">SECOND</option>
-      <option value="HUNDRED_MILLIS">HUNDRED_MILLIS</option>
-      <option value="TEN_MILLIS">TEN_MILLIS</option>
-      <option value="MILLIS">MILLIS</option>
-    </select>
-  </div>
-  <div class="input-group mb-3">
-    <span class="input-group-text" id="basic-addon1">Instance distribution</span>
+    <span class="input-group-text">Instance distribution</span>
     <select class="form-select" [(ngModel)]="execPlanService.executionPlan!.instanceDistribution">
       <option selected>Choose...</option>
       <option value="DAYS">DAYS</option>
       <option value="HALF_DAYS">HALF_DAYS</option>
       <option value="HOURS">HOURS</option>
-	  <!--
-      <option value="MINUTES">MINUTES</option>
-	  -->
     </select>
   </div>
   <div class="input-group mb-3">
-    <span class="input-group-text" id="basic-addon1">Duration expression type</span>
+    <span class="input-group-text">Execution plan stops</span>
+    <select class="form-select" [(ngModel)]="execPlanService.executionPlan!.executionEnd">
+      <option selected>Choose...</option>
+      <option value="NOW">Now (instances pending)</option>
+      <option value="NOW_CANCEL_REMAINING">Now (cancel pending instances)</option>
+      <option value="COMPLETE_ALL_INSTANCES">All pending instances will complete (even in the future)</option>
+    </select>
+  </div>
+  <div class="input-group mb-3">
+    <span class="input-group-text">Duration expression type</span>
     <select class="form-select" [(ngModel)]="execPlanService.executionPlan!.durationsType">
       <option selected>Choose...</option>
       <option value="FEEL">FEEL</option>
@@ -49,7 +39,7 @@
     </select>
   </div>
   <div class="input-group mb-3">
-    <span class="input-group-text" id="basic-addon1">Steps label</span>
+    <span class="input-group-text">Steps label</span>
     <select class="form-select" [(ngModel)]="execPlanService.executionPlan!.stepLabel">
       <option selected>Choose...</option>
       <option value="id">id</option>
