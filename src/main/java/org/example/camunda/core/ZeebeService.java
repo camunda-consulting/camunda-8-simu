@@ -81,8 +81,6 @@ public class ZeebeService {
     }
   }
 
-
-
   public void stop() {
     zeebeClient().newClockResetCommand().send().join();
   }
@@ -215,7 +213,11 @@ public class ZeebeService {
 
   public void completeJob(Long jobKey, JsonNode variables, int retryCount) {
     try {
-      this.zeebeClient().newCompleteCommand(jobKey).variables(variables).send().join();
+      if (variables != null) {
+        this.zeebeClient().newCompleteCommand(jobKey).variables(variables).send().join();
+      } else {
+        this.zeebeClient().newCompleteCommand(jobKey).send().join();
+      }
     } catch (ClientException e) {
       if (e instanceof ClientStatusException
               && (((ClientStatusException) e).getStatus().getCode() == Status.Code.NOT_FOUND)
@@ -266,16 +268,16 @@ public class ZeebeService {
 
   public JobWorker createStreamingWorker(String jobType, JobHandler jobHandler) {
     return this.zeebeClient()
-            .newWorker()
-            .jobType(jobType)
-            .handler(jobHandler)
-            .name(jobType)
-            .timeout(Duration.ofDays(30))//avoid requesting multiple time the same task
-            // .requestTimeout(Duration.ofMillis(500))
-            // .streamTimeout()
-            .streamEnabled(true)
-            // .streamTimeout(Duration.ofMinutes())
-            .open();
+        .newWorker()
+        .jobType(jobType)
+        .handler(jobHandler)
+        .name(jobType)
+        .timeout(Duration.ofDays(30)) // avoid requesting multiple time the same task
+        // .requestTimeout(Duration.ofMillis(500))
+        // .streamTimeout()
+        .streamEnabled(true)
+        // .streamTimeout(Duration.ofMinutes())
+        .open();
   }
 
   @PostConstruct

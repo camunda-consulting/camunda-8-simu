@@ -25,10 +25,12 @@ public class ContextUtils {
   private static final SortedMap<Long, Map<String, List<Action>>> timedActions = new TreeMap<>();
   private static final Map<String, InstanceContext> processInstanceScenarioMap = new HashMap<>();
   private static final Map<String, Long> uniqueKeyToInstanceKey = new HashMap<>();
+  private static JobWorker terminationWorker = null;
   private static final List<JobWorker> activeWorkers = new ArrayList<>();
 
   @Getter
-  private static final Map<String, List<StepExecPlan>> intermediateClockCalculations = new HashMap<>();
+  private static final Map<String, List<StepExecPlan>> intermediateClockCalculations =
+      new HashMap<>();
 
   public static void addInstancesToStart(
       long time, Scenario scenario, Long nbInstances, double progress) {
@@ -64,6 +66,10 @@ public class ContextUtils {
 
   public static void addWorker(JobWorker worker) {
     activeWorkers.add(worker);
+  }
+
+  public static void addTerminationWorker(JobWorker processTerminated) {
+    terminationWorker = processTerminated;
   }
 
   public static void addTime(long time, String uniqueId) {
@@ -134,6 +140,16 @@ public class ContextUtils {
       worker.close();
     }
     activeWorkers.clear();
+    if (terminationWorker != null) {
+      new Thread(
+          () -> {
+            // we differ termination worker closing to avoid having completed instances marked as
+            // waiting.
+            ThreadUtils.pause(5000);
+            terminationWorker.close();
+            terminationWorker = null;
+          });
+    }
   }
 
   public static void endPlan() {
@@ -257,19 +273,19 @@ public class ContextUtils {
     return avgStepDuration.get(step + scenario + progress);
   }
 
-
   public static void addIntermediateClockCalculation(String processUniqueId, StepExecPlan step) {
     addDeleteClock(processUniqueId, step);
   }
 
   public static void removeIntermediateClockCalculation(Collection<String> processUniqueIds) {
-    for(String id : processUniqueIds) {
+    for (String id : processUniqueIds) {
       addDeleteClock(id, null);
     }
   }
-  //if step is null, the entry will be deleted
+
+  // if step is null, the entry will be deleted
   private static synchronized void addDeleteClock(String processUniqueId, StepExecPlan step) {
-    if (step==null) {
+    if (step == null) {
       intermediateClockCalculations.remove(processUniqueId);
     } else {
       if (!intermediateClockCalculations.containsKey(processUniqueId)) {

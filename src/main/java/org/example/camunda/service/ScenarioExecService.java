@@ -60,7 +60,7 @@ public class ScenarioExecService {
   }
 
   public void start(ExecutionPlan plan, String scenarioName) {
-    if (plan.getExecutionEnd()==null) {
+    if (plan.getExecutionEnd() == null) {
       plan.setExecutionEnd(ExecutionEnd.NOW);
     }
     // we deploy faked connectors and workers to not be disturbed by connectors and custom demo
@@ -81,7 +81,7 @@ public class ScenarioExecService {
                 stop();
               }
             })
-            .start();
+        .start();
   }
 
   private void prepareWorkers(ExecutionPlan plan) {
@@ -91,144 +91,144 @@ public class ScenarioExecService {
         jobTypes.addAll(BpmnUtils.getJobTypes(xml));
       }
     }
+    ContextUtils.addTerminationWorker(
+        this.zeebeService.createStreamingWorker(
+            "processTerminated",
+            new JobHandler() {
+              @Override
+              public void handle(JobClient client, ActivatedJob job) throws Exception {
+                Map<String, Object> variables = job.getVariablesAsMap();
+                String processUniqueId = (String) variables.get(Constants.UNIQUE_ID_KEY);
+                ContextUtils.instanceResolved(processUniqueId, true);
+                zeebeService.completeJob(job.getKey(), null);
+              }
+            }));
     ContextUtils.addWorker(
-            this.zeebeService.createStreamingWorker(
-                    "processTerminated",
-                    new JobHandler() {
-                      @Override
-                      public void handle(JobClient client, ActivatedJob job) throws Exception {
-                        Map<String, Object> variables = job.getVariablesAsMap();
-                        String processUniqueId = (String) variables.get(Constants.UNIQUE_ID_KEY);
-                        ContextUtils.instanceResolved(processUniqueId, true);
-                        client.newCompleteCommand(job.getKey()).send();
-                      }
-                    }));
+        this.zeebeService.createStreamingWorker(
+            "startEventListener",
+            new JobHandler() {
+              @Override
+              public void handle(JobClient client, ActivatedJob job) throws Exception {
+                Map<String, Object> variables = job.getVariablesAsMap();
+                String processUniqueId = (String) variables.get(Constants.UNIQUE_ID_KEY);
+                ContextUtils.addInstanceKey(processUniqueId, job.getProcessInstanceKey());
+                client.newCompleteCommand(job.getKey()).send();
+              }
+            }));
     ContextUtils.addWorker(
-            this.zeebeService.createStreamingWorker(
-                    "startEventListener",
-                    new JobHandler() {
-                      @Override
-                      public void handle(JobClient client, ActivatedJob job) throws Exception {
-                        Map<String, Object> variables = job.getVariablesAsMap();
-                        String processUniqueId = (String) variables.get(Constants.UNIQUE_ID_KEY);
-                        ContextUtils.addInstanceKey(processUniqueId, job.getProcessInstanceKey());
-                        client.newCompleteCommand(job.getKey()).send();
-                      }
-                    }));
-    ContextUtils.addWorker(
-            this.zeebeService.createStreamingWorker(
-                    "moveClock",
-                    new JobHandler() {
-                      @Override
-                      public void handle(JobClient client, ActivatedJob job) throws Exception {
-                        waitingTimeBetweenActions = 200;
-                        zeebeService.completeJob(job.getKey(), JsonUtils.getEmptyNode());
-                        Map<String, Object> variables = job.getVariablesAsMap();
-                        String processUniqueId = (String) variables.get(Constants.UNIQUE_ID_KEY);
-                        InstanceContext context = ContextUtils.getContext(processUniqueId);
-                        if (context == null) {
-                          LOG.error(
-                                  "Not retrieving context for "
-                                          + processUniqueId
-                                          + " for process instance "
-                                          + job.getProcessInstanceKey());
-                        } else {
-                          StepExecPlan step = context.getScenario().getSteps().get(job.getElementId());
-                          Long processInstanceTime = ContextUtils.getProcessInstanceTime(processUniqueId);
-                          // in case, the listener closes before anything else, move the clock based on
-                          // current time first
-                          prepareClockMove(processUniqueId, step, processInstanceTime);
-                          // if some other calculations move the clock while the listeneris completing, we
-                          // move the clock further
-                          ContextUtils.addIntermediateClockCalculation(processUniqueId, step);
-                        }
-                      }
-                    }));
+        this.zeebeService.createStreamingWorker(
+            "moveClock",
+            new JobHandler() {
+              @Override
+              public void handle(JobClient client, ActivatedJob job) throws Exception {
+                waitingTimeBetweenActions = 200;
+                zeebeService.completeJob(job.getKey(), JsonUtils.getEmptyNode());
+                Map<String, Object> variables = job.getVariablesAsMap();
+                String processUniqueId = (String) variables.get(Constants.UNIQUE_ID_KEY);
+                InstanceContext context = ContextUtils.getContext(processUniqueId);
+                if (context == null) {
+                  LOG.error(
+                      "Not retrieving context for "
+                          + processUniqueId
+                          + " for process instance "
+                          + job.getProcessInstanceKey());
+                } else {
+                  StepExecPlan step = context.getScenario().getSteps().get(job.getElementId());
+                  Long processInstanceTime = ContextUtils.getProcessInstanceTime(processUniqueId);
+                  // in case, the listener closes before anything else, move the clock based on
+                  // current time first
+                  prepareClockMove(processUniqueId, step, processInstanceTime);
+                  // if some other calculations move the clock while the listeneris completing, we
+                  // move the clock further
+                  ContextUtils.addIntermediateClockCalculation(processUniqueId, step);
+                }
+              }
+            }));
     for (String jobType : jobTypes) {
       ContextUtils.addWorker(
-              this.zeebeService.createStreamingWorker(
-                      jobType,
-                      new JobHandler() {
-                        @Override
-                        public void handle(JobClient client, ActivatedJob job) throws Exception {
-                          if (ContextUtils.checkAlreadyReceived(job.getKey())) {
-                            return;
-                          }
-                          Map<String, Object> variables = job.getVariablesAsMap();
-                          String processUniqueId = (String) variables.get(Constants.UNIQUE_ID_KEY);
-                          Long processInstanceTime = ContextUtils.getProcessInstanceTime(processUniqueId);
+          this.zeebeService.createStreamingWorker(
+              jobType,
+              new JobHandler() {
+                @Override
+                public void handle(JobClient client, ActivatedJob job) throws Exception {
+                  if (ContextUtils.checkAlreadyReceived(job.getKey())) {
+                    return;
+                  }
+                  Map<String, Object> variables = job.getVariablesAsMap();
+                  String processUniqueId = (String) variables.get(Constants.UNIQUE_ID_KEY);
+                  Long processInstanceTime = ContextUtils.getProcessInstanceTime(processUniqueId);
 
-                          InstanceContext context = ContextUtils.getContext(processUniqueId);
-                          if (context == null) {
-                            LOG.error(
-                                    "Not retrieving context for "
-                                            + processUniqueId
-                                            + " for process instance "
-                                            + job.getProcessInstanceKey());
-                          } else {
-                            StepExecPlan step = context.getScenario().getSteps().get(job.getElementId());
-                            if (step == null) {
-                              LOG.error(
-                                      "Not retrieving step "
-                                              + job.getElementId()
-                                              + " for scenario"
-                                              + context.getScenario().getName()
-                                              + " related to process instance "
-                                              + job.getProcessInstanceKey()
-                                              + " and unique identifier "
-                                              + variables.get(Constants.UNIQUE_ID_KEY));
-                              return;
-                            }
-                            if (step.getPreSteps() != null) {
-                              for (StepAdditionalAction preStep : step.getPreSteps()) {
-                                // pre steps are calculated after current engine time (before completion
-                                // time)
-                                addAdditionalStep(processInstanceTime, job, preStep);
-                              }
-                            }
-                            // main step action
-                            long mainTargetTime =
-                                    processInstanceTime + ScenarioUtils.getTaskDuration(step, context);
+                  InstanceContext context = ContextUtils.getContext(processUniqueId);
+                  if (context == null) {
+                    LOG.error(
+                        "Not retrieving context for "
+                            + processUniqueId
+                            + " for process instance "
+                            + job.getProcessInstanceKey());
+                  } else {
+                    StepExecPlan step = context.getScenario().getSteps().get(job.getElementId());
+                    if (step == null) {
+                      LOG.error(
+                          "Not retrieving step "
+                              + job.getElementId()
+                              + " for scenario"
+                              + context.getScenario().getName()
+                              + " related to process instance "
+                              + job.getProcessInstanceKey()
+                              + " and unique identifier "
+                              + variables.get(Constants.UNIQUE_ID_KEY));
+                      return;
+                    }
+                    if (step.getPreSteps() != null) {
+                      for (StepAdditionalAction preStep : step.getPreSteps()) {
+                        // pre steps are calculated after current engine time (before completion
+                        // time)
+                        addAdditionalStep(processInstanceTime, job, preStep);
+                      }
+                    }
+                    // main step action
+                    long mainTargetTime =
+                        processInstanceTime + ScenarioUtils.getTaskDuration(step, context);
 
-                            if (mainTargetTime > System.currentTimeMillis()
-                                    && ContextUtils.getPlan().getExecutionEnd()
-                                    != ExecutionEnd.COMPLETE_ALL_INSTANCES) {
-                              if (ContextUtils.getPlan().getExecutionEnd() == ExecutionEnd.NOW) {
-                                //we mark instance as resolved so it will not be canceled.
-                                ContextUtils.instanceResolved(processUniqueId, false);
-                              }
-                            } else {
-                              if (step.getAction() == StepActionEnum.INCIDENT) {
-                                ContextUtils.addAction(
-                                        mainTargetTime,
-                                        new IncidentJobAction(
-                                                job.getKey(),
-                                                step.getIncident(),
-                                                variables,
-                                                zeebeService,
-                                                mainTargetTime));
-                              } else if (step.getAction() == StepActionEnum.COMPLETE) {
-                                ContextUtils.addAction(
-                                        mainTargetTime,
-                                        new CompleteJobAction(
-                                                job.getKey(),
-                                                step.getJsonTemplate().getTemplate(),
-                                                job.getVariablesAsMap(),
-                                                zeebeService,
-                                                mainTargetTime));
-                                // post steps are only managed when main action will complete. Typically
-                                // intermediate catch event coming after.
-                                if (step.getPostSteps() != null) {
-                                  for (StepAdditionalAction postStep : step.getPostSteps()) {
-                                    // post steps are calculated after completion time
-                                    addAdditionalStep(mainTargetTime, job, postStep);
-                                  }
-                                }
-                              }
-                            }
+                    if (mainTargetTime > System.currentTimeMillis()
+                        && ContextUtils.getPlan().getExecutionEnd()
+                            != ExecutionEnd.COMPLETE_ALL_INSTANCES) {
+                      if (ContextUtils.getPlan().getExecutionEnd() == ExecutionEnd.NOW) {
+                        // we mark instance as resolved so it will not be canceled.
+                        ContextUtils.instanceResolved(processUniqueId, false);
+                      }
+                    } else {
+                      if (step.getAction() == StepActionEnum.INCIDENT) {
+                        ContextUtils.addAction(
+                            mainTargetTime,
+                            new IncidentJobAction(
+                                job.getKey(),
+                                step.getIncident(),
+                                variables,
+                                zeebeService,
+                                mainTargetTime));
+                      } else if (step.getAction() == StepActionEnum.COMPLETE) {
+                        ContextUtils.addAction(
+                            mainTargetTime,
+                            new CompleteJobAction(
+                                job.getKey(),
+                                step.getJsonTemplate().getTemplate(),
+                                job.getVariablesAsMap(),
+                                zeebeService,
+                                mainTargetTime));
+                        // post steps are only managed when main action will complete. Typically
+                        // intermediate catch event coming after.
+                        if (step.getPostSteps() != null) {
+                          for (StepAdditionalAction postStep : step.getPostSteps()) {
+                            // post steps are calculated after completion time
+                            addAdditionalStep(mainTargetTime, job, postStep);
                           }
                         }
-                      }));
+                      }
+                    }
+                  }
+                }
+              }));
     }
   }
 
@@ -236,9 +236,10 @@ public class ScenarioExecService {
     Map<String, Object> variables = job.getVariablesAsMap();
     String processUniqueId = (String) variables.get(Constants.UNIQUE_ID_KEY);
     long dateTarget = baseDate + ScenarioUtils.durationToMillis(step.getDelay());
-    if (dateTarget > System.currentTimeMillis() && ContextUtils.getPlan().getExecutionEnd()!=ExecutionEnd.COMPLETE_ALL_INSTANCES) {
+    if (dateTarget > System.currentTimeMillis()
+        && ContextUtils.getPlan().getExecutionEnd() != ExecutionEnd.COMPLETE_ALL_INSTANCES) {
       if (ContextUtils.getPlan().getExecutionEnd() == ExecutionEnd.NOW) {
-        //if we don't mark it as resolved, instance remain pending in memory and will be canceled.
+        // if we don't mark it as resolved, instance remain pending in memory and will be canceled.
         ContextUtils.instanceResolved(processUniqueId, false);
       }
     } else {
@@ -246,33 +247,33 @@ public class ScenarioExecService {
         ContextUtils.addTime(dateTarget, processUniqueId);
       } else if (step.getType() == StepActionEnum.MSG) {
         ContextUtils.addAction(
-                dateTarget,
-                new MessageAction(
-                        step.getMsg(),
-                        ScenarioUtils.getCorrelationKeyValue(variables, step.getCorrelationKey()),
-                        step.getJsonTemplate().getTemplate(),
-                        job.getVariablesAsMap(),
-                        zeebeService,
-                        dateTarget));
+            dateTarget,
+            new MessageAction(
+                step.getMsg(),
+                ScenarioUtils.getCorrelationKeyValue(variables, step.getCorrelationKey()),
+                step.getJsonTemplate().getTemplate(),
+                job.getVariablesAsMap(),
+                zeebeService,
+                dateTarget));
       } else if (step.getType() == StepActionEnum.SIGNAL) {
         ContextUtils.addAction(
-                dateTarget,
-                new SignalAction(
-                        step.getSignal(),
-                        step.getJsonTemplate().getTemplate(),
-                        job.getVariablesAsMap(),
-                        zeebeService,
-                        dateTarget));
+            dateTarget,
+            new SignalAction(
+                step.getSignal(),
+                step.getJsonTemplate().getTemplate(),
+                job.getVariablesAsMap(),
+                zeebeService,
+                dateTarget));
       } else if (step.getType() == StepActionEnum.BPMN_ERROR) {
         ContextUtils.addAction(
-                dateTarget,
-                new BpmnErrorAction(
-                        step.getErrorCode(),
-                        job.getKey(),
-                        step.getJsonTemplate().getTemplate(),
-                        job.getVariablesAsMap(),
-                        zeebeService,
-                        dateTarget));
+            dateTarget,
+            new BpmnErrorAction(
+                step.getErrorCode(),
+                job.getKey(),
+                step.getJsonTemplate().getTemplate(),
+                job.getVariablesAsMap(),
+                zeebeService,
+                dateTarget));
       }
     }
   }
@@ -298,7 +299,7 @@ public class ScenarioExecService {
     long durationInDays = ChronoUnit.DAYS.between(firstDay, lastDay) + 1;
     for (double x = 0; x < durationInDays && running; x++) {
       long nbInstancesPerDay =
-              ScenarioUtils.calculateInstancesPerDay(scenario.getEvolution(), x / durationInDays);
+          ScenarioUtils.calculateInstancesPerDay(scenario.getEvolution(), x / durationInDays);
       addInstancesWithDesiredPrecision(time, nbInstancesPerDay, scenario, x / durationInDays);
 
       time = time + 86400000;
@@ -306,9 +307,12 @@ public class ScenarioExecService {
   }
 
   private void startAndCompleteInstances(
-          long time, Scenario scenario, long nbInstances, double progress) {
+      long time, Scenario scenario, long nbInstances, double progress) {
     if (time < System.currentTimeMillis() && nbInstances > 0) {
       ThreadUtils.pause(100);
+      // each time we start a new day, we don't want to return to the future if some instances
+      // completed after today. To avoid it, we set the engine clock.
+      ContextUtils.setEngineTime(time);
       setClock(time);
       startInstances(time, nbInstances, scenario, progress);
       long lastWork = System.currentTimeMillis();
@@ -348,23 +352,23 @@ public class ScenarioExecService {
 
     for (long x = 0; x < nbInstances; x++) {
       futures.put(
-              x,
-              CompletableFuture.supplyAsync(
-                      () -> {
-                        ObjectNode variables = getVariables(scenario.getJsonTemplate().getTemplate(), null);
-                        String uniqueId = UUID.randomUUID().toString();
-                        ContextUtils.addInstance(uniqueId, scenario, progress);
-                        ContextUtils.setProcessInstanceTime(uniqueId, time);
-                        variables.put(Constants.UNIQUE_ID_KEY, uniqueId);
-                        if (InstanceStartTypeEnum.MSG == scenario.getStartType()) {
-                          this.zeebeService.message(scenario.getStartMsgName(), uniqueId, variables);
-                        } else {
-                          this.zeebeService.startProcessInstance(
-                                  scenario.getBpmnProcessId(), scenario.getVersion(), variables);
-                        }
+          x,
+          CompletableFuture.supplyAsync(
+              () -> {
+                ObjectNode variables = getVariables(scenario.getJsonTemplate().getTemplate(), null);
+                String uniqueId = UUID.randomUUID().toString();
+                ContextUtils.addInstance(uniqueId, scenario, progress);
+                ContextUtils.setProcessInstanceTime(uniqueId, time);
+                variables.put(Constants.UNIQUE_ID_KEY, uniqueId);
+                if (InstanceStartTypeEnum.MSG == scenario.getStartType()) {
+                  this.zeebeService.message(scenario.getStartMsgName(), uniqueId, variables);
+                } else {
+                  this.zeebeService.startProcessInstance(
+                      scenario.getBpmnProcessId(), scenario.getVersion(), variables);
+                }
 
-                        return true;
-                      }));
+                return true;
+              }));
     }
 
     try {
@@ -379,7 +383,7 @@ public class ScenarioExecService {
   }
 
   private void addInstancesWithDesiredPrecision(
-          long time, long nbInstancesPerDay, Scenario scenario, double progress) {
+      long time, long nbInstancesPerDay, Scenario scenario, double progress) {
     if (ContextUtils.getInstanceDistribution() == ChronoUnit.DAYS) {
       startAndCompleteInstances(time, scenario, nbInstancesPerDay, progress);
     } else if (ContextUtils.getInstanceDistribution() == ChronoUnit.HALF_DAYS) {
@@ -389,10 +393,10 @@ public class ScenarioExecService {
       // ContextUtils.addInstancesToStart(time + nextround *
       // ChronoUnit.HOURS.getDuration().toMillis(), scenario, nbInstancesPerDay / 2, progress);
       startAndCompleteInstances(
-              time + nextround * ChronoUnit.HOURS.getDuration().toMillis(),
-              scenario,
-              nbInstances,
-              progress);
+          time + nextround * ChronoUnit.HOURS.getDuration().toMillis(),
+          scenario,
+          nbInstances,
+          progress);
     } else if (ContextUtils.getInstanceDistribution() == ChronoUnit.HOURS) {
       int nbHours = scenario.getDayTimeEnd() - scenario.getDayTimeStart();
       long nbInstancesPerHour = nbInstancesPerDay / nbHours;
@@ -406,10 +410,10 @@ public class ScenarioExecService {
           // ContextUtils.addInstancesToStart(time + i * ChronoUnit.HOURS.getDuration().toMillis(),
           // scenario, nbInstances, progress);
           startAndCompleteInstances(
-                  time + i * ChronoUnit.HOURS.getDuration().toMillis(),
-                  scenario,
-                  nbInstances,
-                  progress);
+              time + i * ChronoUnit.HOURS.getDuration().toMillis(),
+              scenario,
+              nbInstances,
+              progress);
         }
       }
     } else if (ContextUtils.getInstanceDistribution() == ChronoUnit.MINUTES) {
@@ -423,10 +427,10 @@ public class ScenarioExecService {
           // ContextUtils.addInstancesToStart(time + i *
           // ChronoUnit.MINUTES.getDuration().toMillis(), scenario, nbInstances, progress);
           startAndCompleteInstances(
-                  time + i * ChronoUnit.MINUTES.getDuration().toMillis(),
-                  scenario,
-                  nbInstances,
-                  progress);
+              time + i * ChronoUnit.MINUTES.getDuration().toMillis(),
+              scenario,
+              nbInstances,
+              progress);
         }
       }
     }
@@ -461,24 +465,25 @@ public class ScenarioExecService {
       ThreadUtils.pause(300);
     } else if (diff < 2880000) {
       LOG.warn(
-              "Moving from " + ContextUtils.getEngineTime() + " to " + ContextUtils.nextTimeEntry());
+          "Moving from " + ContextUtils.getEngineTime() + " to " + ContextUtils.nextTimeEntry());
       ThreadUtils.pause(500);
     } else {
       LOG.error(
-              "Moving from " + ContextUtils.getEngineTime() + " to " + ContextUtils.nextTimeEntry());
+          "Moving from " + ContextUtils.getEngineTime() + " to " + ContextUtils.nextTimeEntry());
       ThreadUtils.pause(800);
     }
   }
 
   private void prepareClockMove(
-          String processUniqueId, StepExecPlan step, long processInstanceTime) {
+      String processUniqueId, StepExecPlan step, long processInstanceTime) {
     if (step != null && step.getPreSteps() != null) {
       for (StepAdditionalAction preStep : step.getPreSteps()) {
         long dateTarget = processInstanceTime + ScenarioUtils.durationToMillis(preStep.getDelay());
-        if (dateTarget > System.currentTimeMillis() && ContextUtils.getPlan().getExecutionEnd()!=ExecutionEnd.COMPLETE_ALL_INSTANCES) {
+        if (dateTarget > System.currentTimeMillis()
+            && ContextUtils.getPlan().getExecutionEnd() != ExecutionEnd.COMPLETE_ALL_INSTANCES) {
           LOG.warn(processUniqueId + " time move discarded");
           if (ContextUtils.getPlan().getExecutionEnd() == ExecutionEnd.NOW) {
-            //we remove instance from pending instances so it will not be canceled.
+            // we remove instance from pending instances so it will not be canceled.
             ContextUtils.instanceResolved(processUniqueId, false);
           }
         } else {
@@ -490,11 +495,11 @@ public class ScenarioExecService {
 
   public void calculateNewClockEvents() {
     Set<String> clockCalculations =
-            new HashSet<>(ContextUtils.getIntermediateClockCalculations().keySet());
+        new HashSet<>(ContextUtils.getIntermediateClockCalculations().keySet());
     while (!clockCalculations.isEmpty()) {
       for (String processUniqueId : clockCalculations) {
         List<StepExecPlan> processClocks =
-                ContextUtils.getIntermediateClockCalculations().get(processUniqueId);
+            ContextUtils.getIntermediateClockCalculations().get(processUniqueId);
         Long processInstanceTime = ContextUtils.getProcessInstanceTime(processUniqueId);
         for (StepExecPlan step : processClocks) {
           if (processInstanceTime != null) {
@@ -513,7 +518,7 @@ public class ScenarioExecService {
   public synchronized boolean nextTimedAction() {
 
     if (ContextUtils.hasTimeEntries()
-            || ContextUtils.getIntermediateClockCalculations().size() > 0) {
+        || ContextUtils.getIntermediateClockCalculations().size() > 0) {
       calculateNewClockEvents();
       ThreadUtils.pause(waitingTimeBetweenActions);
       // the timer catch event will increase that time to let the engine create the trigger after
@@ -560,12 +565,12 @@ public class ScenarioExecService {
   }
 
   public void stop() {
-    LOG.info("STOP PLAN EXEC");
+    LOG.info("STOP PLAN EXEC.");
     running = false;
     ExecutionPlan plan = ContextUtils.getPlan();
     HistoUtils.stop();
-    zeebeService.stop();
     ContextUtils.endPlan();
+    zeebeService.stop();
     /* Deploy original files again to let custom demo work as expected */
     BpmnSimulatorModifUtils.revertToInitial(plan);
     deploy(plan);
