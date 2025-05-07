@@ -164,10 +164,18 @@ public class ScenarioUtils {
       ContextUtils.addAvgStepDuration(
           step.getElementId(), context.getScenario().getName(), context.getProgress(), duration);
     }
+    if (duration < 0) {
+      if (duration < -5000) {
+        LOG.error("computing duration of " + duration + " for " + step.getElementId());
+      }
+      duration = 0L;
+    }
     return duration;
   }
 
   private static long calculateTaskDuration(StepExecPlan step, InstanceContext context) {
+    // LOG.warn("Computing task duration for " + step.getElementId() + " at " +
+    // context.getProgress());
     StepDuration duration = step.getDuration();
 
     long startAvg = durationToMillis(duration.getStartDesiredAvg());
