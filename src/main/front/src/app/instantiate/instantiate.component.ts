@@ -12,6 +12,7 @@ export class InstantiateComponent {
 
   @ViewChild('preview') preview: ElementRef | undefined;
   private chart?: Chart;
+  duplicateScenarioName: string='';
   constructor(public execPlanService: ExecPlanService) { }
 
   openStartPlanModal() {
@@ -32,5 +33,16 @@ export class InstantiateComponent {
         this.chart.update();
       }
     });
+  }
+  
+  duplicateScenarioModal():void {
+    this.duplicateScenarioName = "COPY_"+this.execPlanService.scenario!.name;
+    (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById('duplicateScenarioModal')).show();
+  }
+  
+  duplicateScenario(): void {
+    let clone = JSON.parse(JSON.stringify(this.execPlanService.scenario));
+	clone.name = this.duplicateScenarioName;
+    this.execPlanService.executionPlan.scenarii.push(clone);
   }
 }

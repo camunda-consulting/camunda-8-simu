@@ -1,10 +1,13 @@
 <div class="row">
-  <div class="col-12">
+  <div class="col-10">
     <div class="input-group mb-3">
       <span class="input-group-text">Scenario name</span>
       <input type="text" class="form-control" [(ngModel)]="execPlanService.scenario!.name">
       <button class="btn btn-primary" (click)="execPlanService.executeCurrentScenario()"><i class="bi bi-send"></i> Start scenario</button>
     </div>
+  </div>
+  <div class="col-2">
+    <button class="btn btn-dark" (click)="duplicateScenarioModal()"><i class="bi bi-copy"></i> Duplicate scenario</button>
   </div>
 </div>
 <div class="row">
@@ -139,3 +142,27 @@
       </div>
     </div>
   </div>
+
+
+<!-- duplicate page modal -->
+<div class="modal" id="duplicateScenarioModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Duplicate {{execPlanService.scenario!.name}}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        You're about to <b>duplicate {{execPlanService.scenario!.name}}</b>. Please provide a name to that new scenario :
+        <div class="input-group mb-1 ">
+          <span class="input-group-text">Scenario name</span>
+          <input type="text" class="form-control" [(ngModel)]="duplicateScenarioName">
+        </div>
+      </div>
+      <div class="modal-footer d-flex justify-content-between">
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal" aria-label="Close"><i class="bi bi-x"></i> Cancel</button>
+        <button class="btn btn-primary" (click)="duplicateScenario()" data-bs-dismiss="modal"><i class="bi bi-copy"></i> Duplicate</button>
+      </div>
+    </div>
+  </div>
+</div>
